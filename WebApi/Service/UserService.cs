@@ -29,11 +29,25 @@ public class UserService
 
     public async Task AddUser(User user)
     {
+        user.Password = _passwordHasher.HashPassword(user, user.Password);
         await _userRepository.AddUser(user);
     }
 
     public async Task UpdateUser(User user)
     {
+        if (!string.IsNullOrWhiteSpace(user.Password))
+        {
+            user.Password = _passwordHasher.HashPassword(user, user.Password);
+        }
+        else
+        {
+            var existingUser = await _userRepository.GetUserById(user.Id);
+            if (existingUser != null)
+            {
+                user.Password = existingUser.Password;
+            }
+        }
+
         await _userRepository.UpdateUser(user);
     }
 
@@ -42,14 +56,12 @@ public class UserService
         await _userRepository.DeleteUser(id);
     }
 
-    // Метод за извличане на потребител по email
     public async Task<User> GetUserByEmail(string email)
     {
         var user = await _userRepository.GetUserByEmail(email);
         return user;
     }
 
-    // Метод за проверка на имейл и парола
     public async Task<User> GetUserByEmailAndPassword(string email, string password)
     {
         var user = await _userRepository.GetUserByEmail(email);
@@ -66,7 +78,6 @@ public class UserService
         return await _userRepository.GetUsersByClubId(clubId);
     }
 
-    // Метод за обновяване на профилната снимка
     public async Task<string> UpdateUserProfilePicture(int userId, IFormFile file)
     {
         // Проверка дали файлът е предоставен
@@ -103,7 +114,6 @@ public class UserService
         return user.profileImage_url; // Връща URL на профилната снимка
     }
 
-    // Метод за получаване на URL на профилната снимка
     public async Task<string> GetUserProfilePictureUrl(int userId)
     {
         var user = await _userRepository.GetUserById(userId);
@@ -112,7 +122,6 @@ public class UserService
         return user.profileImage_url; // Връща URL на профилната снимка
     }
 
-    // Метод за получаване на самата снимка
     public async Task<FileContentResult> GetUserProfilePicture(int userId)
     {
         var user = await _userRepository.GetUserById(userId);
