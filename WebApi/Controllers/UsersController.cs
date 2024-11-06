@@ -43,21 +43,9 @@ namespace SpoerStats2.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
-            Console.WriteLine("Received password before hashing: " + user.Password); // Логиране преди хеширането
-
-            // Хеширане, ако е зададена паролата
-            if (!string.IsNullOrWhiteSpace(user.Password))
-            {
-                var passwordHasher = new PasswordHasher<User>();
-                user.Password = passwordHasher.HashPassword(user, user.Password);
-                Console.WriteLine("Hashed password: " + user.Password); // Логиране след хеширането
-            }
-
             await _userService.UpdateUser(user);
             return NoContent();
         }
-
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -76,7 +64,6 @@ namespace SpoerStats2.Controllers
             {
                 return Unauthorized();
             }
-
             return Ok(user);
         }
 
@@ -123,6 +110,7 @@ namespace SpoerStats2.Controllers
             }
             return Ok(users);
         }
+
         [HttpPost("uploadProfilePicture/{userId}")]
         public async Task<IActionResult> UploadProfilePicture(int userId, IFormFile file)
         {
