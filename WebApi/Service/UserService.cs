@@ -51,6 +51,7 @@ public class UserService
         await _userRepository.UpdateUser(user);
     }
 
+
     public async Task DeleteUser(int id)
     {
         await _userRepository.DeleteUser(id);
@@ -71,8 +72,6 @@ public class UserService
         var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
         return result == PasswordVerificationResult.Success ? user : null;
     }
-
-
     public async Task<IEnumerable<User>> GetUsersByClubId(int clubId)
     {
         return await _userRepository.GetUsersByClubId(clubId);
