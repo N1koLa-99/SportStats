@@ -7,7 +7,6 @@ using SpoerStats2.Repository;
 using SpoerStats2.Service;
 using System.Data;
 using System.Data.SqlClient;
-using System.Net.Http;
 
 namespace SpoerStats2
 {
@@ -33,11 +32,11 @@ namespace SpoerStats2
             builder.Services.AddScoped<IRoleRepository, RoleRepository>();
             builder.Services.AddScoped<IClubDisciplineRepository, ClubDisciplineRepository>();
 
-            // Add Sport services and repositories
+            // Register sports-related services and repositories
             builder.Services.AddScoped<ISportRepository, SportRepository>();
             builder.Services.AddScoped<SportService>();
 
-            // Register other services
+            // Register additional services
             builder.Services.AddScoped<RoleService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<ClubService>();
@@ -52,15 +51,15 @@ namespace SpoerStats2
             builder.Services.AddScoped<IDbConnection>(sp =>
                 new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Configure CORS
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
-                    builder =>
+                    policy =>
                     {
-                        builder.AllowAnyOrigin()
-                               .AllowAnyMethod()
-                               .AllowAnyHeader();
+                        policy.AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
                     });
             });
 
@@ -77,11 +76,11 @@ namespace SpoerStats2
             app.UseCors("AllowAll");
 
             app.UseAuthentication();
-            app.UseAuthorization(); 
+            app.UseAuthorization();
 
             app.MapControllers();
-            app.Run();
 
+            app.Run();
         }
     }
 }
