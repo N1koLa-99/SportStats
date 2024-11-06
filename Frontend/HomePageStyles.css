@@ -1,0 +1,779 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh; /* Вместо height: 100vh; */
+    width: 100vw;
+    background: 
+        linear-gradient(
+            rgba(0, 0, 0, 0.651),
+            rgba(0, 0, 0, 0.658)
+        ),
+        url('https://sportstats.blob.core.windows.net/$web/swimmingAi1.webp') no-repeat center center fixed;
+    background-size: cover;
+    animation: backgroundAnimation 15s infinite alternate;
+}
+
+
+
+@keyframes backgroundAnimation {
+    0% {
+        background-position: center center;
+    }
+    50% {
+        background-position: center top;
+    }
+    100% {
+        background-position: center center;
+    }
+}
+
+.profile-image {
+    display: block;
+    margin: 0 auto 20px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+}
+
+.info {
+    max-width: 300px;
+    background: transparent;
+    color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: 'Roboto', sans-serif;
+    margin-left: 80px;
+    padding-left: 55px;
+    padding-right: 55px;
+    margin-top: -100px;
+}
+
+.info .info-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.info .info-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 100px;
+    margin-bottom: 10px;
+}
+
+.info .info-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.info .info-col .label {
+    font-weight: 700;
+    color: #888888b0;
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.info .info-col .value {
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 28px;
+}
+
+/* Стилове за линиите под етикетите */
+.info .info-col .line {
+    height: 2px;
+    background: #ddd;
+    margin-bottom: 10px;
+    width: 120%;
+    transform: translateX(-10%);
+}
+
+/* Стилове за линиите под другите етикети */
+.info .info-section .line {
+    height: 2px;
+    background: #ddd;
+    margin-bottom: 10px;
+    width: 120%;
+    transform: translateX(-10%);
+}
+
+.info .label {
+    font-weight: 700;
+    color: #888888b0;
+    font-size: 22px; 
+    margin-bottom: 5px; 
+}
+
+.info .value {
+    font-weight: 700; 
+    color: #ffffff; 
+    font-size: 28px; 
+}
+.results {
+    flex: 1;
+    max-width: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255 255 255 / 22%);
+    color: #333;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 800px;
+    position: absolute;
+    right: 20px; 
+    margin-right: 200px;
+    margin-top: 10px;
+    overflow: auto; /* Разрешаване на скролването в този контейнер */
+    transition: transform 0.3s ease-in-out;
+}
+
+
+#resultsChart {
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: scale(0.8);
+    animation: scaleUp 1s ease-out forwards;
+}
+
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#chart-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#resultsChart {
+    max-width: 800px;
+    max-height: 250px;
+}
+
+#chart-info {
+    margin-left: 20px;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-weight: bold;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    line-height: 1.6em;
+    animation: fadeIn 2s ease-in;
+}
+
+#chart-info p {
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+#chart-info span {
+    font-weight: bold;
+    color: #1e90ff;
+}
+
+#chart-info p:last-child {
+    border-bottom: none;
+}
+
+select {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 2px solid #1e90ff;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease, transform 0.2s ease;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+select:focus {
+    border-color: #1c7ed6;
+    outline: none;
+    background-color: #e6f0ff;
+    transform: scale(1.02);
+}
+
+select::-ms-expand {
+    display: none;
+}
+
+select::after {
+    content: '▼';
+    font-size: 18px;
+    color: #1e90ff;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.form-group {
+    position: relative;
+    display: inline-block;
+}
+
+select:hover {
+    border-color: #1c7ed6;
+    background-color: #f0f8ff;
+    cursor: pointer;
+}
+
+button {
+    background: linear-gradient(to right, #1e90ff, #00d2ff);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background: linear-gradient(to right, #1c7ed6, #00aaff);
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.settings-button {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    font-size: 50px;
+    color: #ffffff;
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.settings-button:hover {
+    color: #1e90ff;
+}
+.results h2 {
+    color: white;
+ }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.points-and-rank {
+    position: fixed;
+    bottom: 7%;
+    left: 6%;
+    background: linear-gradient(135deg, #ff9900, #0c76b3);
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000; /* Ensures it's on top */
+}
+
+.points-and-rank:hover {
+    transform: scale(1.05);
+}
+
+#total-points {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+
+#rank-name {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+#total-points, #rank-name {
+    animation: fadeIn 0.5s ease-in-out;
+}
+.hidden {
+    display: none; /* Задържане на стил, ако е необходимо да се скрие */
+}
+
+.coach-button {
+    position: fixed;
+    top: 36px;
+    right: 6%;
+    font-size: 20px;
+    color: #ffffff;
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 1000;
+}
+
+.coach-button:hover {
+    color: #1e90ff;
+}
+
+@media (max-width: 1500px) {
+    .results h2 {
+       color: white;
+    }
+    .results {
+        flex: 1;
+        max-width: 50%;
+        background: rgba(255 255 255 / 22%);
+        color: #333;
+        padding: 0px;
+        border-radius: 15px;
+        text-align: center;
+        width: 90%;
+        max-width: 523px;
+        position: absolute;
+        right: 61px;
+        margin-right: 104px;
+        margin-top: -34px;
+        overflow: hidden;
+        transition: transform 0.3s ease-in-out;
+    }
+    button {
+        font-size: 13px;
+    }
+    .info{
+        max-width: 252px;
+        padding: 6px;
+        border-radius: 7px;
+        margin-left: -4px;
+        padding-left: 55px;
+        padding-right: 55px;
+        margin-top: -68px;
+    }
+    #chart-info {
+        margin-left: 22px;
+        margin-right: 22px;
+        margin-top: 20px;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-weight: bold;
+        color: #333;
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 15px;
+        line-height: 18px;
+        animation: fadeIn 2s ease-in;
+        margin-bottom: 16px
+    }
+    #resultsChart {
+        max-width: 400px;
+        max-height: 210px;
+        margin-left: 54px;
+        margin-top: -10px;
+        margin-bottom: -8px;
+        background-color: #f0f8ffd1;
+    }
+    #chart-info p {
+        margin: 6px 0;
+    }
+    info {
+        margin-top: 6px;
+    }
+    .info {
+        max-width: 234px;
+        padding: 0px;
+        border-radius: 7px;
+        margin-left: -4px;
+        padding-left: 118px;
+        padding-right: 49px;
+        margin-top: -7px;
+    }
+    image{
+        width: 125px;
+        height: 125px;
+    }
+    .info .value {
+        font-size: 24px;
+    }
+    .info .info-col .value {
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 1360) {
+    
+    .results {
+        max-width: 50%;
+        padding: 20px;
+        width: 93%;
+        max-width: 700px;
+        right: -14px;
+        margin-right: 200px;
+        margin-top: 18px;
+    }
+
+    .info{
+        max-width: 252px;
+        padding: 6px;
+        border-radius: 7px;
+
+        margin-left: -4px;
+        padding-left: 55px;
+        padding-right: 55px;
+        margin-top: -68px;
+    }
+
+    #chart-info{
+        padding: 0px;
+        font-size: 18px;
+        line-height: 10px;
+    }
+}
+
+@media (max-width: 450px) {
+    
+    .container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 0px;
+        padding-bottom: 39%;
+        width: 100vw;
+        background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)), url(https://sportstats.blob.core.windows.net/$web/SnimkaTel.jpg) no-repeat center center fixed;
+        animation: backgroundAnimation 0s infinite alternate;
+    }
+
+    select {
+        padding: 14px 11px;
+        border-radius: 29px;
+        border: 2px solid #1e90ff;
+        font-size: 16px;
+        margin-bottom: 20px;
+        margin-left: 22px;
+    }
+
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        margin-top: 40%;
+        margin-left: 60%;
+        margin-bottom: 4%;
+    }
+
+    .info {
+        width: 58%;
+        max-width: none;
+        padding: 0px;
+        margin-top: -63px;
+        margin-right: 44%;
+    }
+
+    .info-section{
+         display: table-cell;
+    }
+
+    .info .info-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .info .label, .info .value {
+        font-size: 24px;
+        margin-left: -24%;
+        margin-top: -6%;
+        padding-inline: 28px;
+    }
+
+    .info .info-col .label {
+        font-weight: 700;
+        color: #888888b0;
+        font-size: 24px;
+        margin-bottom: 15px;
+        margin-left: 15%;
+    }
+
+    .info .info-col .value {
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 22px;
+        margin-left: 99px;
+        width: 68px;
+    }
+
+    .info .info-section {
+        margin-bottom: -4px;
+        padding-bottom: 21px;
+    }
+
+    .line{
+        display: none;    }
+
+    .results h2{
+        color: white;
+        font-size: 32px;
+        font-family: cursive;
+        margin-top: 5%;
+        font-family: 'Roboto';
+    }
+
+    .results {
+        max-width: 100%;
+        padding: 13px;
+        max-width: 380px;
+        margin-top: 55%;
+        margin-right: -9%;
+        background: rgba(255, 255, 255, 0);
+    }
+
+    #chart-info {
+        margin-left: 26px;
+        margin-top: 13px;
+        padding: 20px;
+        border-radius: 38px;
+        font-size: 16px;
+        line-height: 16px;
+    }
+    #chart-info p {
+        margin: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 13px 15px;
+        border-bottom: 1px solid #ddd;
+        margin-top: -13px;
+        margin-right: -8px;
+        font-size: 14px;
+    }
+
+    #chart-info span {
+        font-weight: bold;
+        display: contents;
+        color: #1e90ff;
+    }
+
+    #resultsChart {
+        max-width: 377px;
+        max-height: 255px;
+        margin-left: 19px;
+        margin-top: -11px;
+    }
+
+    #age.value{
+        display: none;
+    }
+
+    #club.value{
+        display: none;
+    }
+
+    .info-col:nth-child(2) .label {
+        display: none;
+    }
+    .info-col:nth-child(1) .label {
+        display: none;
+    }
+    .info-section:nth-child(3) .label {
+        display: none;
+    }
+    .info-section:nth-child(4) .label {
+        display: none;
+    }
+    #last-name ~ .label {
+        display: none;
+    }
+
+    .settings-button, .coach-button {
+        font-size: 30px;
+        top: 20px;
+        right: 10px;
+    }
+
+    button {
+        border-radius: 18px;
+        padding: 13px 30px;
+        font-size: 13px;
+        margin-left: 4%;
+    }
+    #coach-button {
+        font-size: 11px;
+        top: 16px;
+        right: 49px;
+        padding: 11px;
+        background: #ffffff78;
+        border: 2px solid #000000;
+        color: black;
+    }
+}
+
+@media (max-width: 414px) {
+    
+    .results {
+        margin-top: 47%;
+        margin-right: -33px;
+    }
+    #chart-info {
+        margin-left: 26px;
+        margin-top: 13px;
+        padding: 20px;
+        border-radius: 38px;
+        font-size: 16px;
+        line-height: 17px;
+    }
+
+    .results h2{
+        font-size: 25px;
+    }
+}
+
+@media(max-width: 412px){
+    .results {
+        margin-top: 52%;
+        margin-right: -43px;
+    }
+}
+
+@media (max-width: 390px) {
+    .results {
+        margin-top: 51%;
+        margin-right: -44px;
+    }
+
+    .profile-image {
+        margin-top: 38%;
+        margin-left: 55%;
+        margin-bottom: 6%;
+    }
+
+    .info .info-col .value {
+        margin-left: 78px;
+    }
+}
+
+@media(max-width: 375px){
+    select {
+        padding: 9px 0px;
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+    #resultsChart {
+        max-width: 300px;
+        max-height: 193px;
+        margin-left: 31px;
+        margin-top: 2px;
+        margin-bottom: 5px;
+    }
+    #chart-info {
+        margin-left: 37px;
+        margin-right: 9px;
+        margin-top: 13px;
+        padding: 20px;
+        border-radius: 38px;
+        font-size: 16px;
+        line-height: 17px;
+    }
+    .profile-image {
+        margin-top: 38%;
+        margin-left: 61%;
+        margin-bottom: 5%;
+        width: 100px;
+        height: 100px;
+    }
+    .results h2 {
+        font-size: 22px;
+        margin-top: 31px;
+    }
+}
+
+@media(max-width: 361px){
+    
+    .info .info-col .value {
+        margin-left: 73px;
+    }
+
+    .select {
+        padding: 9px 0px;
+        border-radius: 11px;
+        border: 2px solid #1e90ff;
+        font-size: 14px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    #chart-info {
+        margin-left: 9px;
+        margin-right: -2px;
+        margin-top: 14px;
+        padding: 8px;
+        border-radius: 40px;
+        font-size: 13px;
+        line-height: 15px;
+    }
+
+    #chart-info p {
+        margin: 9px 0;
+    }
+
+    #resultsChart {
+        max-width: 320px;
+        max-height: 209px;
+        margin-left: 9px;
+    }
+
+    .profile-image{
+        width: 100px;
+        height: 100px;
+        margin-left: 59%;
+    }
+}
