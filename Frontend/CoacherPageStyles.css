@@ -1,0 +1,268 @@
+body {
+    font-family: 'Roboto', Arial, sans-serif; /* Модерен шрифт */
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    color: #333;
+}
+h2 {
+    color: #1878d3; /* Светло синьо */
+    margin-bottom: 20px;
+    font-size: 26px; /* Увеличен размер на шрифта */
+    font-weight: bold;
+    text-align: center; /* Центрирано заглавие */
+}
+
+#coach-name {
+    color: #105db4; /* По-светло синьо */
+    font-weight: bold;
+}
+
+form, select {
+    margin-bottom: 20px;
+}
+
+select, input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+    font-size: 16px;
+    background-color: #fff;
+}
+
+button {
+    padding: 6px 20px;
+    background-color: #1ccc48;
+    background-color: #1ccca6;
+    background-color: #1ccca6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+    margin-top: 2%;
+}
+
+button:hover {
+    background-color: transparent; /* За да запазиш фона прозрачен */
+    color: #ffffff; /* Промени цвета на текста при hover */
+}
+
+button:focus {
+    outline: none; /* Премахва очертанието при фокусиране */
+    background-color: transparent; /* За да запазиш фона прозрачен */
+    color: #ffffff; /* Промени цвета на текста при фокус */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+th, td {
+    padding: 6px; /* Допълнително намалена височина на редовете */
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px; /* По-голям размер на шрифта */
+    font-weight: bold; /* Удебелен шрифт */
+}
+
+th {
+    background-color: #3c8bda; /* Светло синьо */
+    color: white;
+    font-size: 18px; /* По-голям размер на шрифта за заглавията */
+}
+
+tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.container {
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 1200px;
+}
+
+/* Скролираща таблица */
+.scrollable-table {
+    max-height: 300px; /* Височина на таблицата */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    width: 100%; /* Ширина до 100% от родителския контейнер */
+    margin-top: 10px;
+    margin-bottom: 4%;
+}
+
+.scrollable-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.scrollable-table th, .scrollable-table td {
+    border: 1px solid #ddd;
+    padding: 6px; /* Допълнително намалена височина на редовете */
+    text-align: left;
+    font-size: 16px; /* По-голям размер на шрифта */
+    font-weight: bold; /* Удебелен шрифт */
+}
+
+#user-profile-picture {
+    display: none; /* Запази това, ако не искаш снимката да се показва по подразбиране */
+    width: 125px;
+    height: 125px;
+    border-radius: 50%; /* Прави изображението кръгло */
+    object-fit: cover;  /* За да се запази съдържанието на изображението в кръга */
+    margin-left: 2%;  /* Разстояние между падащото меню и изображението */
+    margin-bottom: 2%;
+    border: 4px solid #696969; /* Добавя рамка с цвят светло синьо */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Добавя леко сенчесто ефект */
+}
+
+
+#add-user-container {
+    display: block;
+    align-items: center;
+    margin-bottom: 20px; /* Добавя разстояние под падащото меню и снимката */
+}
+
+.home-button {
+    position: absolute; /* Позволява позициониране спрямо родителския елемент */
+    top: 20px; /* Разстояние от горната част на екрана */
+    right: 20px; /* Разстояние от дясната част на екрана */
+    background: transparent; /* Прозрачен фон */
+    border: none; /* Без рамка */
+    cursor: pointer; /* Курсор на ръка при задържане */
+    font-size: 50px; /* Размер на иконата */
+    color: #1b84da; /* Цветът на иконата */
+    transition: color 0.3s; /* Преход за промяна на цвета */
+}
+
+.home-button:hover {
+    color: #084783; /* По-тъмен цвят при hover */
+}
+
+.home-button:focus {
+    outline: none; /* Премахва очертанието при фокусиране */
+    background-color: transparent; /* За да запазиш фона прозрачен */
+}
+.delete-result {
+    background: none; /* Remove default button background */
+    border: none; /* Remove border */
+    cursor: pointer; /* Change cursor to pointer */
+    color: rgb(160, 106, 106); /* Set color of the icon */
+    font-size: 20px; /* Adjust size of the icon */
+}
+
+.delete-result:hover {
+    color: darkred; /* Change color on hover */
+}
+@media (max-width: 450px) {
+    .container {
+        padding: 15px; /* По-малко отстояние за малки екрани */
+    }
+
+    h2 {
+        font-size: 22px; 
+    }
+
+@media (max-width: 450px) {
+    .container {
+        padding: 15px;
+        margin-bottom: 10%;
+    }
+
+    h2 {
+        font-size: 18px; 
+        margin-bottom: 10%;
+    }
+
+    select, input {
+        font-size: 10px; 
+    }
+
+    button {
+        padding: 3px 21px;
+        background-color: #1ccc48;
+        font-size: 12px;
+        display: list-item;
+        padding-bottom: 2%;
+        margin-bottom: 5%;
+    }
+
+.delete-result{
+    font-size: 14px;
+}
+
+    button {
+        padding: 6px 21px 7px 19px;
+        background-color: #1ccca6;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 12px;
+        margin-top: 4%;
+        display: block;
+        display: block;
+    }
+
+    .scrollable-table th, .scrollable-table td {
+        border: 1px solid #ddd;
+        padding: 4px;
+        text-align: left;
+        font-size: 9px;
+        font-size: 11px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    #user-profile-picture {
+        width: 100px; /* По-малък размер на снимката */
+        height: 100px;
+        width: 85px;
+        height: 85px;
+        border: 2px solid #696969;
+    }
+    #add-user-container {
+        display: block;
+        align-items: center;
+        margin-bottom: 20px; /* Добавя разстояние под падащото меню и снимката */
+    }
+
+    .home-button {
+        font-size: 27px;
+        margin-top: 1%;
+        margin-right: 0%;
+    }
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        font-size: 11px;
+        margin-top: -1%;
+        margin-right: -5%;
+    }
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        font-size: 19px;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: normal;
+    }
+}
+
+}
