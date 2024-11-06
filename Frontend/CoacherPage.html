@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coacher Page</title>
+    <link rel="stylesheet" href="CoacherPageStyles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+
+        <button id="go-home" class="home-button"><i class="fas fa-home"></i></button>
+
+        <!-- Показване на името на треньора -->
+        <h2>Добре дошли, <span id="coach-name"></span></h2>
+
+        <!-- Падащо меню за избор на дисциплина -->
+        <label for="discipline">Изберете дисциплина:</label>
+        <select id="discipline">
+            <option value="" disabled selected>Изберете дисциплина</option>
+        </select>
+        
+        <form id="search-form">
+            <label for="first-name">Име:</label>
+            <input type="text" id="first-name" name="first-name" placeholder="Въведете име" />
+            <label for="last-name">Фамилия:</label>
+            <input type="text" id="last-name" name="last-name" placeholder="Въведете фамилия" />
+            <button type="submit">Търси</button>
+        </form>
+
+        <h3>Потребители на клуба</h3>
+        <div class="scrollable-table">
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>Първо име</th>
+                        <th>Фамилия</th>
+                        <th>Възраст</th>
+                        <th>Най-добър резултат</th> 
+                        <th>Старите резултати</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Потребителите ще бъдат попълнени тук -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="add-result-form">
+            <h3>Добавяне на резултат</h3>
+            <label for="add-discipline">Дисциплина:</label>
+            <select id="add-discipline">
+                <!-- Опции за дисциплини ще бъдат добавени тук динамично -->
+            </select>
+            
+            <div id="add-user-container">
+                <label for="add-user">Потребител:</label>
+                <select id="add-user">
+                    <!-- Опции за потребители ще бъдат добавени тук динамично -->
+                </select>
+                <img id="user-profile-picture" alt="Профилна снимка на потребителя" />
+            </div>
+            
+            <div id="time-input" style="display: none;">
+                <label for="hours">Час:</label>
+                <input type="number" id="hours" min="0" value="0">
+                <label for="minutes">Минути:</label>
+                <input type="number" id="minutes" min="0" value="0">
+                <label for="seconds">Секунди:</label>
+                <input type="number" id="seconds" min="0" value="0">
+                <label for="milliseconds">Стотни от секунда:</label>
+                <input type="number" id="milliseconds" min="0" max="99" value="0">
+            </div>
+        
+            <div id="decimal-input" style="display: none;">
+                <label for="decimal-result">Резултат:</label>
+                <input type="number" id="decimal-result" step="0.01">
+            </div>
+        
+            <button id="submit-result">Добави резултат</button>
+        </div>
+
+    </div>
+
+    <script src="CoacherPageScript.js"></script>
+</body>
+</html>
