@@ -43,9 +43,30 @@ namespace SpoerStats2.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
-            await _userService.UpdateUser(user);
-            return NoContent();
+            if (id != user.Id)
+            {
+                return BadRequest("User ID mismatch.");
+            }
+
+            var existingUser = await _userService.GetUserById(id);
+            if (existingUser == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            try
+            {
+                await _userService.UpdateUser(user);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user with ID {Id}.", id);
+                return StatusCode(500, "Internal server error.");
+            }
         }
+
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
