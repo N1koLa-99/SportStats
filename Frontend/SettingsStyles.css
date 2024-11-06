@@ -1,0 +1,304 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto; /* Позволява вертикално скролиране */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Променено за вертикално подреждане */
+    align-items: center;
+    min-height: 100%; /* Това позволява на контейнера да расте, ако съдържанието е твърде голямо */
+    background: 
+        linear-gradient(
+            rgba(0, 0, 0, 0.651),
+            rgba(0, 0, 0, 0.658)
+        ),
+        url('https://sportstats.blob.core.windows.net/$web/SwimmingAi2.webp') no-repeat center center fixed;
+    background-size: 107% auto;
+    padding: 20px;
+    color: #fff;
+    box-sizing: border-box;
+    overflow-y: auto; /* Позволява скролиране в контейнера, ако е необходимо */
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 15px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    font-family: 'Verdana', sans-serif;
+    position: relative;
+    box-sizing: border-box;
+    overflow-y: auto; /* Позволява на информацията да се скролва в случай на голямо съдържание */
+}
+
+.info h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #49818d;
+    margin-top: -2%;
+}
+
+/* Контейнер за профилната снимка */
+.profile-image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    margin-bottom: 35px;
+    margin-left: 160px;
+}
+
+.edit-image-button {
+    background-color: #b1b1b140;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid white;
+    border-radius: 30px;
+    margin-left: 154px;
+    margin-bottom: 14%;
+}
+
+.edit-image-button:hover {
+    background-color: #27464d;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    font-size: 1.2em;
+    color: #ffffff;
+}
+
+.label {
+    font-size: 0.9em; /* Дребен шрифт за етикетите */
+    color: #cccccc; /* Блед цвят за етикетите */
+    margin-right: 10px;
+    min-width: 100px; /* Увеличава ширината на етикетите */
+}
+
+.info-content {
+    border-bottom: 1px solid #ffffff;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.settings-button {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    font-size: 50px;
+    color: #ffffff;
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.settings-button:hover {
+    color: #666;
+}
+
+.edit-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+}
+
+.edit-button i {
+    pointer-events: none; /* Позволява клик върху цялата площ на бутона */
+}
+
+.edit-button:hover {
+    color: #ffcc00;
+}
+
+.save-button {
+    background-color: #b1b1b140;
+    color: white;
+    border: 2px solid #ffffff;
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    display: none; /* Скрива се по подразбиране */
+}
+.hidden {
+    display: none;
+}
+.cancel-button {
+    background-color: #b1b1b140;
+    color: white;
+    border: 2px solid #ffffff;
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    display: none;
+    margin-left: 20%;
+    margin-top: -10%;
+}
+.confirm-password-label {
+    display: none;
+}
+.confirm-password-label {
+    margin-left: 108px;
+    margin-right: -107px;
+}
+
+.save-button:hover {
+    background-color: #45a049;
+}
+.cancel-button:hover {
+    background-color: #45a049;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    display: none;
+}
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .info {
+        width: 100%;
+        font-size: 1em;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+@media (max-width: 450px) {
+    .container {
+        background: url(https://sportstats.blob.core.windows.net/$web/SettingsImg.jpg) no-repeat center bottom fixed;
+        padding: 10px;
+        background-size: cover;
+        height: 203px;
+    }
+
+    .info {
+        width: 82%;
+        padding: 15px;
+        font-size: 37px;
+        max-width: none;
+        margin-top: 72px;
+        height: auto;
+    }
+    .profile-image-container {
+        margin-bottom: 15px; /* Намалява разстоянието отдолу */
+    }
+
+    #profile-image {
+        width: 100px; /* Намалява размера на профилната снимка */
+        height: 100px;
+        margin-left: 74px;
+        margin-bottom: 8%;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 15px;
+        margin: 8px;
+    }
+
+    .label {
+        min-width: 80px; /* Намалява ширината на етикетите */
+        font-size: 14px; /* Още по-малък шрифт за етикетите */
+        color: #cccccc70;
+        margin-right: 10px;
+    }
+
+    .settings-button {
+        font-size: 40px; /* Намалява размера на иконата за настройките */
+        top: 20px; /* Премества иконата малко по-надолу */
+        right: 20px; /* Премества иконата малко по-наляво */
+        padding: 10px;
+    }
+
+    .edit-button {
+        font-size: 18px; /* Намалява размера на бутона за редакция */
+        top: 8px;
+        right: 8px;
+        padding: 8px 15px;
+    }
+
+    .cancel-button {
+        background-color: #8d8d8d26;
+        color: white;
+        border: 1px solid white; /* Бяла рамка */
+        padding: 8px 22px;
+        margin: 3px 0;
+        cursor: pointer;
+        border-radius: 20px; /* Овални ъгли */
+        display: none;
+        margin-left: 31%;
+        margin-top: -17%;
+    }
+
+    .edit-image-button {
+        background-color: #9d9d9d21;
+        color: white;
+        border: 1px solid white; /* Бяла рамка */
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 20px; /* Овални ъгли */
+        margin-left: 68px;
+        margin-bottom: 6%;
+    }
+
+    .save-button {
+        padding: 8px 15px;
+        background-color: #8d8d8d26;
+        border: 1px solid white; /* Бяла рамка */
+        border-radius: 20px; /* Овални ъгли */
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"] {
+        padding: 6px; /* Намалява отстоянието в полетата */
+    }
+}
