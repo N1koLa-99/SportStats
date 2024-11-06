@@ -1,4 +1,4 @@
-﻿using SpoerStats2.Models;
+using SpoerStats2.Models;
 
 namespace SpoerStats2.Repository
 {
@@ -9,6 +9,7 @@ namespace SpoerStats2.Repository
         Task AddUser(User user);
         Task UpdateUser(User user);
         Task DeleteUser(int id);
+        Task<User> GetUserByEmail(string email);
         Task<User> GetUserByEmailAndPassword(string email, string password);
         Task<IEnumerable<User>> GetUsersByClubId(int clubId);
     }
