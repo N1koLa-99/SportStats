@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="SettingsStyles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="SettingsScript.js"></script>
+</head>
+<body>
+    <a href="HomePage.html" class="settings-button">
+        <i class="fas fa-home"></i>
+    </a>
+
+    <div class="container">
+        <div class="info">
+            <h2>Профил</h2>
+
+            <div class="profile-image-container">
+                <img id="profile-image" src="default-profile.png" alt="Профилна снимка" />
+                <input type="file" id="edit-profile-image" style="display: none;">
+                <button class="edit-image-button" id="edit-image-button">Смени снимката</button>
+            </div>
+
+            <button class="edit-button" id="edit-profile">
+                <i class="fas fa-pencil-alt"></i>
+            </button>
+
+            <button class="save-button" id="save-profile" style="display: none;">Запази</button>
+            <button class="cancel-button" id="cancel-profile" style="display: none;">Назад</button>
+
+            <div id="changes-notification" style="display: none;"></div>
+
+            <div class="info-item">
+                <span class="label">Име:</span>
+                <div class="info-content">
+                    <span id="first-name">Зарежда се...</span>
+                    <input type="text" id="edit-first-name" style="display: none;" placeholder="Ново име">
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="label">Фамилия:</span>
+                <div class="info-content">
+                    <span id="last-name">Зарежда се...</span>
+                    <input type="text" id="edit-last-name" style="display: none;" placeholder="Нова фамилия">
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="label">Години:</span>
+                <div class="info-content">
+                    <span id="age">Зарежда се...</span>
+                    <input type="number" id="edit-age" style="display: none;" placeholder="Нови години">
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="label">Email:</span>
+                <div class="info-content">
+                    <span id="email">Зарежда се...</span>
+                    <input type="email" id="edit-email" style="display: none;" placeholder="Нов email">
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="label">Парола:</span>
+                <div class="info-content">
+                    <span id="password">********</span>
+                    <input type="password" id="edit-password" style="display: none;" placeholder="Нова парола">
+                </div>
+            </div>        
+            <div class="info-item">
+                <span class="label confirm-password-label">Потвърдете паролата:</span>
+                <div class="info-content">
+                    <input type="password" id="edit-confirm-password" class="hidden" placeholder="Потвърдете новата парола">
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="label">Клуб:</span>
+                <div class="info-content">
+                    <span id="club">Зарежда се...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
