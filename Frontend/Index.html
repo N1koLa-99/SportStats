@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogInPage</title>
+    <link rel="stylesheet" href="Index_Style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="button-53.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Лява част с изображение -->
+        <div class="left-side">
+            <img src="https://sportstats.blob.core.windows.net/$web/SwimImg.jpg" alt="Swimming" class="form-image left">
+        </div>
+        
+        <!-- Средна част с меню за вход и регистрация -->
+        <div class="middle-side">
+            <div class="content">
+                <img src="https://sportstats.blob.core.windows.net/$web/SportStats.png" alt="Sport Stats Logo" width="625" height="240">
+                <h1>Welcome to<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sports Stats</h1>
+                
+                <div class="tabs">
+                    <button class="button-53 tab-button active" data-tab="registration">Регистрация</button>
+                    <button class="button-53 tab-button" data-tab="login">Вход</button>
+                </div>
+                
+                <form id="registration-form" class="form tab-content active" novalidate>
+                    <div class="form-group">
+                        <input type="text" id="firstName" name="firstName" required>
+                        <label for="firstName" class="required-label">Име</label>
+                        <span class="error-message" id="firstName-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="lastName" name="lastName" required>
+                        <label for="lastName" class="required-label">Фамилия</label>
+                        <span class="error-message" id="lastName-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required>
+                        <label for="email" class="required-label">Имейл</label>
+                        <span class="error-message" id="email-error"></span>
+                        <div class="hint-message" id="email-hint">Валиден имейл формат (напр. user@example.com).</div>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" name="password" required minlength="6">
+                        <label for="password" class="required-label">Парола</label>
+                        <span class="error-message" id="password-error"></span>
+                        <div class="hint-message" id="password-hint">Поне 8 символа, 1 главна буква и 1 цифра.</div>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="age" name="age" required min="1">
+                        <label for="age" class="required-label">Години</label>
+                        <span class="error-message" id="age-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <select id="gender" name="gender" required>
+                            <option value="" disabled selected></option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                        <label for="gender" class="required-label">Пол</label>
+                        <span class="error-message" id="gender-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <select id="club" name="club" required>
+                            <option value="" disabled selected></option>
+                            <!-- Добавете клубовете тук -->
+                        </select>
+                        <label for="club" class="required-label">Отбор</label>
+                        <span class="error-message" id="club-error"></span>
+                    </div>
+                    
+                    <button type="submit" class="button-53 button-53-red">Регистрация</button>
+                </form>
+                
+                <!-- Формата за вход -->
+                <form id="login-form" class="form tab-content" novalidate>
+                    <div class="form-group">
+                        <input type="email" id="login-email" name="login-email" required>
+                        <label for="login-email" class="required-label">Email</label>
+                        <span class="error-message" id="login-email-error"></span>
+                        <div class="hint-message" id="login-email-hint">Изисква валиден имейл формат.</div>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="login-password" name="login-password" required>
+                        <label for="login-password" class="required-label">Password</label>
+                        <span class="error-message" id="login-password-error"></span>
+                        <div class="hint-message" id="login-password-hint">Паролата трябва да съдържа поне 6 символа.</div>
+                    </div>
+                    <button type="submit" class="button-53 button-53-orange">Login</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Дясна част с изображение -->
+        <div class="right-side">
+            <img src="https://sportstats.blob.core.windows.net/$web/Bqgane2.png" alt="Athletics" class="form-image right">
+        </div>
+    </div>
+
+    <script src="Index-script.js"></script>
+</body>
+</html>
