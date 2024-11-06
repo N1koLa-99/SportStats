@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SpoerStats2.Models;
 using System.Security.Claims;
 using System.IO;
@@ -91,8 +91,6 @@ namespace SpoerStats2.Controllers
             _logger.LogInformation("Получен userId от токена: {userId}", userId);
             return userId;
         }
-
-
 
         [HttpGet("me")]
         public async Task<ActionResult<User>> GetCurrentUser()
