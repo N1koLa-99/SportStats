@@ -1,4 +1,4 @@
-﻿using SpoerStats2.Models;
+using SpoerStats2.Models;
 using Dapper;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -31,13 +31,20 @@ namespace SpoerStats2.ClassRepository
                 return await connection.QuerySingleOrDefaultAsync<User>("SELECT * FROM Users WHERE Id = @Id", new { Id = id });
             }
         }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM Users WHERE Email = @Email";
+                return await connection.QuerySingleOrDefaultAsync<User>(query, new { Email = email });
+            }
+        }
+
         public async Task AddUser(User user)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var passwordHasher = new PasswordHasher<User>();
-                user.Password = passwordHasher.HashPassword(user, user.Password);
-
                 var query = "INSERT INTO Users (FirstName, LastName, Age, Email, Password, Gender, RoleID, ClubID, profileImage_url) " +
                             "VALUES (@FirstName, @LastName, @Age, @Email, @Password, @Gender, @RoleID, @ClubID, @profileImage_url)";
                 await connection.ExecuteAsync(query, new
@@ -58,41 +65,22 @@ namespace SpoerStats2.ClassRepository
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                string hashedPassword = null;
-
-                // Проверка за хеширане на паролата само ако е зададена
-                if (!string.IsNullOrWhiteSpace(user.Password))
-                {
-                    var passwordHasher = new PasswordHasher<User>();
-                    hashedPassword = passwordHasher.HashPassword(user, user.Password);
-                }
-
                 var query = "UPDATE Users SET FirstName = @FirstName, LastName = @LastName, Age = @Age, Email = @Email, " +
-                            "Gender = @Gender, profileImage_url = @profileImage_url" +
-                            (hashedPassword != null ? ", Password = @Password" : "") + // Добавете хешираната парола само ако е зададена
-                            " WHERE Id = @Id";
+                            "Gender = @Gender, profileImage_url = @profileImage_url, Password = @Password WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
-
                 parameters.Add("FirstName", user.FirstName);
                 parameters.Add("LastName", user.LastName);
                 parameters.Add("Age", user.Age);
                 parameters.Add("Email", user.Email);
                 parameters.Add("Gender", user.Gender);
                 parameters.Add("profileImage_url", user.profileImage_url);
+                parameters.Add("Password", user.Password);
                 parameters.Add("Id", user.Id);
 
-                // Включете хешираната парола само ако е зададена
-                if (hashedPassword != null)
-                {
-                    parameters.Add("Password", hashedPassword);
-                }
-
-                // Изпълнява се актуализацията
                 await connection.ExecuteAsync(query, parameters);
             }
         }
-
         public async Task DeleteUser(int id)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -114,9 +102,7 @@ namespace SpoerStats2.ClassRepository
                 }
 
                 var passwordHasher = new PasswordHasher<User>();
-
                 var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
-
                 return result == PasswordVerificationResult.Success ? user : null;
             }
         }

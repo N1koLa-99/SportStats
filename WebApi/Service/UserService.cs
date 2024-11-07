@@ -1,14 +1,20 @@
-﻿using SpoerStats2.Models;
+using SpoerStats2.Models;
 using SpoerStats2.Repository;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using System.Data.Common;
+using System.Data.SqlClient;
 
 public class UserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly PasswordHasher<User> _passwordHasher;
+
     public UserService(IUserRepository userRepository)
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        _passwordHasher = new PasswordHasher<User>();
     }
 
     public async Task<IEnumerable<User>> GetAllUsers()
@@ -23,28 +29,54 @@ public class UserService
 
     public async Task AddUser(User user)
     {
+        user.Password = _passwordHasher.HashPassword(user, user.Password);
         await _userRepository.AddUser(user);
     }
 
     public async Task UpdateUser(User user)
     {
+        if (!string.IsNullOrWhiteSpace(user.Password))
+        {
+            user.Password = _passwordHasher.HashPassword(user, user.Password);
+        }
+        else
+        {
+            var existingUser = await _userRepository.GetUserById(user.Id);
+            if (existingUser != null)
+            {
+                user.Password = existingUser.Password;
+            }
+        }
+
         await _userRepository.UpdateUser(user);
     }
+
 
     public async Task DeleteUser(int id)
     {
         await _userRepository.DeleteUser(id);
     }
 
-    public async Task<User> GetUserByEmailAndPassword(string email, string password)
+    public async Task<User> GetUserByEmail(string email)
     {
-        return await _userRepository.GetUserByEmailAndPassword(email, password);
+        var user = await _userRepository.GetUserByEmail(email);
+        return user;
     }
 
+    public async Task<User> GetUserByEmailAndPassword(string email, string password)
+    {
+        var user = await _userRepository.GetUserByEmail(email);
+        if (user == null) return null;
+
+        var passwordHasher = new PasswordHasher<User>();
+        var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+        return result == PasswordVerificationResult.Success ? user : null;
+    }
     public async Task<IEnumerable<User>> GetUsersByClubId(int clubId)
     {
         return await _userRepository.GetUsersByClubId(clubId);
     }
+
     public async Task<string> UpdateUserProfilePicture(int userId, IFormFile file)
     {
         // Проверка дали файлът е предоставен
@@ -81,8 +113,6 @@ public class UserService
         return user.profileImage_url; // Връща URL на профилната снимка
     }
 
-
-
     public async Task<string> GetUserProfilePictureUrl(int userId)
     {
         var user = await _userRepository.GetUserById(userId);
@@ -90,6 +120,7 @@ public class UserService
 
         return user.profileImage_url; // Връща URL на профилната снимка
     }
+
     public async Task<FileContentResult> GetUserProfilePicture(int userId)
     {
         var user = await _userRepository.GetUserById(userId);
@@ -117,6 +148,4 @@ public class UserService
 
         return new FileContentResult(fileBytes, mimeType);
     }
-
-
 }

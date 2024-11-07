@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SpoerStats2.Models;
 using System.Security.Claims;
 using System.IO;
@@ -43,18 +43,27 @@ namespace SpoerStats2.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
-            Console.WriteLine("Received password before hashing: " + user.Password); // Логиране преди хеширането
-
-            // Хеширане, ако е зададена паролата
-            if (!string.IsNullOrWhiteSpace(user.Password))
+            if (id != user.Id)
             {
-                var passwordHasher = new PasswordHasher<User>();
-                user.Password = passwordHasher.HashPassword(user, user.Password);
-                Console.WriteLine("Hashed password: " + user.Password); // Логиране след хеширането
+                return BadRequest("User ID mismatch.");
             }
 
-            await _userService.UpdateUser(user);
-            return NoContent();
+            var existingUser = await _userService.GetUserById(id);
+            if (existingUser == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            try
+            {
+                await _userService.UpdateUser(user);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user with ID {Id}.", id);
+                return StatusCode(500, "Internal server error.");
+            }
         }
 
 
@@ -76,7 +85,6 @@ namespace SpoerStats2.Controllers
             {
                 return Unauthorized();
             }
-
             return Ok(user);
         }
 
@@ -91,8 +99,6 @@ namespace SpoerStats2.Controllers
             _logger.LogInformation("Получен userId от токена: {userId}", userId);
             return userId;
         }
-
-
 
         [HttpGet("me")]
         public async Task<ActionResult<User>> GetCurrentUser()
@@ -125,6 +131,7 @@ namespace SpoerStats2.Controllers
             }
             return Ok(users);
         }
+
         [HttpPost("uploadProfilePicture/{userId}")]
         public async Task<IActionResult> UploadProfilePicture(int userId, IFormFile file)
         {
@@ -163,6 +170,65 @@ namespace SpoerStats2.Controllers
                 _logger.LogError(ex, "An error occurred while retrieving profile picture for user {userId}", userId);
                 return StatusCode(500, new { message = "An error occurred while retrieving the profile picture." });
             }
+        }
+        // Update FirstName
+        [HttpPost("{id}/update-firstname")]
+        public async Task<IActionResult> UpdateFirstName(int id, [FromBody] string firstName)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.FirstName = firstName;
+            await _userService.UpdateUser(user);
+            return Ok("First name updated successfully.");
+        }
+
+        // Update LastName
+        [HttpPost("{id}/update-lastname")]
+        public async Task<IActionResult> UpdateLastName(int id, [FromBody] string lastName)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.LastName = lastName;
+            await _userService.UpdateUser(user);
+            return Ok("Last name updated successfully.");
+        }
+
+        // Update Age
+        [HttpPost("{id}/update-age")]
+        public async Task<IActionResult> UpdateAge(int id, [FromBody] int age)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Age = age;
+            await _userService.UpdateUser(user);
+            return Ok("Age updated successfully.");
+        }
+
+        // Update Email
+        [HttpPost("{id}/update-email")]
+        public async Task<IActionResult> UpdateEmail(int id, [FromBody] string email)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Email = email;
+            await _userService.UpdateUser(user);
+            return Ok("Email updated successfully.");
+        }
+
+        // Update Password
+        [HttpPost("{id}/update-password")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] string password)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Password = password;
+            await _userService.UpdateUser(user);
+            return Ok("Password updated successfully.");
         }
     }
 }
