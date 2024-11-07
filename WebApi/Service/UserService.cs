@@ -68,8 +68,7 @@ public class UserService
         var user = await _userRepository.GetUserByEmail(email);
         if (user == null) return null;
 
-        var passwordHasher = new PasswordHasher<User>();
-        var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+        var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
         return result == PasswordVerificationResult.Success ? user : null;
     }
     public async Task<IEnumerable<User>> GetUsersByClubId(int clubId)
@@ -148,4 +147,45 @@ public class UserService
 
         return new FileContentResult(fileBytes, mimeType);
     }
+    public async Task UpdateFirstName(int id, string firstName)
+    {
+        var user = await _userRepository.GetUserById(id);
+        if (user == null) throw new ArgumentException("User not found.");
+
+        await _userRepository.UpdateFirstName(id, firstName);
+    }
+
+    public async Task UpdateLastName(int id, string lastName)
+    {
+        var user = await _userRepository.GetUserById(id);
+        if (user == null) throw new ArgumentException("User not found.");
+
+        await _userRepository.UpdateLastName(id, lastName);
+    }
+
+    public async Task UpdateAge(int id, int age)
+    {
+        var user = await _userRepository.GetUserById(id);
+        if (user == null) throw new ArgumentException("User not found.");
+
+        await _userRepository.UpdateAge(id, age);
+    }
+
+    public async Task UpdateEmail(int id, string email)
+    {
+        var user = await _userRepository.GetUserById(id);
+        if (user == null) throw new ArgumentException("User not found.");
+
+        await _userRepository.UpdateEmail(id, email);
+    }
+
+    public async Task UpdatePassword(int id, string newPassword)
+    {
+        var user = await _userRepository.GetUserById(id);
+        if (user == null) throw new ArgumentException("User not found.");
+
+        user.Password = _passwordHasher.HashPassword(user, newPassword);
+        await _userRepository.UpdatePassword(id, user.Password);
+    }
+
 }
