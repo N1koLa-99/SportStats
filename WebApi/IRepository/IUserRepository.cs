@@ -12,6 +12,11 @@ namespace SpoerStats2.Repository
         Task<User> GetUserByEmail(string email);
         Task<User> GetUserByEmailAndPassword(string email, string password);
         Task<IEnumerable<User>> GetUsersByClubId(int clubId);
+        Task UpdateFirstName(int id, string firstName);
+        Task UpdateLastName(int id, string lastName);
+        Task UpdateAge(int id, int age);
+        Task UpdateEmail(int id, string email);
+        Task UpdatePassword(int id, string password);
     }
 
 }
