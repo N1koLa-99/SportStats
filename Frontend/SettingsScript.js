@@ -1,228 +1,183 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const user = JSON.parse(localStorage.getItem('user'));
 
-    if (user) {
-        // Включи показването на информацията за профила
-        document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
-        document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
-        document.getElementById('age').textContent = user.age || 'Няма данни';
-        document.getElementById('email').textContent = user.email || 'Няма данни';
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-        // Зареждане на профилната снимка
-        if (user.id > 0) {
-            fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${user.id}`)
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('Неуспешно зареждане на профилната снимка:', response.status, response.statusText);
-                        throw new Error('Неуспешно зареждане на профилната снимка');
-                    }
-                    return response.blob();
-                })
-                .then(imageBlob => {
-                    const imageUrl = URL.createObjectURL(imageBlob);
-                    document.getElementById('profile-image').src = imageUrl; // Вмъкни профилната снимка
-                })
-                .catch(error => {
-                    console.error('Грешка при зареждане на профилната снимка:', error);
-                    document.getElementById('profile-image').src = '../SportStatsImg/ProfilePhoto2.jpg';
-                    document.getElementById('profile-image').alt = 'Профилната снимка не е налична';
-                });
-        } else {
-            console.warn('Невалиден user.id:', user.id);
+    // Display user information
+    document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
+    document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
+    document.getElementById('age').textContent = user.age || 'Няма данни';
+    document.getElementById('email').textContent = user.email || 'Няма данни';
+
+    // Load profile picture
+    if (user.id > 0) {
+        try {
+            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${user.id}`);
+            if (!response.ok) throw new Error('Неуспешно зареждане на профилната снимка');
+            
+            const imageBlob = await response.blob();
+            document.getElementById('profile-image').src = URL.createObjectURL(imageBlob);
+        } catch (error) {
+            console.error(error.message);
             document.getElementById('profile-image').src = '../SportStatsImg/ProfilePhoto2.jpg';
             document.getElementById('profile-image').alt = 'Профилната снимка не е налична';
         }
+    } else {
+        document.getElementById('profile-image').src = '../SportStatsImg/ProfilePhoto2.jpg';
+        document.getElementById('profile-image').alt = 'Профилната снимка не е налична';
+    }
 
-        const editImageButton = document.getElementById('edit-image-button');
-        const profileImageInput = document.getElementById('edit-profile-image');
+    // Profile image update functionality
+    const editImageButton = document.getElementById('edit-image-button');
+    const profileImageInput = document.getElementById('edit-profile-image');
 
-        // Функционалност за смяна на профилната снимка
-        editImageButton.addEventListener('click', function () {
-            profileImageInput.click();
-        });
+    editImageButton.addEventListener('click', () => profileImageInput.click());
 
-        profileImageInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const formData = new FormData();
-                formData.append('file', file);
-        
-                // Изпрати заявка за качване на снимката към API-то
-                fetch(`https://sportstatsapi.azurewebsites.net/api/Users/uploadProfilePicture/${user.id}`, {
+    profileImageInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/uploadProfilePicture/${user.id}`, {
                     method: 'POST',
                     body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(`Грешка при качване на снимката: ${text}`);
-                        });
-                    }
-                    return response.json(); // Очакваме JSON
-                })
-                .then(data => {
-                    const imageUrl = data.profileImage_url; // Вземи URL на новата снимка
-                    document.getElementById('profile-image').src = imageUrl;
-        
-                    // Обнови профилната снимка в локалното съхранение
-                    user.profileImage_url = imageUrl; // Актуализирай снимката
-                    localStorage.setItem('user', JSON.stringify(user));
-                })
-                .catch(error => {
-                    console.error('Грешка при качване на снимката:', error);
-                    alert('Грешка при качване на снимката: ' + error.message);
                 });
-            }
-        });
-        
-        // Функционалност за редактиране на информацията за профила
-        const editProfileButton = document.getElementById('edit-profile');
-        const saveProfileButton = document.getElementById('save-profile');
-        const cancelProfileButton = document.getElementById('cancel-profile');
-        const confirmPasswordInput = document.getElementById('edit-confirm-password');
-        
-        editProfileButton.addEventListener('click', function () {
-            toggleEditFields(true);
-            saveProfileButton.style.display = 'block';  // Показва бутона "Запази"
-            cancelProfileButton.style.display = 'block'; // Показва бутона "Назад"
-            editProfileButton.style.display = 'none';    // Скрива бутона "Редактирай"
-            
-            // Показва полето за потвърдителна парола
-            confirmPasswordInput.style.display = 'block';
-        });
-        
-        cancelProfileButton.addEventListener('click', function () {
-            toggleEditFields(false); // Скрива полетата за редактиране
-            saveProfileButton.style.display = 'none'; // Скрива бутона "Запази"
-            cancelProfileButton.style.display = 'none'; // Скрива бутона "Назад"
-            editProfileButton.style.display = 'block'; // Показва бутона "Редактирай"
-        });
+                if (!response.ok) throw new Error(await response.text());
 
-        saveProfileButton.addEventListener('click', function () {
-            if (!user || !user.id) {
-                alert('Потребителят не е валиден. Моля, влезте отново.');
-                return;
+                const data = await response.json();
+                document.getElementById('profile-image').src = data.profileImage_url;
+
+                // Update local storage
+                user.profileImage_url = data.profileImage_url;
+                localStorage.setItem('user', JSON.stringify(user));
+            } catch (error) {
+                console.error(error.message);
+                alert('Грешка при качване на снимката: ' + error.message);
             }
-        
-            // Събиране на новите данни от формата
-            const updatedUser = {
-                id: user.id,
-                firstName: document.getElementById('edit-first-name').value.trim() || user.firstName,
-                lastName: document.getElementById('edit-last-name').value.trim() || user.lastName,
-                age: document.getElementById('edit-age').value.trim() || user.age,
-                email: document.getElementById('edit-email').value.trim() || user.email,
-                password: document.getElementById('edit-password').value.trim() || user.password,
-                gender: document.querySelector('input[name="gender"]:checked')?.value || user.gender,
-                profileImage_url: user.profileImage_url // Запази текущата снимка
-            };
-        
-            const confirmPassword = document.getElementById('edit-confirm-password').value.trim();
-            if (updatedUser.password && updatedUser.password !== confirmPassword) {
+        }
+    });
+
+    // Edit profile functionality
+    const editProfileButton = document.getElementById('edit-profile');
+    const saveProfileButton = document.getElementById('save-profile');
+    const cancelProfileButton = document.getElementById('cancel-profile');
+    const confirmPasswordInput = document.getElementById('edit-confirm-password');
+
+    editProfileButton.addEventListener('click', () => {
+        toggleEditFields(true);
+        saveProfileButton.style.display = 'block';
+        cancelProfileButton.style.display = 'block';
+        editProfileButton.style.display = 'none';
+    });
+
+    cancelProfileButton.addEventListener('click', () => {
+        toggleEditFields(false);
+        saveProfileButton.style.display = 'none';
+        cancelProfileButton.style.display = 'none';
+        editProfileButton.style.display = 'block';
+    });
+
+    saveProfileButton.addEventListener('click', async () => {
+        if (!user || !user.id) {
+            alert('Потребителят не е валиден. Моля, влезте отново.');
+            return;
+        }
+
+        const updatedUser = {
+            firstName: document.getElementById('edit-first-name').value.trim(),
+            lastName: document.getElementById('edit-last-name').value.trim(),
+            age: document.getElementById('edit-age').value.trim(),
+            email: document.getElementById('edit-email').value.trim(),
+            password: document.getElementById('edit-password').value.trim(),
+            confirmPassword: document.getElementById('edit-confirm-password').value.trim(),
+            gender: document.querySelector('input[name="gender"]:checked')?.value
+        };
+
+        try {
+            // Separate API calls for each field
+            await updateField(user.id, 'firstName', updatedUser.firstName, 'Име');
+            await updateField(user.id, 'lastName', updatedUser.lastName, 'Фамилия');
+            await updateField(user.id, 'age', updatedUser.age, 'Години');
+            await updateField(user.id, 'email', updatedUser.email, 'Имейл');
+
+            if (updatedUser.password && updatedUser.password === updatedUser.confirmPassword) {
+                await updateField(user.id, 'password', updatedUser.password, 'Парола');
+            } else if (updatedUser.password) {
                 alert('Паролите не съвпадат. Моля, опитайте отново.');
                 return;
             }
-        
-            // Премахване на полета, които не са променени
-            const updateData = {
-                id: updatedUser.id,
-                firstName: updatedUser.firstName,
-                lastName: updatedUser.lastName,
-                email: updatedUser.email,
-                gender: updatedUser.gender,
-                // Запази текущата профилна снимка
-                profileImage_url: user.profileImage_url,
-            };
-        
-            // Добави проверка за задължителни полета
-            if (!updateData.firstName || !updateData.lastName || !updateData.email || !updateData.gender) {
-                alert('Моля, попълнете всички задължителни полета: Име, Фамилно име, Имейл и Пол.');
-                return;
-            }
-        
-            // Добави останалите полета, само ако са променени
-            if (updatedUser.age !== user.age) updateData.age = updatedUser.age;
-            if (updatedUser.password) updateData.password = updatedUser.password; // Тук добавяш новата парола
-        
-            // Проверка дали updateData е празен
-            if (Object.keys(updateData).length === 1) { // Само с ID-то
-                alert('Няма променени данни за обновяване.');
-                return;
-            }
-        
-            // Извикване на функцията за обновяване на профила
-            updateUserProfile(updateData).then(() => {
-                // Обновяване на полетата в HTML
-                if (updateData.firstName) document.getElementById('first-name').textContent = updateData.firstName;
-                if (updateData.lastName) document.getElementById('last-name').textContent = updateData.lastName;
-                if (updateData.age) document.getElementById('age').textContent = updateData.age;
-                if (updateData.email) document.getElementById('email').textContent = updateData.email;
-        
-                alert('Профилът е успешно обновен!');
-        
-                // Скрива бутоните за запазване и показва бутона за редактиране
-                saveProfileButton.style.display = 'none';
-                editProfileButton.style.display = 'block';
-        
-                toggleEditFields(false);
-        
-                // Актуализиране на локалното съхранение
-                localStorage.setItem('user', JSON.stringify({...user, ...updateData}));
-            }).catch(error => {
-                console.error('Грешка при обновяване на профила:', error);
-                alert('Възникна грешка при обновяване на профила.');
-            });
-        });
-              
 
-        function toggleEditFields(editing) {
-            document.getElementById('edit-first-name').style.display = editing ? 'block' : 'none';
-            document.getElementById('edit-last-name').style.display = editing ? 'block' : 'none';
-            document.getElementById('edit-age').style.display = editing ? 'block' : 'none';
-            document.getElementById('edit-email').style.display = editing ? 'block' : 'none';
-            document.getElementById('edit-password').style.display = editing ? 'block' : 'none';
-            document.getElementById('edit-confirm-password').style.display = editing ? 'block' : 'none';
-        
-            document.getElementById('first-name').style.display = editing ? 'none' : 'inline';
-            document.getElementById('last-name').style.display = editing ? 'none' : 'inline';
-            document.getElementById('age').style.display = editing ? 'none' : 'inline';
-            document.getElementById('email').style.display = editing ? 'none' : 'inline';
-            document.getElementById('password').style.display = editing ? 'none' : 'inline';
+            // Update displayed data and local storage
+            document.getElementById('first-name').textContent = updatedUser.firstName || user.firstName;
+            document.getElementById('last-name').textContent = updatedUser.lastName || user.lastName;
+            document.getElementById('age').textContent = updatedUser.age || user.age;
+            document.getElementById('email').textContent = updatedUser.email || user.email;
+
+            localStorage.setItem('user', JSON.stringify({ ...user, ...updatedUser }));
+
+            alert('Профилът е успешно обновен!');
+            saveProfileButton.style.display = 'none';
+            editProfileButton.style.display = 'block';
+            toggleEditFields(false);
+        } catch (error) {
+            console.error(error.message);
+            alert('Възникна грешка при обновяване на профила.');
         }
+    });
+
+    async function updateField(userId, field, value, fieldName) {
+        if (!value) return;
         
-        function updateUserProfile(data) {
-            console.log('Updating user profile with data:', data); 
-            return fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${data.id}`, { 
-                method: 'PUT',
+        // Пътят до ендпоинта може да варира според API-то
+        const endpoints = {
+            firstName: `https://sportstatsapi.azurewebsites.net/api/Users/update-firstname/${userId}`,
+            lastName: `https://sportstatsapi.azurewebsites.net/api/Users/updateLastName/${userId}`,
+            age: `https://sportstatsapi.azurewebsites.net/api/Users/updateAge/${userId}`,
+            email: `https://sportstatsapi.azurewebsites.net/api/Users/updateEmail/${userId}`,
+            password: `https://sportstatsapi.azurewebsites.net/api/Users/updatePassword/${userId}`
+        };
+    
+        const endpoint = endpoints[field];
+        if (!endpoint) throw new Error(`Ендпоинт за ${field} не е намерен`);
+    
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data) 
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`Профилът не можа да бъде обновен: ${text}`);
-                    });
-                }
+                body: JSON.stringify({ value })  // Тялото трябва да съответства на формата, очакван от API-то
             });
+            if (!response.ok) throw new Error(await response.text());
+        } catch (error) {
+            throw new Error(`Неуспешно обновяване на ${fieldName}: ${error.message}`);
         }
-        
-        // Получаване на информация за клуба
-        fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(club => {
-            const clubName = club.name || 'Няма данни';
-            document.getElementById('club').textContent = clubName; // Увери се, че club е валиден
-        })
-        .catch(error => {
-            console.error('Грешка при извличане на информация за клуба:', error);
-            document.getElementById('club').textContent = 'Грешка при зареждане на клуба'; // Увери се, че клубът е дефиниран
-        });
+    }
+    
+    
 
-    } else {
-        window.location.href = 'index.html';
+    function toggleEditFields(editing) {
+        ['first-name', 'last-name', 'age', 'email'].forEach(field => {
+            document.getElementById(field).style.display = editing ? 'none' : 'inline';
+            document.getElementById(`edit-${field}`).style.display = editing ? 'block' : 'none';
+        });
+        document.getElementById('edit-password').style.display = editing ? 'block' : 'none';
+        document.getElementById('edit-confirm-password').style.display = editing ? 'block' : 'none';
+    }
+
+    try {
+        const clubResponse = await fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`);
+        if (!clubResponse.ok) throw new Error('Грешка при зареждане на информация за клуба.');
+
+        const club = await clubResponse.json();
+        document.getElementById('club').textContent = club.name || 'Няма данни';
+    } catch (error) {
+        console.error(error.message);
+        document.getElementById('club').textContent = 'Грешка при зареждане на клуба';
     }
 });
