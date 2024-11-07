@@ -1,191 +1,233 @@
-using SpoerStats2.Models;
-using SpoerStats2.Repository;
-using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using SpoerStats2.Models;
+using System.Security.Claims;
+using System.IO;
 using Microsoft.AspNetCore.Identity;
-using System.Data.Common;
-using System.Data.SqlClient;
 
-public class UserService
+namespace SpoerStats2.Controllers
 {
-    private readonly IUserRepository _userRepository;
-    private readonly PasswordHasher<User> _passwordHasher;
-
-    public UserService(IUserRepository userRepository)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UsersController : ControllerBase
     {
-        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-        _passwordHasher = new PasswordHasher<User>();
-    }
+        private readonly UserService _userService;
+        private readonly ILogger<UsersController> _logger;
 
-    public async Task<IEnumerable<User>> GetAllUsers()
-    {
-        return await _userRepository.GetAllUsers();
-    }
-
-    public async Task<User> GetUserById(int id)
-    {
-        return await _userRepository.GetUserById(id);
-    }
-
-    public async Task AddUser(User user)
-    {
-        user.Password = _passwordHasher.HashPassword(user, user.Password);
-        await _userRepository.AddUser(user);
-    }
-
-    public async Task UpdateUser(User user)
-    {
-        if (!string.IsNullOrWhiteSpace(user.Password))
+        public UsersController(UserService userService, ILogger<UsersController> logger)
         {
-            user.Password = _passwordHasher.HashPassword(user, user.Password);
+            _userService = userService;
+            _logger = logger;
         }
-        else
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            var existingUser = await _userRepository.GetUserById(user.Id);
-            if (existingUser != null)
+            return Ok(await _userService.GetAllUsers());
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<User>> GetUser(int id)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<User>> PostUser(User user)
+        {
+            await _userService.AddUser(user);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        {
+            if (id != user.Id)
             {
-                user.Password = existingUser.Password;
+                return BadRequest("User ID mismatch.");
+            }
+
+            var existingUser = await _userService.GetUserById(id);
+            if (existingUser == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            try
+            {
+                await _userService.UpdateUser(user);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user with ID {Id}.", id);
+                return StatusCode(500, "Internal server error.");
             }
         }
 
-        await _userRepository.UpdateUser(user);
-    }
 
 
-    public async Task DeleteUser(int id)
-    {
-        await _userRepository.DeleteUser(id);
-    }
-
-    public async Task<User> GetUserByEmail(string email)
-    {
-        var user = await _userRepository.GetUserByEmail(email);
-        return user;
-    }
-
-    public async Task<User> GetUserByEmailAndPassword(string email, string password)
-    {
-        var user = await _userRepository.GetUserByEmail(email);
-        if (user == null) return null;
-
-        var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
-        return result == PasswordVerificationResult.Success ? user : null;
-    }
-    public async Task<IEnumerable<User>> GetUsersByClubId(int clubId)
-    {
-        return await _userRepository.GetUsersByClubId(clubId);
-    }
-
-    public async Task<string> UpdateUserProfilePicture(int userId, IFormFile file)
-    {
-        // Проверка дали файлът е предоставен
-        if (file == null || file.Length == 0)
-            throw new ArgumentException("No file uploaded.");
-
-        var user = await _userRepository.GetUserById(userId);
-        if (user == null)
-            throw new ArgumentException("User not found.");
-
-        // Път за съхранение на снимката
-        var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProfilePictures");
-
-        // Създаване на директория, ако не съществува
-        if (!Directory.Exists(directoryPath))
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            Directory.CreateDirectory(directoryPath);
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound();
+            await _userService.DeleteUser(id);
+            return NoContent();
         }
 
-        // Запазване на файла с уникално име
-        var fileName = $"{userId}_{Path.GetFileName(file.FileName)}"; // Увери се, че името на файла е безопасно
-        var filePath = Path.Combine(directoryPath, fileName);
-
-        // Записване на файла
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        [HttpPost("login")]
+        public async Task<ActionResult<User>> Login([FromBody] UserLogin loginData)
         {
-            await file.CopyToAsync(stream);
+            var user = await _userService.GetUserByEmailAndPassword(loginData.Email, loginData.Password);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            return Ok(user);
         }
 
-        // Обновяване на профилната снимка в базата данни
-        user.profileImage_url = Path.Combine("ProfilePictures", fileName);
-        await _userRepository.UpdateUser(user);
-
-        return user.profileImage_url; // Връща URL на профилната снимка
-    }
-
-    public async Task<string> GetUserProfilePictureUrl(int userId)
-    {
-        var user = await _userRepository.GetUserById(userId);
-        if (user == null) throw new ArgumentException("User not found.");
-
-        return user.profileImage_url; // Връща URL на профилната снимка
-    }
-
-    public async Task<FileContentResult> GetUserProfilePicture(int userId)
-    {
-        var user = await _userRepository.GetUserById(userId);
-        if (user == null || string.IsNullOrEmpty(user.profileImage_url))
+        private int GetUserIdFromToken()
         {
-            throw new ArgumentException("Profile picture not found.");
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                throw new UnauthorizedAccessException("Token does not contain user ID.");
+            }
+            var userId = int.Parse(userIdClaim.Value);
+            _logger.LogInformation("Получен userId от токена: {userId}", userId);
+            return userId;
         }
 
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.profileImage_url);
-        if (!File.Exists(filePath))
+        [HttpGet("me")]
+        public async Task<ActionResult<User>> GetCurrentUser()
         {
-            throw new FileNotFoundException("Profile picture file not found.");
+            try
+            {
+                var userId = GetUserIdFromToken();
+                var user = await _userService.GetUserById(userId);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(user);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
         }
 
-        var fileBytes = await File.ReadAllBytesAsync(filePath);
-        var fileExtension = Path.GetExtension(filePath).ToLower();
-        var mimeType = fileExtension switch
+        [HttpGet("club/{clubId}")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersByClubId(int clubId)
         {
-            ".jpg" => "image/jpeg",
-            ".jpeg" => "image/jpeg",
-            ".png" => "image/png",
-            ".gif" => "image/gif",
-            _ => "application/octet-stream"
-        };
+            var users = await _userService.GetUsersByClubId(clubId);
+            if (users == null || !users.Any())
+            {
+                return NotFound();
+            }
+            return Ok(users);
+        }
 
-        return new FileContentResult(fileBytes, mimeType);
+        [HttpPost("uploadProfilePicture/{userId}")]
+        public async Task<IActionResult> UploadProfilePicture(int userId, IFormFile file)
+        {
+            try
+            {
+                var profileImageUrl = await _userService.UpdateUserProfilePicture(userId, file);
+                return Ok(new { profileImage_url = profileImageUrl });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating profile picture for user {userId}", userId);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("profilePicture/{userId}")]
+        public async Task<IActionResult> GetUserProfilePicture(int userId)
+        {
+            try
+            {
+                var result = await _userService.GetUserProfilePicture(userId);
+                return result;
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Profile picture not found for user {userId}", userId);
+                return NotFound(new { message = ex.Message });
+            }
+            catch (FileNotFoundException ex)
+            {
+                _logger.LogError(ex, "File not found for user {userId}", userId);
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving profile picture for user {userId}", userId);
+                return StatusCode(500, new { message = "An error occurred while retrieving the profile picture." });
+            }
+        }
+        // Update FirstName
+        [HttpPost("{id}/update-firstname")]
+        public async Task<IActionResult> UpdateFirstName(int id, [FromBody] string firstName)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.FirstName = firstName;
+            await _userService.UpdateUser(user);
+            return Ok("First name updated successfully.");
+        }
+
+        // Update LastName
+        [HttpPost("{id}/update-lastname")]
+        public async Task<IActionResult> UpdateLastName(int id, [FromBody] string lastName)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.LastName = lastName;
+            await _userService.UpdateUser(user);
+            return Ok("Last name updated successfully.");
+        }
+
+        // Update Age
+        [HttpPost("{id}/update-age")]
+        public async Task<IActionResult> UpdateAge(int id, [FromBody] int age)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Age = age;
+            await _userService.UpdateUser(user);
+            return Ok("Age updated successfully.");
+        }
+
+        // Update Email
+        [HttpPost("{id}/update-email")]
+        public async Task<IActionResult> UpdateEmail(int id, [FromBody] string email)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Email = email;
+            await _userService.UpdateUser(user);
+            return Ok("Email updated successfully.");
+        }
+
+        // Update Password
+        [HttpPost("{id}/update-password")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] string password)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            await _userService.UpdatePassword(id, password);
+            return Ok("Password updated successfully.");
+        }
     }
-    public async Task UpdateFirstName(int id, string firstName)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new ArgumentException("User not found.");
-
-        await _userRepository.UpdateFirstName(id, firstName);
-    }
-
-    public async Task UpdateLastName(int id, string lastName)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new ArgumentException("User not found.");
-
-        await _userRepository.UpdateLastName(id, lastName);
-    }
-
-    public async Task UpdateAge(int id, int age)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new ArgumentException("User not found.");
-
-        await _userRepository.UpdateAge(id, age);
-    }
-
-    public async Task UpdateEmail(int id, string email)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new ArgumentException("User not found.");
-
-        await _userRepository.UpdateEmail(id, email);
-    }
-
-    public async Task UpdatePassword(int id, string newPassword)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new ArgumentException("User not found.");
-
-        user.Password = _passwordHasher.HashPassword(user, newPassword);
-        await _userRepository.UpdatePassword(id, user.Password);
-    }
-
 }
