@@ -171,5 +171,64 @@ namespace SpoerStats2.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving the profile picture." });
             }
         }
+        // Update FirstName
+        [HttpPost("{id}/update-firstname")]
+        public async Task<IActionResult> UpdateFirstName(int id, [FromBody] string firstName)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.FirstName = firstName;
+            await _userService.UpdateUser(user);
+            return Ok("First name updated successfully.");
+        }
+
+        // Update LastName
+        [HttpPost("{id}/update-lastname")]
+        public async Task<IActionResult> UpdateLastName(int id, [FromBody] string lastName)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.LastName = lastName;
+            await _userService.UpdateUser(user);
+            return Ok("Last name updated successfully.");
+        }
+
+        // Update Age
+        [HttpPost("{id}/update-age")]
+        public async Task<IActionResult> UpdateAge(int id, [FromBody] int age)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Age = age;
+            await _userService.UpdateUser(user);
+            return Ok("Age updated successfully.");
+        }
+
+        // Update Email
+        [HttpPost("{id}/update-email")]
+        public async Task<IActionResult> UpdateEmail(int id, [FromBody] string email)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Email = email;
+            await _userService.UpdateUser(user);
+            return Ok("Email updated successfully.");
+        }
+
+        // Update Password
+        [HttpPost("{id}/update-password")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] string password)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null) return NotFound("User not found.");
+
+            user.Password = password;
+            await _userService.UpdateUser(user);
+            return Ok("Password updated successfully.");
+        }
     }
 }
