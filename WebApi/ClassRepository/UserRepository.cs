@@ -115,5 +115,50 @@ namespace SpoerStats2.ClassRepository
                 return await connection.QueryAsync<User>(query, new { ClubID = clubId });
             }
         }
+        public async Task UpdateFirstName(int id, string firstName)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "UPDATE Users SET FirstName = @FirstName WHERE Id = @Id";
+                await connection.ExecuteAsync(query, new { FirstName = firstName, Id = id });
+            }
+        }
+
+        public async Task UpdateLastName(int id, string lastName)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "UPDATE Users SET LastName = @LastName WHERE Id = @Id";
+                await connection.ExecuteAsync(query, new { LastName = lastName, Id = id });
+            }
+        }
+
+        public async Task UpdateAge(int id, int age)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "UPDATE Users SET Age = @Age WHERE Id = @Id";
+                await connection.ExecuteAsync(query, new { Age = age, Id = id });
+            }
+        }
+
+        public async Task UpdateEmail(int id, string email)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "UPDATE Users SET Email = @Email WHERE Id = @Id";
+                await connection.ExecuteAsync(query, new { Email = email, Id = id });
+            }
+        }
+
+        public async Task UpdatePassword(int id, string password)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "UPDATE Users SET Password = @Password WHERE Id = @Id";
+                await connection.ExecuteAsync(query, new { Password = password, Id = id });
+            }
+        }
+
     }
 }
