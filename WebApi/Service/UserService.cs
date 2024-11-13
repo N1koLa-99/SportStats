@@ -35,21 +35,29 @@ public class UserService
 
     public async Task UpdateUser(User user)
     {
-        if (!string.IsNullOrWhiteSpace(user.Password))
+        // Първо взимаме съществуващия потребител, за да проверим дали паролата е променена
+        var existingUser = await _userRepository.GetUserById(user.Id);
+
+        if (existingUser == null)
+        {
+            throw new ArgumentException("User not found.");
+        }
+
+        // Ако паролата е променена, тогава я хешираме
+        if (!string.IsNullOrWhiteSpace(user.Password) && user.Password != existingUser.Password)
         {
             user.Password = _passwordHasher.HashPassword(user, user.Password);
         }
         else
         {
-            var existingUser = await _userRepository.GetUserById(user.Id);
-            if (existingUser != null)
-            {
-                user.Password = existingUser.Password;
-            }
+            // Ако паролата не е променена, използваме старата парола (не я променяме)
+            user.Password = existingUser.Password;
         }
 
+        // Актуализираме всички останали данни
         await _userRepository.UpdateUser(user);
     }
+
 
 
     public async Task DeleteUser(int id)
@@ -152,7 +160,11 @@ public class UserService
         var user = await _userRepository.GetUserById(id);
         if (user == null) throw new ArgumentException("User not found.");
 
-        await _userRepository.UpdateFirstName(id, firstName);
+        // Обновяваме името, само ако е различно от текущото
+        if (user.FirstName != firstName)
+        {
+            await _userRepository.UpdateFirstName(id, firstName);
+        }
     }
 
     public async Task UpdateLastName(int id, string lastName)
@@ -160,7 +172,11 @@ public class UserService
         var user = await _userRepository.GetUserById(id);
         if (user == null) throw new ArgumentException("User not found.");
 
-        await _userRepository.UpdateLastName(id, lastName);
+        // Обновяваме фамилията, само ако е различна от текущата
+        if (user.LastName != lastName)
+        {
+            await _userRepository.UpdateLastName(id, lastName);
+        }
     }
 
     public async Task UpdateAge(int id, int age)
@@ -168,7 +184,11 @@ public class UserService
         var user = await _userRepository.GetUserById(id);
         if (user == null) throw new ArgumentException("User not found.");
 
-        await _userRepository.UpdateAge(id, age);
+        // Обновяваме възрастта, само ако е различна от текущата
+        if (user.Age != age)
+        {
+            await _userRepository.UpdateAge(id, age);
+        }
     }
 
     public async Task UpdateEmail(int id, string email)
@@ -176,8 +196,13 @@ public class UserService
         var user = await _userRepository.GetUserById(id);
         if (user == null) throw new ArgumentException("User not found.");
 
-        await _userRepository.UpdateEmail(id, email);
+        // Обновяваме имейла, само ако е различен от текущия
+        if (user.Email != email)
+        {
+            await _userRepository.UpdateEmail(id, email);
+        }
     }
+
 
     public async Task UpdatePassword(int id, string newPassword)
     {
