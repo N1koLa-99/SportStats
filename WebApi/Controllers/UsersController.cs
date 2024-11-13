@@ -171,6 +171,7 @@ namespace SpoerStats2.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving the profile picture." });
             }
         }
+        
         // Update FirstName
         [HttpPost("{id}/update-firstname")]
         public async Task<IActionResult> UpdateFirstName(int id, [FromBody] string firstName)
