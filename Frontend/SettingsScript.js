@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         window.location.href = 'index.html';
         return;
     }
-
+    
     // Display user information
     displayUserInfo(user);
 
@@ -96,7 +96,6 @@ function setupProfileEditing(user) {
     saveProfileButton.addEventListener('click', async () => {
         try {
             await saveProfileChanges(user);
-            alert('Профилът е успешно обновен!');
             toggleEditFields(false);
         } catch (error) {
             console.error(error.message);
@@ -106,6 +105,11 @@ function setupProfileEditing(user) {
 }
 
 async function saveProfileChanges(user) {
+    const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const namePattern = /^[A-Za-zА-Яа-я]+$/;
+    const agePattern = /^(?:[1-9]|[1-9][0-9]|100)$/;
+   
     const updatedUser = {
         firstName: document.getElementById('edit-first-name').value.trim() || user.firstName,
         lastName: document.getElementById('edit-last-name').value.trim() || user.lastName,
@@ -113,33 +117,65 @@ async function saveProfileChanges(user) {
         email: document.getElementById('edit-email').value.trim() || user.email
     };
 
-    // само ако съвпадат
+    // Validate first name
+    if (!namePattern.test(updatedUser.firstName)) {
+        alert('Името трябва да съдържа само букви.');
+        return;  // Stop the function here if validation fails
+    }
+
+    // Validate last name
+    if (!namePattern.test(updatedUser.lastName)) {
+        alert('Фамилията трябва да съдържа само букви.');
+        return;  // Stop the function here if validation fails
+    }
+
+    // Validate age
+    if (!agePattern.test(updatedUser.age)) {
+        alert('Възрастта трябва да бъде между 1 и 100.');
+        return;  // Stop the function here if validation fails
+    }
+
+    // Validate email
+    if (!emailPattern.test(updatedUser.email)) {
+        alert('Моля, въведете валиден имейл адрес (напр. user@example.com)');
+        return;  // Stop the function here if validation fails
+    }
+
+    // Handle password (only if it's entered)
     const password = document.getElementById('edit-password').value.trim();
     const confirmPassword = document.getElementById('edit-confirm-password').value.trim();
+    if (password && confirmPassword && password !== confirmPassword) {
+        alert('Паролите не съвпадат. Моля, опитайте отново.');
+        return;  // Stop the function here if passwords do not match
+    }
+    if (password && !passwordPattern.test(password)) {
+        alert('Паролата трябва да съдържа поне 8 символа, да включва главна буква и цифра.');
+        return;  // Stop the function here if password doesn't meet criteria
+    }
     if (password && confirmPassword && password === confirmPassword) {
         updatedUser.password = password;
-    } else if (password || confirmPassword) {
-        alert('Паролите не съвпадат. Моля, опитайте отново.');
-        return;
     }
 
     try {
-        // само променените
+        // Only update the fields that have changed
         for (const [field, value] of Object.entries(updatedUser)) {
             if (value && value !== user[field]) {
                 await updateField(user.id, field, value, field);
             }
         }
 
-        // обноваваме лк ст
+        // Update local storage
         const newUser = { ...user, ...updatedUser };
         localStorage.setItem('user', JSON.stringify(newUser));
         displayUserInfo(newUser);
+        alert('Профилът е успешно обновен!');
     } catch (error) {
         console.error(error.message);
         alert('Възникна грешка при обновяване на профила.');
     }
 }
+
+
 
 function displayUserInfo(user) {
     document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
