@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     // Зареждане на клубовете
     fetchClubs();
@@ -6,15 +5,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const registrationForm = document.getElementById('registration-form');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const ageInput = document.getElementById('age');
+    const genderInput = document.getElementById('gender');
+    const clubInput = document.getElementById('club');
+    
     const emailError = document.createElement('div');
     const passwordError = document.createElement('div');
+    const firstNameError = document.createElement('div');
+    const lastNameError = document.createElement('div');
+    const ageError = document.createElement('div');
+    const genderError = document.createElement('div');
+    const clubError = document.createElement('div');
+    
     emailError.id = 'email-error';
     passwordError.id = 'password-error';
+    firstNameError.id = 'first-name-error';
+    lastNameError.id = 'last-name-error';
+    ageError.id = 'age-error';
+    genderError.id = 'gender-error';
+    clubError.id = 'club-error';
+    
     emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
     passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
+    firstNameInput.parentNode.insertBefore(firstNameError, firstNameInput.nextSibling);
+    lastNameInput.parentNode.insertBefore(lastNameError, lastNameInput.nextSibling);
+    ageInput.parentNode.insertBefore(ageError, ageInput.nextSibling);
+    genderInput.parentNode.insertBefore(genderError, genderInput.nextSibling);
+    clubInput.parentNode.insertBefore(clubError, clubInput.nextSibling);
 
     const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const namePattern = /^[A-Za-zА-Яа-я]+$/; // Only letters (supports Cyrillic as well)
+    const agePattern = /^(?:[1-9]|[1-9][0-9]|100)$/; // Age must be between 1 and 100
 
     // Валидация при изпращане на регистрационната форма
     registrationForm.addEventListener('submit', async function(event) {
@@ -35,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // По-строга проверка на парола
         if (!passwordPattern.test(passwordInput.value)) {
-            passwordError.textContent = 'Паролата трябва да е поне 8 символа и да съдържа главна буква';
+            passwordError.textContent = 'Поне 8 символа и да съдържа главна буква';
             passwordError.style.display = 'block';
             passwordInput.classList.add('error');
             formIsValid = false;
@@ -43,6 +67,65 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordError.textContent = '';
             passwordError.style.display = 'none';
             passwordInput.classList.remove('error');
+        }
+
+        // Проверка на първо и фамилно име (само букви)
+        if (!namePattern.test(firstNameInput.value)) {
+            firstNameError.textContent = 'Трябва да съдържа само букви.';
+            firstNameError.style.display = 'block';
+            firstNameInput.classList.add('error');
+            formIsValid = false;
+        } else {
+            firstNameError.textContent = '';
+            firstNameError.style.display = 'none';
+            firstNameInput.classList.remove('error');
+        }
+
+        if (!namePattern.test(lastNameInput.value)) {
+            lastNameError.textContent = 'Трябва да съдържа само букви.';
+            lastNameError.style.display = 'block';
+            lastNameInput.classList.add('error');
+            formIsValid = false;
+        } else {
+            lastNameError.textContent = '';
+            lastNameError.style.display = 'none';
+            lastNameInput.classList.remove('error');
+        }
+
+        // Проверка за възраст (между 1 и 100)
+        if (!agePattern.test(ageInput.value)) {
+            ageError.textContent = 'Моля, въведете възраст между 1 и 100.';
+            ageError.style.display = 'block';
+            ageInput.classList.add('error');
+            formIsValid = false;
+        } else {
+            ageError.textContent = '';
+            ageError.style.display = 'none';
+            ageInput.classList.remove('error');
+        }
+
+        // Проверка за пол (задължителен)
+        if (!genderInput.value) {
+            genderError.textContent = 'Моля, изберете пол.';
+            genderError.style.display = 'block';
+            genderInput.classList.add('error');
+            formIsValid = false;
+        } else {
+            genderError.textContent = '';
+            genderError.style.display = 'none';
+            genderInput.classList.remove('error');
+        }
+
+        // Проверка за клуб (задължителен)
+        if (!clubInput.value) {
+            clubError.textContent = 'Моля, изберете отбор.';
+            clubError.style.display = 'block';
+            clubInput.classList.add('error');
+            formIsValid = false;
+        } else {
+            clubError.textContent = '';
+            clubError.style.display = 'none';
+            clubInput.classList.remove('error');
         }
 
         // Ако всички проверки са преминати, изпрати формата
@@ -82,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-
+    
     // Обработчик на формата за вход
     const loginForm = document.getElementById('login-form');
     loginForm.addEventListener('submit', async function(event) {
@@ -162,6 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
     // Показване и скриване на подсказки и заглавия
     function setupInputHints(input, hintId) {
         input.addEventListener('focus', () => {
@@ -192,4 +276,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-});
+}); 

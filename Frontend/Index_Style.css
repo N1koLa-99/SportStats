@@ -142,15 +142,16 @@ label {
     transition: 0.2s ease all;
 }
 
-/* Когато полето е фокусирано или не е празно */
+/* Не скривай етикетите за името и фамилията, когато полетата са фокусирани или не са празни */
 input:focus ~ label,
 input:not(:placeholder-shown) ~ label,
 select:focus ~ label,
-select:not([value=""]) ~ label {
-    bottom: 0; /* Оставяме етикета в долната част на полето */
-    font-size: 18px; /* Намаляваме размера на шрифта на етикетите */
-    color: rgba(51, 51, 51, 0.8); /* Леко прозрачен цвят */
+select:not(:placeholder-shown) ~ label {
+    bottom: 0;
+    font-size: 18px;
+    color: rgba(51, 51, 51, 0.8);
 }
+
 
 /* Табове за превключване */
 .tabs {
