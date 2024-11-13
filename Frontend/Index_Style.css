@@ -392,19 +392,19 @@ input.error {
     }
 
     .left-side, .right-side {
-        width: 100%; /* 100% ширина на изображението */
-        display: none; /* Показва блоковото подреждане */
-        display: none; /* Блоково подреждане */
+        width: 100%; 
+        display: none;
+        display: none; 
     }
 
     .left-side img, .right-side img {
-        width: 100%; /* Запълва 100% от родителя */
-        height: auto; /* Автоматична височина */
-        height: none; /* Автоматична височина */
+        width: 100%;
+        height: auto;
+        height: none; 
     }
 
     .middle-side {
-        width: 100%; /* 100% ширина на средната част */
+        width: 100%;
         margin: 0;
         padding: 0;
     }
@@ -430,28 +430,28 @@ input.error {
     }
 
     form {
-        padding: 10px; /* Намаляване на padding-a на формата */
+        padding: 10px;
     }
 
     .tab-button {
-        padding: 5px 8px; /* Намаляване на padding-a на табовете */
-        font-size: 14px; /* Намаляване на размера на шрифта на табовете */
+        padding: 5px 8px;
+        font-size: 14px; 
     }
 
     .button-53 {
-        font-size: 0.9rem; /* Намаляване на размера на бутона */
-        padding: 0.5rem 1rem; /* Намаляване на padding-а */
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem; 
     }
     select {
         width: 100%;
-        padding: 10px; /* Намаляваме padding-а за по-малко разстояние */
-        font-size: 14px; /* Увеличаваме размера на шрифта */
+        padding: 10px;
+        font-size: 14px; 
         border: none;
-        border-bottom: 2px solid #ddd; /* Долната линия на полето */
+        border-bottom: 2px solid #ddd;
         background: transparent;
         outline: none;
         box-sizing: border-box;
-        text-align: center; /* Центриране на текста вътре в полето */
+        text-align: center;
     }
     .hint-message {
         font-size: 12px;

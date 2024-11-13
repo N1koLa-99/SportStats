@@ -37,10 +37,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    const namePattern = /^[A-Za-zА-Яа-я]+$/; // Only letters (supports Cyrillic as well)
-    const agePattern = /^(?:[1-9]|[1-9][0-9]|100)$/; // Age must be between 1 and 100
+    const namePattern = /^[A-Za-zА-Яа-я]+$/; 
+    const agePattern = /^(?:[1-9]|[1-9][0-9]|100)$/;
 
-    // Валидация при изпращане на регистрационната форма
+
     registrationForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         let formIsValid = true;
@@ -128,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
             clubInput.classList.remove('error');
         }
 
-        // Ако всички проверки са преминати, изпрати формата
         if (formIsValid) {
             const formData = new FormData(registrationForm);
             const user = {
@@ -166,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Обработчик на формата за вход
     const loginForm = document.getElementById('login-form');
     loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -198,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Функция за извличане на клубовете
     async function fetchClubs() {
         try {
             const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Clubs');
@@ -212,7 +209,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Функция за попълване на падащото меню за клубове
     function populateClubDropdown(clubs) {
         const clubSelect = document.getElementById('club');
         clubSelect.innerHTML = '<option value="" disabled selected></option>';
@@ -225,7 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Управление на табовете
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -246,7 +241,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Показване и скриване на подсказки и заглавия
     function setupInputHints(input, hintId) {
         input.addEventListener('focus', () => {
             document.getElementById(hintId).style.display = 'block';
@@ -259,21 +253,20 @@ document.addEventListener('DOMContentLoaded', function() {
     setupInputHints(emailInput, 'email-hint');
     setupInputHints(passwordInput, 'password-hint');
 
-    // Управление на заглавията
     const inputs = document.querySelectorAll('.form-group input, .form-group select');
 
     inputs.forEach(input => {
-        const label = input.nextElementSibling; // Следващият елемент след input е label
+        const label = input.nextElementSibling;
         if (label) {
             input.addEventListener('focus', () => {
-                label.classList.add('hidden-label'); // Скриване на заглавието
+                label.classList.add('hidden-label');
             });
 
             input.addEventListener('blur', () => {
                 if (input.value === '') {
-                    label.classList.remove('hidden-label'); // Показване на заглавието, ако полето е празно
+                    label.classList.remove('hidden-label');
                 }
             });
         }
     });
-}); 
+});
