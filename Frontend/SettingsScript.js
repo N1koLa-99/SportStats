@@ -117,47 +117,40 @@ async function saveProfileChanges(user) {
         email: document.getElementById('edit-email').value.trim() || user.email
     };
 
-    // Validate first name
     if (!namePattern.test(updatedUser.firstName)) {
         alert('Името трябва да съдържа само букви.');
-        return;  // Stop the function here if validation fails
+        return; 
     }
 
-    // Validate last name
     if (!namePattern.test(updatedUser.lastName)) {
         alert('Фамилията трябва да съдържа само букви.');
-        return;  // Stop the function here if validation fails
+        return; 
     }
 
-    // Validate age
     if (!agePattern.test(updatedUser.age)) {
         alert('Възрастта трябва да бъде между 1 и 100.');
-        return;  // Stop the function here if validation fails
+        return;
     }
 
-    // Validate email
     if (!emailPattern.test(updatedUser.email)) {
         alert('Моля, въведете валиден имейл адрес (напр. user@example.com)');
-        return;  // Stop the function here if validation fails
+        return;
     }
-
-    // Handle password (only if it's entered)
     const password = document.getElementById('edit-password').value.trim();
     const confirmPassword = document.getElementById('edit-confirm-password').value.trim();
     if (password && confirmPassword && password !== confirmPassword) {
         alert('Паролите не съвпадат. Моля, опитайте отново.');
-        return;  // Stop the function here if passwords do not match
+        return;
     }
     if (password && !passwordPattern.test(password)) {
         alert('Паролата трябва да съдържа поне 8 символа, да включва главна буква и цифра.');
-        return;  // Stop the function here if password doesn't meet criteria
+        return;
     }
     if (password && confirmPassword && password === confirmPassword) {
         updatedUser.password = password;
     }
 
     try {
-        // Only update the fields that have changed
         for (const [field, value] of Object.entries(updatedUser)) {
             if (value && value !== user[field]) {
                 await updateField(user.id, field, value, field);
