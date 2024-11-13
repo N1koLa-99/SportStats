@@ -175,3 +175,4 @@ function toggleEditFields(editing) {
     document.getElementById('cancel-profile').style.display = editing ? 'block' : 'none';
     document.getElementById('edit-profile').style.display = editing ? 'none' : 'block';
 }
+

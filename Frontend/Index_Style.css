@@ -457,6 +457,41 @@ input.error {
         font-size: 12px;
         margin-left: 70px;
     }
+    #first-name-error{
+        font-size: 13px;
+        margin-left: 21%;
+        color: #d21e1b6e;
+    }
+    #last-name-error{
+        font-size: 13px;
+        margin-left: 21%;
+        color: #d21e1b6e;
+    }
+    #email-error{
+        font-size: 13px;
+        margin-left: 11%;
+        color: #d21e1b6e;
+    }
+    #password-error{
+        font-size: 13px;
+        margin-left: 21%;
+        color: #d21e1b6e;
+    }
+    #age-error{
+        font-size: 13px;
+        margin-left: 21%;
+        color: #d21e1b6e;
+    }
+    #gender-error{
+        font-size: 13px;
+        margin-left: 3%;
+        color: #d21e1b6e;
+    }
+    #club-error{
+        font-size: 13px;
+        margin-left: 5%;
+        color: #d21e1b6e;
+    }
 }
 
 @media (max-width: 375px) {
