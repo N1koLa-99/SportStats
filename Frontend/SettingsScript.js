@@ -106,7 +106,6 @@ function setupProfileEditing(user) {
 }
 
 async function saveProfileChanges(user) {
-    // Collect user-inputted values
     const updatedUser = {
         firstName: document.getElementById('edit-first-name').value.trim() || user.firstName,
         lastName: document.getElementById('edit-last-name').value.trim() || user.lastName,
@@ -114,35 +113,33 @@ async function saveProfileChanges(user) {
         email: document.getElementById('edit-email').value.trim() || user.email
     };
 
-    // Only update password if both fields are provided and match
+    // само ако съвпадат
     const password = document.getElementById('edit-password').value.trim();
     const confirmPassword = document.getElementById('edit-confirm-password').value.trim();
     if (password && confirmPassword && password === confirmPassword) {
         updatedUser.password = password;
     } else if (password || confirmPassword) {
         alert('Паролите не съвпадат. Моля, опитайте отново.');
-        return; // Stop the function if passwords do not match
+        return;
     }
 
     try {
-        // Update only changed fields
+        // само променените
         for (const [field, value] of Object.entries(updatedUser)) {
             if (value && value !== user[field]) {
                 await updateField(user.id, field, value, field);
             }
         }
 
-        // Merge updated fields into user object and save to localStorage
+        // обноваваме лк ст
         const newUser = { ...user, ...updatedUser };
         localStorage.setItem('user', JSON.stringify(newUser));
-        displayUserInfo(newUser); // Refresh displayed info
+        displayUserInfo(newUser);
     } catch (error) {
         console.error(error.message);
         alert('Възникна грешка при обновяване на профила.');
     }
 }
-
-
 
 function displayUserInfo(user) {
     document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
@@ -150,7 +147,6 @@ function displayUserInfo(user) {
     document.getElementById('age').textContent = user.age || 'Няма данни';
     document.getElementById('email').textContent = user.email || 'Няма данни';
 }
-
 
 async function updateField(userId, fieldName, value, fieldLabel) {
     try {
