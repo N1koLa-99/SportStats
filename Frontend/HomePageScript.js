@@ -2,16 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let chart; // Глобална променлива за съхранение на референцията към диаграмата
     const user = JSON.parse(localStorage.getItem('user'));
 
-    if (user) {
-        console.log('Retrieved user:', user);
-        if (user.id) {
-            console.log('User ID:', user.id);
-        } else {
-            console.warn('Невалиден user.id:', user.id);
-        }
-    } else {
-        console.warn('Няма данни за потребителя в localStorage');
-    }
     
     if (user) {
         // Попълване на информация за потребителя

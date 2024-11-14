@@ -490,7 +490,7 @@ button:active {
         justify-content: flex-start;
         align-items: center;
         padding: 0px;
-        padding-bottom: 39%;
+        padding-bottom: 45%;
         width: 100vw;
         background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)), url(https://sportstats.blob.core.windows.net/$web/SnimkaTel.jpg) no-repeat center center fixed;
         animation: backgroundAnimation 0s infinite alternate;
@@ -682,6 +682,13 @@ button:active {
         margin-top: 52%;
         margin-right: -43px;
     }
+    button {
+        border-radius: 18px;
+        padding: 13px 30px;
+        font-size: 13px;
+        margin-left: 4%;
+        margin-bottom: 25px;
+    }
 }
 
 @media (max-width: 390px) {
@@ -775,5 +782,8 @@ button:active {
         width: 100px;
         height: 100px;
         margin-left: 59%;
+    }
+    .container {
+        width: 101vw;
     }
 }
