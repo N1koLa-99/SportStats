@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const user = JSON.parse(localStorage.getItem('user'));
     console.log('User:', user); // Логване на потребителя
     
-    // Общи функции
     async function fetchJson(url) {
         try {
             const response = await fetch(url);
@@ -20,8 +19,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function deleteResult(resultId) {
         // Prompt for confirmation
         const confirmation = prompt('Сигурни ли сте, че искате да изтриете резултата? Напишете 1 за потвърждение.');
-    
-        // Check if the input is "1"
         if (confirmation !== '1') {
             alert('Изтриването е отменено.');
             return; // Exit the function if not confirmed
@@ -127,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function handleCoach() {
         if (!user || user.roleID !== 2) {
             alert('Няма достъп до тази страница.');
-            window.location.href = 'LoginPage.html';
+            window.location.href = 'HomePage.html';
             return;
         }
     

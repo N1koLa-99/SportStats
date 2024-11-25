@@ -549,8 +549,8 @@ button:active {
         font-weight: 700;
         color: #ffffff;
         font-size: 22px;
-        margin-left: 99px;
-        width: 68px;
+        margin-left: 93px;
+        width: 90px;
     }
 
     .info .info-section {
@@ -607,7 +607,7 @@ button:active {
         max-width: 377px;
         max-height: 255px;
         margin-left: 19px;
-        margin-top: -11px;
+        margin-top: 15px;
     }
 
     #age.value{
@@ -670,6 +670,12 @@ button:active {
         border-radius: 38px;
         font-size: 16px;
         line-height: 17px;
+    }
+    select {
+        font-size: 14px;
+    }
+    button {
+        font-size: 15px;
     }
 
     .results h2{
@@ -786,4 +792,25 @@ button:active {
     .container {
         width: 101vw;
     }
+}
+@media(max-width: 335px){
+    #coach-button {
+        font-size: 12px;
+        top: 16px;
+        right: 235px;
+        padding: 11px;
+        color: #000000;
+        background: linear-gradient(to right, #1e90ff, #00d2ff);
+        color: #fff;
+        border: none;
+    }
+    .profile-image {
+        margin-top: 113px;
+    }
+    .results h2 {
+        font-size: 22px;
+        margin-top: 54px;
+    }
+
+
 }
