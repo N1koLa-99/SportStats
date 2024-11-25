@@ -85,7 +85,9 @@ namespace SpoerStats2.Controllers
             {
                 return Unauthorized();
             }
-            return Ok(user);
+            UserSession result = new UserSession(user);
+            result.UserTokenHash = result.GetUserTokenHash();
+            return Ok(result);
         }
 
         private int GetUserIdFromToken()
@@ -171,7 +173,7 @@ namespace SpoerStats2.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving the profile picture." });
             }
         }
-        
+       
         // Update FirstName
         [HttpPost("{id}/update-firstname")]
         public async Task<IActionResult> UpdateFirstName(int id, [FromBody] string firstName)
