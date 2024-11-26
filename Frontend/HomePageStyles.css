@@ -497,7 +497,7 @@ button:active {
         justify-content: flex-start;
         align-items: center;
         padding: 0px;
-        padding-bottom: 45%;
+        padding-bottom: 100%;
         width: 100vw;
         background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)), url(https://sportstats.blob.core.windows.net/$web/SnimkaTel.jpg) no-repeat center center fixed;
         animation: backgroundAnimation 0s infinite alternate;
@@ -728,8 +728,8 @@ button:active {
         margin-bottom: 20px;
     }
     #resultsChart {
-        max-width: 300px;
-        max-height: 193px;
+        max-width: 389px;
+        max-height: 252px;
         margin-left: 31px;
         margin-top: 2px;
         margin-bottom: 5px;

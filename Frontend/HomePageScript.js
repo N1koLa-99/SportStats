@@ -336,9 +336,9 @@ if (ctx) {
                     position: 'top',
                     labels: {
                         font: {
-                            family: 'Arial', // Нормален шрифт
+                            family: 'Arial',
                             size: 14,
-                            weight: 'normal' // Стандартно тегло
+                            weight: 'normal',
                         },
                         padding: 20,
                         boxWidth: 20
@@ -356,9 +356,8 @@ if (ctx) {
                     callbacks: {
                         label: function(context) {
                             const value = context.parsed.y;
-                            // Променяме текста в tooltip в зависимост от това дали е норматив или резултат
                             if (context.dataset.label.includes("Норматив")) {
-                                return `Норматив: ${value}`;  // Ако е норматив, показваме "Норматив"
+                                return `Норматив: ${value}`;
                             } else {
                                 return isTimeDiscipline ? `Резултат: ${formatTime(value)}` : `Резултат: ${value}`;
                             }
@@ -395,7 +394,10 @@ if (ctx) {
                         lineWidth: 1
                     },
                     beginAtZero: !isTimeDiscipline,
-                    reverse: isTimeDiscipline
+                    reverse: isTimeDiscipline,
+                    ticks: {
+                        stepSize: 0.10,  // Увеличете стъпката за да разширите разстоянията      // Максималната стойност
+                    }
                 }
             },
             animation: {
@@ -403,8 +405,7 @@ if (ctx) {
                 easing: 'easeInOutElastic',
             }
         }
-    });
-    
+    });  
 }
      
         
