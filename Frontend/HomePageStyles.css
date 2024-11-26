@@ -384,8 +384,10 @@ button:active {
         overflow: hidden;
         transition: transform 0.3s ease-in-out;
     }
-    button {
-        font-size: 13px;
+    .coach-button {
+        top: 95px;
+        right: 5px;
+        font-size: 11px;
     }
     .info{
         max-width: 252px;
@@ -472,6 +474,11 @@ button:active {
         padding-left: 55px;
         padding-right: 55px;
         margin-top: -68px;
+    }
+    button {
+        top: 95px;
+        right: 5px;
+        font-size: 11px;
     }
 
     #chart-info{
