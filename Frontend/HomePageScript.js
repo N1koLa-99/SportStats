@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     let chart; // Глобална променлива за съхранение на референцията към диаграмата
     const user = JSON.parse(localStorage.getItem('user'));
-
     
     if (user) {
         // Попълване на информация за потребителя
@@ -231,8 +230,7 @@ if (user && user.id > 0) {
                     normativeValueText += `Норматив (${poolType}): ${formatTime(normativeValue)}<br>`;
                     normativeDifferenceText += `Разлика с норматив (${poolType}): ${difference.toFixed(2)} сек<br>`;
         
-                    // Бледи цветове за квадратчетата
-                    const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; // Светлозелено и светлочервено
+                    const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; 
                     normativeStatusText += `
                         <div style="display: inline-block; width: 80px; height: 40px; background-color: ${statusColor}; 
                         color: black; text-align: center; line-height: 40px; border-radius: 5px;margin-right: -3px;; font-weight: bold;margin-left: 14px;">
@@ -253,7 +251,6 @@ if (user && user.id > 0) {
         let normative25m = null, normative50m = null;
         let chartNormative25m = [], chartNormative50m = [];
 
-        // Extract normative values for 25m and 50m pools
         relevantNormatives.forEach(normative => {
             if (normative.swimmingPoolStandartId === 1) {
                 normative25m = normative.valueStandart;
@@ -262,81 +259,155 @@ if (user && user.id > 0) {
             }
         });
 
-        // Fill the data for both normatives (25m and 50m)
         chartNormative25m = chartLabels.map(() => normative25m ? normative25m : null);
-        chartNormative50m = chartLabels.map(() => normative50m ? normative50m : null);
-
+        chartNormative50m = chartLabels.map(() => normative50m ? normative50m : null);        
+        
         const ctx = document.getElementById('resultsChart')?.getContext('2d');
-        if (ctx) {
-            if (chart) {
-                chart.destroy();
-            }
+if (ctx) {
+    if (chart) {
+        chart.destroy();
+    }
 
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartLabels,
-                    datasets: [
-                        {
-                            label: 'Резултати',
-                            data: chartData,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Норматив 25m',
-                            data: chartNormative25m,
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Норматив 50m',
-                            data: chartNormative50m,
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            pointRadius: 0
-                        }
-                    ]
+    const gradientLine1 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientLine1.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+    gradientLine1.addColorStop(1, 'rgba(75, 192, 192, 0.4)');
+
+    const gradientLine2 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientLine2.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
+    gradientLine2.addColorStop(1, 'rgba(255, 99, 132, 0.4)');
+
+    const gradientLine3 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientLine3.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+    gradientLine3.addColorStop(1, 'rgba(54, 162, 235, 0.4)');
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [
+                {
+                    label: 'Резултати',
+                    data: chartData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: gradientLine1,
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                    pointHoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    pointStyle: 'rectRounded', // по-забавни точки
                 },
-                options: {
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Дата'
-                            }
+                {
+                    label: 'Норматив 25m',
+                    data: chartNormative25m,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: gradientLine2,
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                    pointHoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
+                },
+                {
+                    label: 'Норматив 50m',
+                    data: chartNormative50m,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: gradientLine3,
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointHoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'nearest',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            family: 'Arial', // Нормален шрифт
+                            size: 14,
+                            weight: 'normal' // Стандартно тегло
                         },
-                        y: {
-                            title: {
-                                display: true,
-                                text: getUnitForDiscipline(disciplineId)
-                            },
-                            beginAtZero: !isTimeDiscipline,
-                            reverse: isTimeDiscipline
-                        }
+                        padding: 20,
+                        boxWidth: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        weight: 'bold',
+                        size: 14
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed.y;
-                                    return isTimeDiscipline ? `Резултат: ${formatTime(value)}` : `Резултат: ${value}`;
-                                }
+                    bodyFont: {
+                        size: 12
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            // Променяме текста в tooltip в зависимост от това дали е норматив или резултат
+                            if (context.dataset.label.includes("Норматив")) {
+                                return `Норматив: ${value}`;  // Ако е норматив, показваме "Норматив"
+                            } else {
+                                return isTimeDiscipline ? `Резултат: ${formatTime(value)}` : `Резултат: ${value}`;
                             }
                         }
                     }
                 }
-            });
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Дата',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: 1
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: getUnitForDiscipline(disciplineId),
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: 1
+                    },
+                    beginAtZero: !isTimeDiscipline,
+                    reverse: isTimeDiscipline
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutElastic',
+            }
         }
+    });
+    
+}
+     
         
-
-        // Update the result elements
         document.getElementById('best-result').textContent = bestResult 
             ? `Най-добър резултат: ${formatTime(bestResult.valueTime)}` 
             : 'Няма налични резултати.';
@@ -386,3 +457,4 @@ if (user && user.id > 0) {
         }
     }
 });
+
