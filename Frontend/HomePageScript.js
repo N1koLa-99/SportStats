@@ -268,145 +268,158 @@ if (ctx) {
         chart.destroy();
     }
 
-    const gradientLine1 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientLine1.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
-    gradientLine1.addColorStop(1, 'rgba(75, 192, 192, 0.4)');
+    // Ограничаваме данните до последните 8 елемента
+const latestDataCount = 8;
 
-    const gradientLine2 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientLine2.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
-    gradientLine2.addColorStop(1, 'rgba(255, 99, 132, 0.4)');
+const latestLabels = chartLabels.slice(-latestDataCount);
+const latestChartData = chartData.slice(-latestDataCount);
+const latestChartNormative25m = chartNormative25m.slice(-latestDataCount);
+const latestChartNormative50m = chartNormative50m.slice(-latestDataCount);
 
-    const gradientLine3 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientLine3.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
-    gradientLine3.addColorStop(1, 'rgba(54, 162, 235, 0.4)');
+// Създаване на градиенти
+const gradientLine1 = ctx.createLinearGradient(0, 0, 0, 400);
+gradientLine1.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+gradientLine1.addColorStop(1, 'rgba(75, 192, 192, 0.4)');
 
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartLabels,
-            datasets: [
-                {
-                    label: 'Резултати',
-                    data: chartData,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: gradientLine1,
-                    borderWidth: 2,
-                    tension: 0.4,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
-                    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                    pointHoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
-                    pointStyle: 'rectRounded', // по-забавни точки
-                },
-                {
-                    label: 'Норматив 25m',
-                    data: chartNormative25m,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: gradientLine2,
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    pointHoverRadius: 8,
-                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                    pointHoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
-                },
-                {
-                    label: 'Норматив 50m',
-                    data: chartNormative50m,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: gradientLine3,
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    pointHoverRadius: 8,
-                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                    pointHoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'nearest',
-                intersect: false,
+const gradientLine2 = ctx.createLinearGradient(0, 0, 0, 400);
+gradientLine2.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
+gradientLine2.addColorStop(1, 'rgba(255, 99, 132, 0.4)');
+
+const gradientLine3 = ctx.createLinearGradient(0, 0, 0, 400);
+gradientLine3.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+gradientLine3.addColorStop(1, 'rgba(54, 162, 235, 0.4)');
+
+// Създаване на графиката с последните 8 резултата
+chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: latestLabels, // Използваме само последните 8 етикета
+        datasets: [
+            {
+                label: 'Резултати',
+                data: latestChartData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: gradientLine1,
+                borderWidth: 2,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                pointHoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
+                pointStyle: 'rectRounded', // по-забавни точки
             },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: {
-                            family: 'Arial',
-                            size: 14,
-                            weight: 'normal',
-                        },
-                        padding: 20,
-                        boxWidth: 20
-                    }
+            {
+                label: 'Норматив 25m',
+                data: latestChartNormative25m,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: gradientLine2,
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                pointHoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
+            },
+            {
+                label: 'Норматив 50m',
+                data: latestChartNormative50m,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: gradientLine3,
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointHoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'nearest',
+            intersect: false,
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: {
+                        family: 'Arial',
+                        size: 14,
+                        weight: 'normal',
+                    },
+                    padding: 20,
+                    boxWidth: 20
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleFont: {
+                    weight: 'bold',
+                    size: 14
                 },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleFont: {
-                        weight: 'bold',
-                        size: 14
-                    },
-                    bodyFont: {
-                        size: 12
-                    },
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.parsed.y;
-                            if (context.dataset.label.includes("Норматив")) {
-                                return `Норматив: ${value}`;
-                            } else {
-                                return isTimeDiscipline ? `Резултат: ${formatTime(value)}` : `Резултат: ${value}`;
-                            }
+                bodyFont: {
+                    size: 12
+                },
+                callbacks: {
+                    label: function(context) {
+                        const value = context.parsed.y;
+                        if (context.dataset.label.includes("Норматив")) {
+                            return `Норматив: ${value}`;
+                        } else {
+                            return isTimeDiscipline ? `Резултат: ${formatTime(value)}` : `Резултат: ${value}`;
                         }
                     }
                 }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Дата',
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        },
+            }
+        },
+        scales: {
+            x: {
+                display: false, // Скриване на етикетите по x-оста
+                title: {
+                    display: true,
+                    text: 'Дата',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
                     },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)',
-                        lineWidth: 1
-                    }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: getUnitForDiscipline(disciplineId),
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        },
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)',
-                        lineWidth: 1
-                    },
-                    beginAtZero: !isTimeDiscipline,
-                    reverse: isTimeDiscipline,
-                    ticks: {
-                        stepSize: 0.10,  // Увеличете стъпката за да разширите разстоянията      // Максималната стойност
-                    }
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)',
+                    lineWidth: 1
                 }
             },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutElastic',
+            y: {
+                title: {
+                    display: true,
+                    text: getUnitForDiscipline(disciplineId),
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)',
+                    lineWidth: 1
+                },
+                beginAtZero: !isTimeDiscipline,
+                reverse: isTimeDiscipline,
+                ticks: {
+                    stepSize: 0.10,  // Увеличете стъпката за да разширите разстоянията
+                }
             }
+        },
+        animation: {
+            duration: 1000,
+            easing: 'easeInOutElastic',
         }
-    });  
-}
+    }
+});
+
+     
+    }
      
         
         document.getElementById('best-result').textContent = bestResult 
