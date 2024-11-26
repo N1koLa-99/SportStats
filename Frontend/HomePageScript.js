@@ -21,8 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             document.getElementById('coach-button').classList.add('hidden');
         }
-
-
+        
         // Извличане на информация за клуба
         fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
             .then(response => {
@@ -216,26 +215,29 @@ if (user && user.id > 0) {
                 n.gender === mappedGender && n.disciplineId === disciplineId
             );
         }
-        
-
+    
         bestResult = findBestResult(results, isTimeDiscipline);
 
         if (normatives.length > 0) {
             console.log('Търсене на нормативи за:', { userAge, userGender, disciplineId });
             relevantNormatives = findNormatives(normatives, disciplineId, userAge, userGender);
-
+        
             if (relevantNormatives.length > 0) {
                 relevantNormatives.forEach(normative => {
                     const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
                     const normativeValue = normative.valueStandart;
                     const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
-
+        
                     normativeValueText += `Норматив (${poolType}): ${formatTime(normativeValue)}<br>`;
                     normativeDifferenceText += `Разлика с норматив (${poolType}): ${difference.toFixed(2)} сек<br>`;
-                    
-                    const statusText = difference <= 0 ? 'Покрит' : 'Не е покрит';
-                    const statusColor = difference <= 0 ? 'green' : 'red';
-                    normativeStatusText += `<span style="color: ${statusColor};">${statusText} (${poolType})</span><br>`;
+        
+                    // Бледи цветове за квадратчетата
+                    const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; // Светлозелено и светлочервено
+                    normativeStatusText += `
+                        <div style="display: inline-block; width: 80px; height: 40px; background-color: ${statusColor}; 
+                        color: black; text-align: center; line-height: 40px; border-radius: 5px;margin-right: -3px;; font-weight: bold;margin-left: 14px;">
+                            ${poolType}
+                        </div><br>`;
                 });
             } else {
                 normativeValueText = 'Няма норматив за тази възрастова група и дисциплина.';
@@ -243,8 +245,8 @@ if (user && user.id > 0) {
         } else {
             normativeValueText = 'Няма налични нормативи.';
         }
-
-        // Generating chart data
+        
+        
         const chartLabels = results.map(result => new Date(result.resultDate).toLocaleDateString());
         const chartData = results.map(result => result.valueTime);
 
@@ -332,6 +334,7 @@ if (user && user.id > 0) {
                 }
             });
         }
+        
 
         // Update the result elements
         document.getElementById('best-result').textContent = bestResult 
