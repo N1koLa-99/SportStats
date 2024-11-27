@@ -188,30 +188,53 @@ document.addEventListener('DOMContentLoaded', async function () {
                 });
             });
             
-            
+            let searchTimeout;
+            document.getElementById('search').addEventListener('keyup', function () {
+                clearTimeout(searchTimeout);
         
-            // Обработчик на събития за търсене по име и фамилия
-            document.getElementById('search-form').addEventListener('submit', function (event) {
+                // Настройваме нов таймер
+                searchTimeout = setTimeout(() => {
+                    document.getElementById('search').dispatchEvent(new Event('submit')); // Симулираме натискане на бутона
+                }, 1200); // 
+            });
+        
+            document.getElementById('search').addEventListener('submit', async function (event) {
                 event.preventDefault();
-                const firstName = document.getElementById('first-name').value.trim().toLowerCase();
-                const lastName = document.getElementById('last-name').value.trim().toLowerCase();
-    
-                const disciplineId = Number(document.getElementById('discipline').value); // Преобразуване на стойността в число
-    
-                console.log('Search submitted with first name:', firstName, 'last name:', lastName, 'disciplineId:', disciplineId);
-    
-                const filteredUsers = clubUsers.filter(user =>
-                    user.firstName.toLowerCase() === firstName &&
-                    user.lastName.toLowerCase() === lastName
-                );
-    
-                if (filteredUsers.length === 0) {
-                    alert('Не бяха намерени потребители с тези имена.');
-                    displayUsersTable([], results, disciplineId);
-                } else {
-                    displayUsersTable(filteredUsers, results, disciplineId);
+        
+                const query = document.getElementById('search').value.trim();
+                if (!query) {
+                    alert('Моля, въведете име или част от име за търсене.');
+                    return;
+                }
+
+                try {
+                    // Изпращаме заявка към новия Search API
+                    const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/search?query=${encodeURIComponent(query)}`);
+        
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            alert('Не бяха намерени потребители, отговарящи на заявката.');
+                            return;
+                        }
+                        throw new Error(`Грешка при търсенето: ${response.statusText}`);
+                    }
+        
+                    const users = await response.json();
+        
+                    console.log('Намерени потребители:', users);
+        
+                    // Актуализираме таблицата с резултатите
+                    const disciplineId = Number(document.getElementById('discipline').value); // Преобразуване на стойността в число
+                    const allResults = await fetchJson('https://sportstatsapi.azurewebsites.net/api/Results');
+                    displayUsersTable(users, allResults, disciplineId);
+        
+                } catch (error) {
+                    console.error('Грешка при търсенето:', error);
+                    alert('Възникна грешка при извършване на търсенето.');
                 }
             });
+
+            
     
         } catch (error) {
             alert('Не можа да се извлекат данните.');
