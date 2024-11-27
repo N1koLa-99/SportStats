@@ -212,5 +212,8 @@ public class UserService
         user.Password = _passwordHasher.HashPassword(user, newPassword);
         await _userRepository.UpdatePassword(id, user.Password);
     }
-
+    public async Task<IEnumerable<User>> SearchUsersByName(string query)
+    {
+        return await _userRepository.SearchUsersByName(query);
+    }
 }
