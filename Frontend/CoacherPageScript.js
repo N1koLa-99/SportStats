@@ -195,22 +195,22 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Настройваме нов таймер
                 searchTimeout = setTimeout(() => {
                     document.getElementById('search').dispatchEvent(new Event('submit')); // Симулираме натискане на бутона
-                }, 1200); // 
+                }, 1000); // 
             });
         
             document.getElementById('search').addEventListener('submit', async function (event) {
                 event.preventDefault();
-        
+            
                 const query = document.getElementById('search').value.trim();
                 if (!query) {
                     alert('Моля, въведете име или част от име за търсене.');
                     return;
                 }
-
+            
                 try {
                     // Изпращаме заявка към новия Search API
                     const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/search?query=${encodeURIComponent(query)}`);
-        
+            
                     if (!response.ok) {
                         if (response.status === 404) {
                             alert('Не бяха намерени потребители, отговарящи на заявката.');
@@ -218,21 +218,52 @@ document.addEventListener('DOMContentLoaded', async function () {
                         }
                         throw new Error(`Грешка при търсенето: ${response.statusText}`);
                     }
-        
+            
                     const users = await response.json();
-        
-                    console.log('Намерени потребители:', users);
-        
-                    // Актуализираме таблицата с резултатите
-                    const disciplineId = Number(document.getElementById('discipline').value); // Преобразуване на стойността в число
-                    const allResults = await fetchJson('https://sportstatsapi.azurewebsites.net/api/Results');
-                    displayUsersTable(users, allResults, disciplineId);
-        
+            
+                    // Ако няма потребители, премахваме таблицата и показваме съобщение
+                    const resultsTable = document.getElementById('resultsTable');
+                    const noResultsMessage = document.getElementById('noResultsMessage');
+            
+                    if (users.length === 0) {
+                        // Премахваме таблицата
+                        if (resultsTable) {
+                            resultsTable.style.display = 'none'; // Скриваме таблицата
+                        }
+            
+                        // Показваме съобщението "Няма такъв състезател"
+                        if (noResultsMessage) {
+                            noResultsMessage.style.display = 'block';
+                        } else {
+                            const messageElement = document.createElement('p');
+                            messageElement.id = 'noResultsMessage';
+                            messageElement.textContent = 'Няма такъв състезател';
+                            messageElement.style.color = 'red';
+                            document.getElementById('resultsContainer').appendChild(messageElement); // Assuming you have a container for results
+                        }
+                    } else {
+                        // Ако има резултати, показваме таблицата
+                        if (resultsTable) {
+                            resultsTable.style.display = 'table'; // Показваме таблицата
+                        }
+            
+                        // Изчистваме предишните резултати и актуализираме таблицата
+                        const disciplineId = Number(document.getElementById('discipline').value); // Преобразуване на стойността в число
+                        const allResults = await fetchJson('https://sportstatsapi.azurewebsites.net/api/Results');
+                        displayUsersTable(users, allResults, disciplineId);
+            
+                        // Скриваме съобщението "Няма такъв състезател", ако е показано
+                        if (noResultsMessage) {
+                            noResultsMessage.style.display = 'none';
+                        }
+                    }
+            
                 } catch (error) {
                     console.error('Грешка при търсенето:', error);
                     alert('Възникна грешка при извършване на търсенето.');
                 }
             });
+            
 
             
     
