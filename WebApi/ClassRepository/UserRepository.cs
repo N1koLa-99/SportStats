@@ -159,6 +159,13 @@ namespace SpoerStats2.ClassRepository
                 await connection.ExecuteAsync(query, new { Password = password, Id = id });
             }
         }
-
+        public async Task<IEnumerable<User>> SearchUsersByName(string query)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var sqlQuery = "SELECT * FROM Users WHERE FirstName LIKE @Query OR LastName LIKE @Query";
+                return await connection.QueryAsync<User>(sqlQuery, new { Query = $"%{query}%" });
+            }
+        }
     }
 }
