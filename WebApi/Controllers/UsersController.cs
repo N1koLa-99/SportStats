@@ -232,5 +232,22 @@ namespace SpoerStats2.Controllers
             await _userService.UpdatePassword(id, password);
             return Ok("Password updated successfully.");
         }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<User>>> SearchUsers([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Search query cannot be empty.");
+            }
+
+            var users = await _userService.SearchUsersByName(query);
+            if (users == null || !users.Any())
+            {
+                return NotFound("No users found matching the query.");
+            }
+
+            return Ok(users);
+        }
     }
 }

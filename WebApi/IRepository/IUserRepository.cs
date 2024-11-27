@@ -17,6 +17,6 @@ namespace SpoerStats2.Repository
         Task UpdateAge(int id, int age);
         Task UpdateEmail(int id, string email);
         Task UpdatePassword(int id, string password);
+        Task<IEnumerable<User>> SearchUsersByName(string query);
     }
-
 }
