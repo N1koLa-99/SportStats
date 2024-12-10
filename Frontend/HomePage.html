@@ -13,8 +13,13 @@
         <a href="Settings.html" class="settings-button">
             <i class="fas fa-cog"></i>
         </a>
+        
         <div class="info">
-            <img id="profile-picture" alt="Profile Picture" class="profile-image" src="https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg">
+            <img id="profile-picture" 
+                 alt="Profile Picture" 
+                 class="profile-image" 
+                 src="https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg">
+            
             <div class="info-section">
                 <div class="info-row">
                     <div class="info-col">
@@ -29,11 +34,13 @@
                     </div>
                 </div>
             </div>
+            
             <div class="info-section">
                 <span class="label">Фамилия:</span>
                 <div class="line"></div>
                 <span class="value" id="last-name">Няма данни</span>
             </div>
+            
             <div class="info-section">
                 <span class="label">Клуб:</span>
                 <div class="line"></div>
@@ -60,19 +67,17 @@
                     <p id="normative-value">Норматив: </p>
                 </div>
             </div>
-        </div> 
-        
-        <button id="coach-button" class="coach-button hidden" onclick="redirectToCoacherPage()">
+        </div>
+
+        <button id="coach-button" 
+                class="coach-button hidden" 
+                onclick="redirectToCoacherPage()">
             Треньори
         </button>
-
-        
-        
     </div>
+
     <script src="HomePageScript.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/chart.js@3.9.1/dist/chart.min.js"></script>
-
-
 </body>
 </html>

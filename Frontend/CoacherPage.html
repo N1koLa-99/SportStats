@@ -13,10 +13,8 @@
 
         <button id="go-home" class="home-button"><i class="fas fa-home"></i></button>
 
-        <!-- Показване на името на треньора -->
         <h2>Добре дошли, <span id="coach-name"></span></h2>
 
-        <!-- Падащо меню за избор на дисциплина -->
         <label for="discipline">Изберете дисциплина:</label>
         <select id="discipline">
             <option value="" disabled selected>Изберете дисциплина</option>
@@ -27,7 +25,6 @@
             <button type="submit">Търсене</button>
         </form>
         
-
         <h3>Потребители на клуба</h3>
         <div class="scrollable-table">
             <table id="users-table">
@@ -36,12 +33,11 @@
                         <th>Първо име</th>
                         <th>Фамилия</th>
                         <th>Възраст</th>
-                        <th>Най-добър резултат</th> 
-                        <th>Старите резултати</th> 
+                        <th>Най-добър резултат</th>
+                        <th>Старите резултати</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Потребителите ще бъдат попълнени тук -->
                 </tbody>
             </table>
         </div>
@@ -50,13 +46,11 @@
             <h3>Добавяне на резултат</h3>
             <label for="add-discipline">Дисциплина:</label>
             <select id="add-discipline">
-                <!-- Опции за дисциплини ще бъдат добавени тук динамично -->
             </select>
             
             <div id="add-user-container">
                 <label for="add-user">Потребител:</label>
                 <select id="add-user">
-                    <!-- Опции за потребители ще бъдат добавени тук динамично -->
                 </select>
                 <img id="user-profile-picture" alt="Профилна снимка на потребителя" />
             </div>
@@ -75,7 +69,6 @@
                 <input type="number" id="milliseconds" min="0" max="99" value="0">
             </div>
             
-        
             <div id="decimal-input" style="display: none;">
                 <label for="decimal-result">Резултат:</label>
                 <input type="number" id="decimal-result" step="0.01">
@@ -83,8 +76,7 @@
         
             <button id="submit-result">Добави резултат</button>
         </div>
-        <a href="Result.html" id="detailed-info-link" 
-        style="margin-left: 76%;font-weight: bold;">Подробна информация</a>
+        <a href="Result.html" id="detailed-info-link" style="margin-left: 76%;font-weight: bold;">Подробна информация</a>
     </div>
 
     <script src="CoacherPageScript.js"></script>

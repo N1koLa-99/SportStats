@@ -163,11 +163,11 @@ tbody tr:hover {
     border: none; /* Remove border */
     cursor: pointer; /* Change cursor to pointer */
     color: rgb(160, 106, 106); /* Set color of the icon */
-    font-size: 20px; /* Adjust size of the icon */
+    font-size: 20px;
 }
 
 .delete-result:hover {
-    color: darkred; /* Change color on hover */
+    color: darkred;
 }
 @media (max-width: 450px) {
     .container {
@@ -225,7 +225,7 @@ tbody tr:hover {
     }
 
     #user-profile-picture {
-        width: 100px; /* По-малък размер на снимката */
+        width: 100px;
         height: 100px;
         width: 85px;
         height: 85px;
@@ -234,7 +234,7 @@ tbody tr:hover {
     #add-user-container {
         display: block;
         align-items: center;
-        margin-bottom: 20px; /* Добавя разстояние под падащото меню и снимката */
+        margin-bottom: 20px;
     }
 
     .home-button {

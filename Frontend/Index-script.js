@@ -45,17 +45,33 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         let formIsValid = true;
 
-        // Проверка на имейл
         if (!emailPattern.test(emailInput.value)) {
             emailError.textContent = 'Моля, въведете валиден имейл адрес.';
             emailError.style.display = 'block';
             emailInput.classList.add('error');
             formIsValid = false;
         } else {
-            emailError.textContent = '';
-            emailError.style.display = 'none';
-            emailInput.classList.remove('error');
+            try {
+                const emailExists = await checkEmailAvailability(emailInput.value);
+                if (emailExists) {
+                    emailError.textContent = 'Този имейл вече е регистриран.';
+                    emailError.style.display = 'block';
+                    emailInput.classList.add('error');
+                    formIsValid = false;
+                } else {
+                    emailError.textContent = '';
+                    emailError.style.display = 'none';
+                    emailInput.classList.remove('error');
+                }
+            } catch (error) {
+                console.error('Грешка при проверка на имейла:', error);
+                emailError.textContent = 'Неуспешна проверка на имейла. Моля, опитайте отново.';
+                emailError.style.display = 'block';
+                emailInput.classList.add('error');
+                formIsValid = false;
+            }
         }
+        
 
         // По-строга проверка на парола
         if (!passwordPattern.test(passwordInput.value)) {
@@ -166,35 +182,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     const loginForm = document.getElementById('login-form');
-    loginForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const formData = new FormData(loginForm);
-        const loginData = {
-            email: formData.get('login-email'),
-            password: formData.get('login-password')
-        };
 
-        try {
-            const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(loginData)
-            });
+    loginForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error('Грешка при влизането: ' + (errorData.errors ? JSON.stringify(errorData.errors) : response.statusText));
-            }
+    const formData = new FormData(loginForm);
+    const loginData = {
+        email: formData.get('login-email'),
+        password: formData.get('login-password')
+    };
 
-            const user = await response.json();
-            localStorage.setItem('user', JSON.stringify(user));
-            alert('Входът е успешен! Добре дошли, ' + user.firstName + '!');
-            window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
-        } catch (error) {
-            console.error('Грешка при влизането:', error);
-            alert('Възникна грешка при влизането. Моля, проверете имейла и паролата и опитайте отново.');
+    try {
+        const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(loginData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error('Грешка при влизането: ' + (errorData.errors ? JSON.stringify(errorData.errors) : response.statusText));
         }
-    });
+
+        const user = await response.json();
+
+        // Запазване на потребителските данни
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('userHash', user.userTokenHash);
+
+        alert('Входът е успешен! Добре дошли, ' + user.firstName + '!');
+        window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+    } catch (error) {
+        console.error('Грешка при влизането:', error);
+        alert('Възникна грешка при влизането. Моля, проверете имейла и паролата и опитайте отново.');
+    }
+});
+
 
     async function fetchClubs() {
         try {
@@ -240,7 +263,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
+    async function checkEmailAvailability(email) {
+        try {
+            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/email-exists/${email}`);
+            if (!response.ok) {
+                throw new Error('Грешка при проверка на имейла: ' + response.statusText);
+            }
+            const data = await response.json();
+            return data.emailExists; // true или false
+        } catch (error) {
+            console.error('Грешка:', error);
+            return false; // Предполага се, че имейлът е зает при грешка
+        }
+    }
+      
     function setupInputHints(input, hintId) {
         input.addEventListener('focus', () => {
             document.getElementById(hintId).style.display = 'block';

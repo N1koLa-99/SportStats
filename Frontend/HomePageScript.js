@@ -1,9 +1,38 @@
-document.addEventListener('DOMContentLoaded', function() {
-    let chart; // Глобална променлива за съхранение на референцията към диаграмата
+document.addEventListener('DOMContentLoaded', async function () { // Маркираме функцията като async
+    let chart; // Глобална променлива за диаграмата
+    
     const user = JSON.parse(localStorage.getItem('user'));
+    const savedHash = localStorage.getItem('userHash');
+
+    if (!user || !savedHash) {
+        alert('Невалидни данни. Пренасочване към началната страница.');
+        window.location.href = 'Index.html';
+        return;
+    }
+
+    // Функция за генериране на хеш
+    async function hashUserData(user) {
+        const data = `${user.firstName}${user.lastName}${user.age}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}`;
+        const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+        return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    }
+
+    try {
+        const currentHash = await hashUserData(user);
+        if (currentHash !== savedHash) {
+            alert('Не бъди злонамерен <3 ');
+            localStorage.clear();
+            window.location.href = 'Index.html';
+            return;
+        }
+    } catch (error) {
+        console.error('Грешка при проверка на хеша:', error);
+        alert('Възникна грешка. Пренасочване към началната страница.');
+        window.location.href = 'Index.html';
+        return;
+    }
     
     if (user) {
-        // Попълване на информация за потребителя
         document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
         document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
         document.getElementById('age').textContent = user.age || 'Няма данни';
@@ -14,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
             coachButton.classList.remove('hidden');
 
             // Добавяне на обработчик на събитието за бутона на треньора
-            coachButton.addEventListener('click', function() {
+            coachButton.addEventListener('click', function () {
                 window.location.href = 'CoacherPage.html'; // Пренасочване към CoacherPage.html
             });
         } else {
@@ -38,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
         // Добавяне на събитие за формата за дисциплина
-        document.getElementById('discipline-form').addEventListener('submit', function(event) {
+        document.getElementById('discipline-form').addEventListener('submit', function (event) {
             event.preventDefault();
             const disciplineId = parseInt(document.getElementById('discipline').value, 10);
             if (disciplineId) {

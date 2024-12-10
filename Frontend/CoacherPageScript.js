@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async function () {
     const user = JSON.parse(localStorage.getItem('user'));
-    console.log('User:', user); // Логване на потребителя
+    console.log('User:', user);
     
     async function fetchJson(url) {
         try {
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            console.log('Fetched data from', url, ':', data); // Логване на данните от API
+            console.log('Fetched data from', url, ':', data);
             return data;
         } catch (error) {
             console.error('Грешка при извличане на данни:', error);
@@ -17,11 +17,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
     async function deleteResult(resultId) {
-        // Prompt for confirmation
         const confirmation = prompt('Сигурни ли сте, че искате да изтриете резултата? Напишете 1 за потвърждение.');
         if (confirmation !== '1') {
             alert('Изтриването е отменено.');
-            return; // Exit the function if not confirmed
+            return; 
         }
     
         try {
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
     
             alert('Резултатът е изтрит успешно!');
-            // Обновяване на показаните резултати
             const disciplineId = Number(document.getElementById('discipline').value);
             const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/Users/club/${user.clubID}`);
             const results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results`);
@@ -59,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 option.textContent = typeof textProperty === 'function' ? textProperty(item) : item[textProperty] || `Опция ${item[valueProperty]}`;
                 select.appendChild(option);
             });
-            console.log('Populated dropdown with ID:', elementId); // Логване на попълнените данни
+            console.log('Populated dropdown with ID:', elementId);
         }
     }
 
@@ -74,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 ? results.filter(result => result.userId === user.id && result.disciplineId == disciplineId)
                 : [];
             
-            console.log('Потребител:', user.firstName, user.lastName, 'Резултати:', userResults); // Логване на резултатите на потребителя
+            console.log('Потребител:', user.firstName, user.lastName, 'Резултати:', userResults);
             
             const bestResult = userResults.length > 0
                 ? getBestResult(userResults, disciplineId)
@@ -110,8 +108,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             `;
             tbody.appendChild(row);
         });
-    
-        // Добавяне на обработчици на събития за бутоните за изтриване
+
         document.querySelectorAll('.delete-result').forEach(button => {
             button.addEventListener('click', async function () {
                 const resultId = this.getAttribute('data-result-id');
@@ -137,54 +134,49 @@ document.addEventListener('DOMContentLoaded', async function () {
             const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
             let results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results`);
     
-            // Първоначално зареждаме потребителите без резултати
             displayUsersTable(clubUsers, results);
     
             document.getElementById('discipline').addEventListener('change', function () {
-                const disciplineId = Number(this.value); // Преобразуване на стойността в число
+                const disciplineId = Number(this.value);
                 console.log('Discipline changed to:', disciplineId);
                 const filteredResults = results.filter(result => result.disciplineId === disciplineId);
                 displayUsersTable(clubUsers, filteredResults, disciplineId);
             });
     
             document.getElementById('add-user').addEventListener('change', function () {
-                const userId = this.value;  // Вземи ID на избрания потребител
+                const userId = this.value;
                 const userProfilePicture = document.getElementById('user-profile-picture');
                 
-                // Скриване на изображението, ако няма избран потребител
                 if (!userId) {
                     userProfilePicture.style.display = 'none'; 
                     return;
                 }
-            
-                // Извличане на данните за избрания потребител и профилната снимка
+        
                 Promise.all([
-                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}`), // Извличане на данни за потребителя
-                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`) // Извличане на профилната снимка с правилното userId
+                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}`), 
+                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`)
                 ])
                 .then(responses => {
-                    // Проверка на статусите на отговорите
                     if (!responses[0].ok) throw new Error('Неуспешно зареждане на данни за потребителя');
                     if (!responses[1].ok) throw new Error('Неуспешно зареждане на профилната снимка');
                     
-                    return Promise.all([responses[0].json(), responses[1].blob()]); // Преобразуване на отговорите
+                    return Promise.all([responses[0].json(), responses[1].blob()]);
                 })
                 .then(([user, imageBlob]) => {
-                    console.log('Избран потребител:', user); // Логни потребителските данни
-                    console.log('Възраст:', user.age); // Логни възрастта
-                    console.log('Пол:', user.gender); // Логни пола
+                    console.log('Избран потребител:', user);
+                    console.log('Възраст:', user.age);
+                    console.log('Пол:', user.gender);
                     
-                    // Обновяване на изображението
                     const imageUrl = URL.createObjectURL(imageBlob);
                     userProfilePicture.src = imageUrl;
-                    userProfilePicture.style.display = 'block'; // Показване на изображението
+                    userProfilePicture.style.display = 'block';
                     userProfilePicture.alt = 'Профилна снимка на избрания потребител';
                 })
                 .catch(error => {
                     console.error('Грешка:', error);
-                    userProfilePicture.src = '../SportStatsImg/ProfilePhoto2.jpg'; // Резервна снимка при грешка
+                    userProfilePicture.src = '../SportStatsImg/ProfilePhoto2.jpg';
                     userProfilePicture.alt = 'Профилната снимка не е налична';
-                    userProfilePicture.style.display = 'block'; // Показване на резервното изображение
+                    userProfilePicture.style.display = 'block';
                 });
             });
             
@@ -192,25 +184,23 @@ document.addEventListener('DOMContentLoaded', async function () {
             document.getElementById('search').addEventListener('keyup', function () {
                 clearTimeout(searchTimeout);
         
-                // Настройваме нов таймер
                 searchTimeout = setTimeout(() => {
-                    document.getElementById('search').dispatchEvent(new Event('submit')); // Симулираме натискане на бутона
+                    document.getElementById('search').dispatchEvent(new Event('submit'));
                 }, 1000); // 
             });
         
             document.getElementById('search').addEventListener('submit', async function (event) {
                 event.preventDefault();
-            
+        
                 const query = document.getElementById('search').value.trim();
                 if (!query) {
                     alert('Моля, въведете име или част от име за търсене.');
                     return;
                 }
-            
+
                 try {
-                    // Изпращаме заявка към новия Search API
                     const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/search?query=${encodeURIComponent(query)}`);
-            
+        
                     if (!response.ok) {
                         if (response.status === 404) {
                             alert('Не бяха намерени потребители, отговарящи на заявката.');
@@ -218,52 +208,20 @@ document.addEventListener('DOMContentLoaded', async function () {
                         }
                         throw new Error(`Грешка при търсенето: ${response.statusText}`);
                     }
-            
+        
                     const users = await response.json();
-            
-                    // Ако няма потребители, премахваме таблицата и показваме съобщение
-                    const resultsTable = document.getElementById('resultsTable');
-                    const noResultsMessage = document.getElementById('noResultsMessage');
-            
-                    if (users.length === 0) {
-                        // Премахваме таблицата
-                        if (resultsTable) {
-                            resultsTable.style.display = 'none'; // Скриваме таблицата
-                        }
-            
-                        // Показваме съобщението "Няма такъв състезател"
-                        if (noResultsMessage) {
-                            noResultsMessage.style.display = 'block';
-                        } else {
-                            const messageElement = document.createElement('p');
-                            messageElement.id = 'noResultsMessage';
-                            messageElement.textContent = 'Няма такъв състезател';
-                            messageElement.style.color = 'red';
-                            document.getElementById('resultsContainer').appendChild(messageElement); // Assuming you have a container for results
-                        }
-                    } else {
-                        // Ако има резултати, показваме таблицата
-                        if (resultsTable) {
-                            resultsTable.style.display = 'table'; // Показваме таблицата
-                        }
-            
-                        // Изчистваме предишните резултати и актуализираме таблицата
-                        const disciplineId = Number(document.getElementById('discipline').value); // Преобразуване на стойността в число
-                        const allResults = await fetchJson('https://sportstatsapi.azurewebsites.net/api/Results');
-                        displayUsersTable(users, allResults, disciplineId);
-            
-                        // Скриваме съобщението "Няма такъв състезател", ако е показано
-                        if (noResultsMessage) {
-                            noResultsMessage.style.display = 'none';
-                        }
-                    }
-            
+        
+                    console.log('Намерени потребители:', users);
+        
+                    const disciplineId = Number(document.getElementById('discipline').value);
+                    const allResults = await fetchJson('https://sportstatsapi.azurewebsites.net/api/Results');
+                    displayUsersTable(users, allResults, disciplineId);
+        
                 } catch (error) {
                     console.error('Грешка при търсенето:', error);
                     alert('Възникна грешка при извършване на търсенето.');
                 }
             });
-            
 
             
     
@@ -281,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.log('Discipline ID:', disciplineId);
         console.log('Time-based IDs:', timeBasedIds);
         
-        const isTimeBased = timeBasedIds.includes(Number(disciplineId)); // Преобразуване на disciplineId в число
+        const isTimeBased = timeBasedIds.includes(Number(disciplineId));
         
         console.log('Is time-based:', isTimeBased);
         
@@ -311,12 +269,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         if (timeBasedIds.includes(Number(disciplineId))) {
-            // Форматиране на времената като час/мин/сек/ст
             const formattedTime = formatTime(valueTime);
             console.log('Formatted result (time-based):', formattedTime);
             return formattedTime;
         } else {
-            // Връщане на числовата стойност в оригинален вид
             const formattedNumber = valueTime.toFixed(2);
             console.log('Formatted result (number-based):', formattedNumber);
             return formattedNumber;
@@ -330,9 +286,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
-        const millis = Math.round((seconds % 1) * 100); // Стотни от секундата
+        const millis = Math.round((seconds % 1) * 100);
 
-        // Сглобяване на резултата
         let timeString = '';
         if (hours > 0) timeString += `${hours} ч `;
         if (minutes > 0 || hours > 0) timeString += `${minutes} мин `;
@@ -341,12 +296,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
     
     async function setupAddResultForm() {
-        // Зареждане на дисциплините и потребителите в падащите менюта
         const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
-        populateDropdown('add-discipline', disciplines, 'disciplineName', 'id'); // Показваме само име на дисциплината
+        populateDropdown('add-discipline', disciplines, 'disciplineName', 'id');
     
         const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
-        populateDropdown('add-user', clubUsers, user => `${user.firstName} ${user.lastName} (${user.age})`, 'id'); // Показваме пълно име и години
+        populateDropdown('add-user', clubUsers, user => `${user.firstName} ${user.lastName} (${user.age})`, 'id');
     
         document.getElementById('add-discipline').addEventListener('change', function () {
             const disciplineId = this.value;
@@ -359,7 +313,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             document.getElementById('decimal-input').style.display = isTimeBased ? 'none' : 'block';
         });
     
-        // Извикване при натискане на бутона за добавяне на резултат
         document.getElementById('submit-result').addEventListener('click', async function () {
             const disciplineId = document.getElementById('add-discipline').value;
             const userId = document.getElementById('add-user').value;
@@ -393,25 +346,23 @@ document.addEventListener('DOMContentLoaded', async function () {
                         userId: userId,
                         disciplineId: disciplineId,
                         valueTime: valueTime,
-                        resultDate: new Date().toISOString() // текущата дата и час
+                        resultDate: new Date().toISOString() 
                     })
                 });
         
                 if (!response.ok) {
-                    const errorText = await response.text(); // Capture the error response text
+                    const errorText = await response.text();
                     console.error('Failed to add result:', { status: response.status, errorText });
                     throw new Error('Неуспешно добавяне на резултата');
                 }
         
-                const responseData = await response.json(); // Assuming your API returns the response data
+                const responseData = await response.json();
                 alert('Резултатът е добавен успешно!');
         
-                // Сравняване на резултата с нормативите
                 const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
                 
-                // Ако е покрит нормативът, добавяме точки в Rankings
                 if (isQualified) {
-                    const points = 50; // Определете колко точки да добавите
+                    const points = 50;
                     await addPointsToRankings(userId, disciplineId, points);
                 }
         
@@ -421,8 +372,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }); 
         async function compareResultWithNorms(user, disciplineId, valueTime) {
-            const userAge = user.age; // Извличане на възрастта на потребителя
-            const userGender = user.gender; // Извличане на пола на потребителя
+            const userAge = user.age;
+            const userGender = user.gender;
         
             console.log(`Пол: ${userGender}, Възраст: ${userAge}, Дисциплина: ${disciplineId}`);
         
@@ -436,13 +387,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const genderMapping = { 'Male': 'M', 'Female': 'F' };
                 const mappedGender = genderMapping[userGender] || userGender;
         
-                // Намиране на нормативи по възраст, пол и ID на дисциплината
                 const norm = norms.find(norm => {
                     return norm.gender === mappedGender && userAge >= norm.minAge && userAge <= norm.maxAge && norm.disciplineId == disciplineId;
                 });
         
                 if (norm) {
-                    // Сравняване на стойността на времето с необходимата стойност на нормата
                     const isQualified = valueTime <= norm.requiredValue;
                     alert(isQualified ? 'Поздравления! Вие отговаряте на нормата.' : 'Не отговаряте на нормата.');
                     return isQualified; 
