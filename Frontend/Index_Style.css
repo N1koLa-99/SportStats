@@ -6,6 +6,124 @@
     padding: 0px;
     background-color: #f4f4f4; /* Светъл фон */
 }
+.message-box {
+    display: none; /* Initially hidden */
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    font-size: 18px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.5s ease-out;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.message-box.success {
+    background: linear-gradient(135deg, #00c6ff, #0072ff); /* Blue gradient */
+    border: 1px solid #0072ff;
+}
+
+.message-box.error {
+    background: linear-gradient(135deg, #ff6b6b, #d84949); /* Red gradient */
+    border: 1px solid #d84949;
+}
+
+.message-box p {
+    margin: 0;
+    font-weight: bold;
+}
+
+.message-box .close-btn {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.message-box .close-btn:hover {
+    opacity: 1;
+}
+
+/* Animation for sliding in the message box */
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Плавни стилове за Select2 */
+.select2-container {
+    width: 100% !important;
+    font-family: "Comic Sans MS", "Arial", sans-serif;
+}
+
+.select2-selection {
+    background: #fdfd96; /* Светло жълто */
+    border: 2px solid #00A0E1; /* Акцентен син цвят */
+    border-radius: 15px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    transition: box-shadow 0.3s, transform 0.3s ease-in-out;
+    color: #16314A;
+    font-weight: bold;
+}
+
+.select2-selection:hover {
+    box-shadow: 0 0 10px rgba(0, 160, 225, 0.4);
+    transform: scale(1.02); /* Леко увеличаване при ховър */
+}
+
+/* Падащо меню с плавен fade ефект */
+.select2-dropdown {
+    border-radius: 10px;
+    border: 2px solid #00A0E1;
+    background-color: #FFF8DC; /* Мека кремава основа */
+    animation: fadeIn 0.5s ease-in-out;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.select2-results__option {
+    padding: 10px;
+    color: #16314A;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.select2-results__option:hover {
+    background-color: #00A0E1; /* Акцентен син фон */
+    color: #fff; /* Бял текст */
+    cursor: pointer;
+}
+
+.select2-selection__placeholder {
+    color: #00A0E1;
+    font-weight: bold;
+}
 
 /* Лява част */
 .left-side {
@@ -112,6 +230,46 @@ form {
 .form-group {
     position: relative;
     margin-bottom: 20px; /* Намаляваме разстоянието между полетата */
+}
+.date-input {
+    width: 89%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #f5f5f5; /* Светъл фон */
+    border: 2px solid #ddd; /* Лека рамка */
+    border-radius: 8px; /* Закръглени ъгли */
+    color: #333; /* Тъмен текст */
+    text-align: center; /* Центриране на текста */
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #00A0E1; /* Синя рамка при фокус */
+    box-shadow: 0 0 5px rgba(0, 160, 225, 0.5); /* Лек акцент при фокус */
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    border-radius: 50%;
+    padding: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.date-input::-webkit-input-placeholder {
+    color: #888; /* Цветът на placeholder */
+}
+
+.date-input::-moz-placeholder {
+    color: #888; /* Цветът на placeholder за Firefox */
+}
+
+.date-input:-ms-input-placeholder {
+    color: #888; /* Цветът на placeholder за IE */
+}
+
+.date-input:focus::-webkit-input-placeholder {
+    color: transparent; /* Прозрачен placeholder при фокус */
 }
 
 input[type="text"],
@@ -395,6 +553,18 @@ input.error {
         width: 100%; 
         display: none;
         display: none; 
+    }
+    .date-input {
+        width: 75%;
+        padding: 5px;
+        font-size: 14px;
+        background-color: #f5f5f5;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        color: #333;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+        cursor: pointer;
     }
 
     .left-side img, .right-side img {

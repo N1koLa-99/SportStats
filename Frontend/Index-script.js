@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Зареждане на клубовете
+    
+    const yearOfBirthSelect = document.getElementById('yearOfBirth');
+    const startYear = 1924;
+    const endYear = 2020;
+
+    for (let year = startYear; year <= endYear; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearOfBirthSelect.appendChild(option);
+    }
+    
+    
+    
     fetchClubs();
 
     const registrationForm = document.getElementById('registration-form');
@@ -11,21 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const genderInput = document.getElementById('gender');
     const clubInput = document.getElementById('club');
     
-    const emailError = document.createElement('div');
-    const passwordError = document.createElement('div');
-    const firstNameError = document.createElement('div');
-    const lastNameError = document.createElement('div');
-    const ageError = document.createElement('div');
-    const genderError = document.createElement('div');
-    const clubError = document.createElement('div');
-    
-    emailError.id = 'email-error';
-    passwordError.id = 'password-error';
-    firstNameError.id = 'first-name-error';
-    lastNameError.id = 'last-name-error';
-    ageError.id = 'age-error';
-    genderError.id = 'gender-error';
-    clubError.id = 'club-error';
+    const emailError = createErrorElement('email-error');
+    const passwordError = createErrorElement('password-error');
+    const firstNameError = createErrorElement('first-name-error');
+    const lastNameError = createErrorElement('last-name-error');
+    const ageError = createErrorElement('age-error');
+    const genderError = createErrorElement('gender-error');
+    const clubError = createErrorElement('club-error');
     
     emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
     passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
@@ -40,11 +45,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const namePattern = /^[A-Za-zА-Яа-я]+$/; 
     const agePattern = /^(?:[1-9]|[1-9][0-9]|100)$/;
 
-
     registrationForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         let formIsValid = true;
 
+        // Email validation
         if (!emailPattern.test(emailInput.value)) {
             emailError.textContent = 'Моля, въведете валиден имейл адрес.';
             emailError.style.display = 'block';
@@ -54,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const emailExists = await checkEmailAvailability(emailInput.value);
                 if (emailExists) {
-                    emailError.textContent = 'Този имейл вече е регистриран.';
+                    emailError.textContent = 'Този имейл вече е регистриран.Влезте в профила си от "Вход"';
                     emailError.style.display = 'block';
                     emailInput.classList.add('error');
                     formIsValid = false;
@@ -64,16 +69,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     emailInput.classList.remove('error');
                 }
             } catch (error) {
-                console.error('Грешка при проверка на имейла:', error);
-                emailError.textContent = 'Неуспешна проверка на имейла. Моля, опитайте отново.';
-                emailError.style.display = 'block';
-                emailInput.classList.add('error');
+                handleError('Грешка при проверка на имейла:', emailError, emailInput);
                 formIsValid = false;
             }
         }
-        
 
-        // По-строга проверка на парола
+        // Password validation
         if (!passwordPattern.test(passwordInput.value)) {
             passwordError.textContent = 'Поне 8 символа и да съдържа главна буква';
             passwordError.style.display = 'block';
@@ -85,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordInput.classList.remove('error');
         }
 
-        // Проверка на първо и фамилно име (само букви)
+        // Name validation
         if (!namePattern.test(firstNameInput.value)) {
             firstNameError.textContent = 'Трябва да съдържа само букви.';
             firstNameError.style.display = 'block';
@@ -108,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
             lastNameInput.classList.remove('error');
         }
 
-        // Проверка за възраст (между 1 и 100)
+        // Age validation
         if (!agePattern.test(ageInput.value)) {
             ageError.textContent = 'Моля, въведете възраст между 1 и 100.';
             ageError.style.display = 'block';
@@ -120,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ageInput.classList.remove('error');
         }
 
-        // Проверка за пол (задължителен)
+        // Gender validation
         if (!genderInput.value) {
             genderError.textContent = 'Моля, изберете пол.';
             genderError.style.display = 'block';
@@ -132,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             genderInput.classList.remove('error');
         }
 
-        // Проверка за клуб (задължителен)
+        // Club validation
         if (!clubInput.value) {
             clubError.textContent = 'Моля, изберете отбор.';
             clubError.style.display = 'block';
@@ -146,82 +147,127 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (formIsValid) {
             const formData = new FormData(registrationForm);
+            const age = parseInt(formData.get('age'), 10);
+            const yearOfBirth = parseInt(formData.get('yearOfBirth'), 10); // Потребителят въвежда годината на раждане
+        
             const user = {
                 firstName: formData.get('firstName'),
                 lastName: formData.get('lastName'),
                 email: formData.get('email'),
                 password: formData.get('password'),
-                age: parseInt(formData.get('age'), 10),
+                age: age, // Възраст
                 gender: formData.get('gender'),
                 roleID: 1,
                 clubID: parseInt(formData.get('club'), 10),
-                profileImage_url: "http://localhost:7198/ProfilePictures/ProfilePhoto2.jpg"
+                profileImage_url: "http://localhost:7198/ProfilePictures/ProfilePhoto2.jpg",
+                yearOfBirth: yearOfBirth 
             };
-
+        
             try {
-                const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users', {
+                const response = await fetch('https://localhost:7198/api/Users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user)
                 });
-
+        
                 if (!response.ok) {
                     throw new Error('Грешка при изпращане на данните: ' + response.statusText);
                 }
-
+        
                 const newUser = await response.json();
                 localStorage.setItem('user', JSON.stringify(newUser));
-                alert('Потребителят е регистриран успешно!');
+        
+                // Показване на съобщение за успешна регистрация
+                showMessageBox('Потребителят е регистриран успешно!', 'success');
+        
                 registrationForm.reset();
                 window.location.href = "HomePage.html";
             } catch (error) {
                 console.error('Грешка:', error);
-                alert('Възникна грешка при регистрацията. Моля, опитайте отново.');
+                showMessageBox('Възникна грешка при регистрацията.Ако имейлът ви е зает влезте в профила си от "Вход" ', 'error');
             }
         }
+        
     });
-    
+
     const loginForm = document.getElementById('login-form');
 
     loginForm.addEventListener('submit', async function (event) {
-    event.preventDefault();
+        event.preventDefault();
 
-    const formData = new FormData(loginForm);
-    const loginData = {
-        email: formData.get('login-email'),
-        password: formData.get('login-password')
-    };
+        const formData = new FormData(loginForm);
+        const loginData = {
+            email: formData.get('login-email'),
+            password: formData.get('login-password')
+        };
 
-    try {
-        const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(loginData)
-        });
+        try {
+            const response = await fetch('https://localhost:7198/api/Users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData)
+            });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error('Грешка при влизането: ' + (errorData.errors ? JSON.stringify(errorData.errors) : response.statusText));
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error('Грешка при влизането: ' + (errorData.errors ? JSON.stringify(errorData.errors) : response.statusText));
+            }
+
+            const user = await response.json();
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('userHash', user.userTokenHash);
+
+            showMessageBox('Входът е успешен! Добре дошли, ' + user.firstName + '!', 'success');
+
+            window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+        } catch (error) {
+            console.error('Грешка при влизането:', error);
+            showMessageBox('Възникна грешка при влизането. Моля, проверете имейла и паролата и опитайте отново.', 'error');
         }
+    });
 
-        const user = await response.json();
-
-        // Запазване на потребителските данни
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('userHash', user.userTokenHash);
-
-        alert('Входът е успешен! Добре дошли, ' + user.firstName + '!');
-        window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
-    } catch (error) {
-        console.error('Грешка при влизането:', error);
-        alert('Възникна грешка при влизането. Моля, проверете имейла и паролата и опитайте отново.');
+    function createErrorElement(id) {
+        const errorElement = document.createElement('div');
+        errorElement.id = id;
+        return errorElement;
     }
-});
 
+    function showMessageBox(message, type) {
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        messageText.textContent = message;
+        messageBox.className = 'message-box ' + type;
+        messageBox.style.display = 'block';
+
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 5000);
+    }
+
+    async function checkEmailAvailability(email) {
+        try {
+            const response = await fetch(`https://localhost:7198/api/Users/email-exists/${email}`);
+            if (!response.ok) {
+                throw new Error('Грешка при проверка на имейла: ' + response.statusText);
+            }
+            const data = await response.json();
+            return data.emailExists;
+        } catch (error) {
+            console.error('Грешка:', error);
+            return false;
+        }
+    }
+
+    function handleError(message, errorElement, inputElement) {
+        console.error(message);
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        inputElement.classList.add('error');
+    }
 
     async function fetchClubs() {
         try {
-            const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Clubs');
+            const response = await fetch('https://localhost:7198/api/Clubs');
             if (!response.ok) {
                 throw new Error('Грешка при извличане на данни от API: ' + response.statusText);
             }
@@ -264,20 +310,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    async function checkEmailAvailability(email) {
-        try {
-            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/email-exists/${email}`);
-            if (!response.ok) {
-                throw new Error('Грешка при проверка на имейла: ' + response.statusText);
-            }
-            const data = await response.json();
-            return data.emailExists; // true или false
-        } catch (error) {
-            console.error('Грешка:', error);
-            return false; // Предполага се, че имейлът е зает при грешка
-        }
-    }
-      
     function setupInputHints(input, hintId) {
         input.addEventListener('focus', () => {
             document.getElementById(hintId).style.display = 'block';

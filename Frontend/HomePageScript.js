@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', async function () { // Марки�
     let chart; // Глобална променлива за диаграмата
     
     const user = JSON.parse(localStorage.getItem('user'));
+    console.log(user);
     const savedHash = localStorage.getItem('userHash');
 
     if (!user || !savedHash) {
@@ -10,27 +11,20 @@ document.addEventListener('DOMContentLoaded', async function () { // Марки�
         return;
     }
 
-    // Функция за генериране на хеш
     async function hashUserData(user) {
-        const data = `${user.firstName}${user.lastName}${user.age}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}`;
+        const data = `${user.firstName}${user.lastName}${user.age}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`; // Добавяме yearOfBirth
         const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
         return btoa(String.fromCharCode(...new Uint8Array(buffer)));
     }
+    const currentHash = await hashUserData(user);
+if (currentHash !== savedHash) {
+    alert('Не бъди злонамерен <3 ');
+    localStorage.clear();
+    window.location.href = 'Index.html';
+    return;
+}
 
-    try {
-        const currentHash = await hashUserData(user);
-        if (currentHash !== savedHash) {
-            alert('Не бъди злонамерен <3 ');
-            localStorage.clear();
-            window.location.href = 'Index.html';
-            return;
-        }
-    } catch (error) {
-        console.error('Грешка при проверка на хеша:', error);
-        alert('Възникна грешка. Пренасочване към началната страница.');
-        window.location.href = 'Index.html';
-        return;
-    }
+
     
     if (user) {
         document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
@@ -51,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async function () { // Марки�
         }
         
         // Извличане на информация за клуба
-        fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
+        fetch(`https://localhost:7198/api/Clubs/${user.clubID}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
@@ -76,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async function () { // Марки�
         });
 
 if (user && user.id > 0) {
-    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${user.id}`)
+    fetch(`https://localhost:7198/api/Users/profilePicture/${user.id}`)
         .then(response => {
             if (!response.ok) {
                 console.error('Неуспешно зареждане на профилната снимка:', response.status, response.statusText);
@@ -99,45 +93,11 @@ if (user && user.id > 0) {
     document.getElementById('profile-picture').src = 'https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg';
     document.getElementById('profile-picture').alt = 'Профилната снимка не е налична';
 }  
-        // Функция за извличане на общите точки на потребителя
-        function fetchUserTotalPoints(userId) {
-            fetch(`https://sportstatsapi.azurewebsites.net/api/Rankings/user/${userId}/total-points-and-rank`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(results => {
-                    const totalPoints = results.reduce((sum, result) => sum + result.totalPoints, 0);
-                    const mostFrequentRank = findMostFrequentRank(results);
-                    document.getElementById('total-points').textContent = `Общо точки: ${totalPoints} ${mostFrequentRank}`;
-                })
-                .catch(error => {
-                    console.error('Грешка при извличане на общите точки на потребителя:', error);
-                    document.getElementById('total-points').textContent = 'Грешка при зареждане на точки';
-                });
-        }
-
-        function findMostFrequentRank(results) {
-            const rankCount = results.reduce((acc, result) => {
-                acc[result.rankName] = (acc[result.rankName] || 0) + 1;
-                return acc;
-            }, {});
-
-            return Object.keys(rankCount).reduce((a, b) => rankCount[a] > rankCount[b] ? a : b);
-        }
-
-        // Извикване на функцията с ID на потребителя
-        if (user && user.id) {
-            fetchUserTotalPoints(user.id);
-        }
-    } else {
-        // Ако няма данни в localStorage, пренасочване към началната страница index.html
-        window.location.href = 'index.html';
     }
 
     function fetchDisciplinesByClubId(clubId) {
         // Извличане на дисциплините свързани само с този клуб
-        fetch(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${clubId}`)
+        fetch(`https://localhost:7198/api/ClubDisciplines/disciplines-by-club/${clubId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
@@ -161,68 +121,104 @@ if (user && user.id > 0) {
         });
     }
 
-    function fetchResults(disciplineId, userId) {
-        fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${userId}/by-discipline/${disciplineId}`)
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(results => {
-                if (results.length === 0) {
-                    document.getElementById('best-result').textContent = 'Няма налични резултати.';
-                    document.getElementById('latest-result').textContent = 'Няма налични резултати.';
-                    document.getElementById('normative-difference').textContent = '';
-                    return;
-                }
-                // Предайте възраст и пол на функцията fetchNormativesAndDisplayResults
-                fetchNormativesAndDisplayResults(disciplineId, user.age, user.gender, results);
-            })
-            .catch(error => {
-                console.error('Грешка при извличане на резултатите:', error);
-                document.getElementById('best-result').textContent = 'Грешка при извличане на резултатите.';
-                document.getElementById('latest-result').textContent = 'Грешка при извличане на резултатите.';
-                document.getElementById('normative-difference').textContent = '';
-            });
+    console.log('Потребителски данни:', user);
+
+function fetchResults(disciplineId, userId) {
+    if (!disciplineId || !userId) {
+        console.error('Липсват данни: disciplineId или userId.');
+        return;
     }
 
-    function fetchNormativesAndDisplayResults(disciplineId, userAge, userGender, results) {
-        fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`)
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(normatives => {
-                console.log('Получени нормативи:', normatives);
-                const genderMapping = { 'Male': 'M', 'Female': 'F' };
-                const mappedGender = genderMapping[userGender.charAt(0).toUpperCase() + userGender.slice(1)] || userGender;
-                
-                displayResults(disciplineId, userAge, mappedGender, results, normatives);
-            })
-            .catch(error => {
-                console.error('Грешка при извличане на нормативите:', error);
-                displayResults(disciplineId, userAge, userGender, results, []);
-            });
+    if (!user || !user.yearOfBirth || !user.gender) {
+        console.error('Липсват данни за потребителя: yearOfBirth или gender.');
+        return;
     }
+
+    const NO_RESULTS_MESSAGE = 'Няма налични резултати.';
+
+    function displayNoResults() {
+        document.getElementById('best-result').textContent = NO_RESULTS_MESSAGE;
+        document.getElementById('latest-result').textContent = NO_RESULTS_MESSAGE;
+        document.getElementById('normative-difference').textContent = '';
+    }
+
+    document.getElementById('best-result').textContent = 'Зареждане...';
+    document.getElementById('latest-result').textContent = 'Зареждане...';
+
+    fetch(`https://localhost:7198/api/Results/by-user/${userId}/by-discipline/${disciplineId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(results => {
+            if (!Array.isArray(results) || results.length === 0) {
+                displayNoResults();
+                return;
+            }
+            fetchNormativesAndDisplayResults(disciplineId, user.yearOfBirth, user.gender, results);
+        })
+        .catch(error => {
+            console.error('Грешка при извличане на резултатите:', error);
+            displayNoResults();
+        });
+}
+
     
-    function displayResults(disciplineId, userAge, userGender, results, normatives) {
+    
+function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender, results) {
+    fetch(`https://localhost:7198/api/Normatives/discipline/${disciplineId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(normatives => {
+            console.log('Получени нормативи:', normatives);
+
+            // Съпоставяне на пола на потребителя към нормативите
+            const genderMapping = { 'Male': 'M', 'Female': 'F' };
+            const mappedGender = genderMapping[userGender.charAt(0).toUpperCase() + userGender.slice(1)] || userGender;
+
+            // Филтриране на нормативите само по година на раждане и пол
+            const relevantNormatives = normatives.filter(normative => {
+                return (
+                    yearOfBirth >= normative.minYearOfBorn && // Проверка дали годината попада в диапазона
+                    yearOfBirth <= normative.maxYearOfBorn && 
+                    normative.gender === mappedGender // Съпоставка на пола
+                );
+            });
+
+            console.log('Филтрирани нормативи:', relevantNormatives);
+            displayResults(disciplineId, yearOfBirth, mappedGender, results, relevantNormatives);
+        })
+        .catch(error => {
+            console.error('Грешка при извличане на нормативите:', error);
+            displayResults(disciplineId, yearOfBirth, userGender, results, []); // Празен списък при грешка
+        });
+}
+
+
+
+
+       
+    
+    function displayResults(disciplineId, dateOfBirth, userGender, results, normatives) {
         console.log('Резултати:', results);
         console.log('Нормативи:', normatives);
-
+    
         const latestResult = results.reduce((latest, result) => 
             new Date(result.resultDate) > new Date(latest.resultDate) ? result : latest, results[0]
         );
-
+    
         let bestResult;
         let normativeDifferenceText = '';
         let normativeValueText = '';
         let normativeStatusText = '';
         let relevantNormatives = []; // Declare relevantNormatives here
-
+    
         const timeDisciplines = Array.from({ length: 18 }, (_, i) => i + 1); // Нов списък на времеви дисциплини
         const isTimeDiscipline = timeDisciplines.includes(disciplineId); // Проверка дали е времева дисциплина
-
-
-        // Function for finding the best result based on discipline type
+    
+       
         function findBestResult(results, isTimeDiscipline) {
             return results.reduce((best, result) => {
                 if (isTimeDiscipline) {
@@ -232,37 +228,32 @@ if (user && user.id > 0) {
                 }
             }, results[0]);
         }
-
-        // Function for finding normatives based on swimmingPoolStandartId
-        function findNormatives(normatives, disciplineId, userAge, userGender) {
-            const genderMapping = { 'Male': 'M', 'Female': 'F' }; // Дефинираме genderMapping тук
-            const mappedGender = genderMapping[userGender] || userGender;
-        
-            return normatives.filter(n => 
-                userAge >= n.minAge && userAge <= n.maxAge && 
-                n.gender === mappedGender && n.disciplineId === disciplineId
-            );
-        }
     
         bestResult = findBestResult(results, isTimeDiscipline);
-
+    
         if (normatives.length > 0) {
-            console.log('Търсене на нормативи за:', { userAge, userGender, disciplineId });
-            relevantNormatives = findNormatives(normatives, disciplineId, userAge, userGender);
-        
+            console.log('Търсене на нормативи за:', { dateOfBirth, userGender, disciplineId });
+            relevantNormatives = normatives.filter(normative => {
+                const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
+                const normativeValue = normative.valueStandart;
+                const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
+    
+                return difference <= 0;
+            });
+    
             if (relevantNormatives.length > 0) {
                 relevantNormatives.forEach(normative => {
                     const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
                     const normativeValue = normative.valueStandart;
                     const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
-        
+    
                     normativeValueText += `Норматив (${poolType}): ${formatTime(normativeValue)}<br>`;
                     normativeDifferenceText += `Разлика с норматив (${poolType}): ${difference.toFixed(2)} сек<br>`;
-        
+    
                     const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; 
                     normativeStatusText += `
                         <div style="display: inline-block; width: 80px; height: 40px; background-color: ${statusColor}; 
-                        color: black; text-align: center; line-height: 40px; border-radius: 5px;margin-right: -3px;; font-weight: bold;margin-left: 14px;">
+                        color: black; text-align: center; line-height: 40px; border-radius: 5px;margin-right: -3px; font-weight: bold;margin-left: 14px;">
                             ${poolType}
                         </div><br>`;
                 });
@@ -292,10 +283,10 @@ if (user && user.id > 0) {
         chartNormative50m = chartLabels.map(() => normative50m ? normative50m : null);        
         
         const ctx = document.getElementById('resultsChart')?.getContext('2d');
-if (ctx) {
-    if (chart) {
-        chart.destroy();
-    }
+          if (ctx) {
+         if (chart) {
+                 chart.destroy();
+        }
 
     // Ограничаваме данните до последните 8 елемента
 const latestDataCount = 8;
@@ -469,25 +460,26 @@ chart = new Chart(ctx, {
         if (seconds === undefined || seconds === null || isNaN(seconds)) {
             return 'Неизвестна стойност';
         }
-
+    
         if (seconds < 1) {
-            const millis = Math.round(seconds * 100);
+            const millis = Math.round(seconds * 100).toString().padStart(2, '0'); // Форматиране с водеща нула
             return `${millis} ст`;
         }
-
+    
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
-        const millis = Math.round((seconds % 1) * 100);
-
+        const millis = Math.round((seconds % 1) * 100).toString().padStart(2, '0'); // Форматиране с водеща нула
+    
         let timeString = '';
         if (hours > 0) timeString += `${hours} ч `;
         if (minutes > 0 || hours > 0) timeString += `${minutes} мин `;
         if (secs > 0 || minutes > 0 || hours > 0) timeString += `${secs} сек `;
         if (millis > 0 || (seconds % 1 !== 0)) timeString += `${millis} ст`;
-
+    
         return timeString.trim();
     }
+    
 
     function getUnitForDiscipline(disciplineId) {
         // Определяне на единицата за дисциплината
