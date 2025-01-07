@@ -194,12 +194,7 @@ function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender,
             console.error('Грешка при извличане на нормативите:', error);
             displayResults(disciplineId, yearOfBirth, userGender, results, []); // Празен списък при грешка
         });
-}
-
-
-
-
-       
+} 
     
     function displayResults(disciplineId, dateOfBirth, userGender, results, normatives) {
         console.log('Резултати:', results);
@@ -492,4 +487,3 @@ chart = new Chart(ctx, {
         }
     }
 });
-

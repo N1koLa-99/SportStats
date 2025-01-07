@@ -65,65 +65,41 @@
     }
 }
 
-/* Плавни стилове за Select2 */
-.select2-container {
-    width: 100% !important;
-    font-family: "Comic Sans MS", "Arial", sans-serif;
+/* Основен стил за Select2 с по-голяма височина */
+.select2-container--default .select2-selection--single {
+    height: 55px; /* Увеличаване на височината */
+    padding: 10px 15px; /* Корекция за вътрешния отстъп */
+    font-size: 18px; /* Малко по-голям текст */
+    padding-bottom: 21px;
+    padding-top: 0px;
 }
 
-.select2-selection {
-    background: #fdfd96; /* Светло жълто */
-    border: 2px solid #00A0E1; /* Акцентен син цвят */
-    border-radius: 15px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    transition: box-shadow 0.3s, transform 0.3s ease-in-out;
-    color: #16314A;
-    font-weight: bold;
+/* Вътрешно текстово съдържание */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 45px; /* Вертикално центриране */
+    font-size: 16px;
 }
 
-.select2-selection:hover {
-    box-shadow: 0 0 10px rgba(0, 160, 225, 0.4);
-    transform: scale(1.02); /* Леко увеличаване при ховър */
+/* Плейсхолдър стил */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    line-height: 45px; /* Вертикално центриране */
+    font-size: 16px;
 }
 
-/* Падащо меню с плавен fade ефект */
-.select2-dropdown {
-    border-radius: 10px;
-    border: 2px solid #00A0E1;
-    background-color: #FFF8DC; /* Мека кремава основа */
-    animation: fadeIn 0.5s ease-in-out;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+/* Резултати в dropdown */
+.select2-container--default .select2-results__option {
+    padding: 15px; /* По-голямо пространство около текста */
+    font-size: 16px;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Акцентиране на избрания елемент */
+.select2-container--default .select2-results__option--highlighted {
+    padding: 15px;
+    font-size: 16px;
 }
 
-.select2-results__option {
-    padding: 10px;
-    color: #16314A;
-    transition: background-color 0.3s, color 0.3s;
-}
 
-.select2-results__option:hover {
-    background-color: #00A0E1; /* Акцентен син фон */
-    color: #fff; /* Бял текст */
-    cursor: pointer;
-}
 
-.select2-selection__placeholder {
-    color: #00A0E1;
-    font-weight: bold;
-}
 
 /* Лява част */
 .left-side {

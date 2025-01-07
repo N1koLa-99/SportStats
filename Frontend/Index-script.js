@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
         yearOfBirthSelect.appendChild(option);
     }
     
-    
+    $('#yearOfBirth, #gender, #club').select2({
+        placeholder: '',
+        allowClear: true,
+    });
     
     fetchClubs();
 

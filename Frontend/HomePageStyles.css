@@ -499,7 +499,8 @@ button:active {
         padding: 0px;
         padding-bottom: 100%;
         width: 100vw;
-        background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)), url(https://sportstats.blob.core.windows.net/$web/SnimkaTel.jpg) no-repeat center center fixed;
+        background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)),
+         url(https://sportstats.blob.core.windows.net/$web/SnimkaTel.jpg) no-repeat center center fixed;
         animation: backgroundAnimation 0s infinite alternate;
     }
 
