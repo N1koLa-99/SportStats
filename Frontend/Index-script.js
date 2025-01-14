@@ -152,19 +152,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 const response = await fetch('https://localhost:7198/api/Users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(user)
+                    body: JSON.stringify(user),
                 });
-        
+            
                 if (!response.ok) {
                     throw new Error('Грешка при изпращане на данните: ' + response.statusText);
                 }
-        
-                const newUser = await response.json();
-        
+            
+                // Логнете отговора, за да го инспектирате
+                const responseBody = await response.text();
+                console.log('Отговор от сървъра:', responseBody);
+            
+                const newUser = JSON.parse(responseBody);
+            
                 // Съхраняване на данните в localStorage
                 localStorage.setItem('user', JSON.stringify(newUser.user));
                 localStorage.setItem('userHash', newUser.userTokenHash);
-        
+            
                 showMessageBox('Потребителят е регистриран успешно!', 'success');
                 registrationForm.reset();
                 window.location.href = "HomePage.html";

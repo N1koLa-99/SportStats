@@ -25,15 +25,24 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
     }
     
+    const userJson = localStorage.getItem('user');
+    if (!userJson) {
+        alert('Потребителят не е намерен. Пренасочване към началната страница.');
+        window.location.href = 'Index.html';
+    } else {
+        const user = JSON.parse(userJson);
+        console.log('Зареден потребител:', user);
+    }
+    
+
+    
 
     if (user) {
         document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
         document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
 
-        // Показваме набора (годината на раждане)
         document.getElementById('year-of-birth').textContent = user.yearOfBirth || 'Няма данни';
 
-        // Показване или скриване на бутона за треньор в зависимост от roleID
         if (user.roleID === 2) {
             const coachButton = document.getElementById('coach-button');
             coachButton.classList.remove('hidden');
