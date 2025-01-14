@@ -54,8 +54,11 @@ namespace SpoerStats2.ClassRepository
             using (var connection = new SqlConnection(_connectionString))
             {
                 var query = "INSERT INTO Users (FirstName, LastName, Email, Password, Gender, RoleID, ClubID, profileImage_url, YearOfBirth) " +
+                            "OUTPUT INSERTED.Id " + // Връща ID на новия запис
                             "VALUES (@FirstName, @LastName, @Email, @Password, @Gender, @RoleID, @ClubID, @profileImage_url, @YearOfBirth)";
-                await connection.ExecuteAsync(query, new
+
+                // Задаваме генерираното ID на потребителя
+                user.Id = await connection.QuerySingleAsync<int>(query, new
                 {
                     user.FirstName,
                     user.LastName,
@@ -69,6 +72,7 @@ namespace SpoerStats2.ClassRepository
                 });
             }
         }
+
         public async Task UpdateUser(User user)
         {
             using (var connection = new SqlConnection(_connectionString))
