@@ -37,8 +37,23 @@ namespace SpoerStats2.Controllers
         public async Task<ActionResult<User>> PostUser(User user)
         {
             await _userService.AddUser(user);
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+
+            if (user.Id <= 0) // Проверка за валидност на ID
+            {
+                return BadRequest("Неуспешно създаване на потребител. ID е невалидно.");
+            }
+
+            var userSession = new UserSession(user);
+            var response = new
+            {
+                user,
+                userTokenHash = userSession.GetUserTokenHash()
+            };
+
+            return CreatedAtAction("GetUser", new { id = user.Id }, response);
         }
+
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
