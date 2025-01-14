@@ -35,7 +35,6 @@ public class UserService
 
     public async Task UpdateUser(User user)
     {
-        // Първо взимаме съществуващия потребител, за да проверим дали паролата е променена
         var existingUser = await _userRepository.GetUserById(user.Id);
 
         if (existingUser == null)
@@ -43,22 +42,17 @@ public class UserService
             throw new ArgumentException("User not found.");
         }
 
-        // Ако паролата е променена, тогава я хешираме
         if (!string.IsNullOrWhiteSpace(user.Password) && user.Password != existingUser.Password)
         {
             user.Password = _passwordHasher.HashPassword(user, user.Password);
         }
         else
         {
-            // Ако паролата не е променена, използваме старата парола (не я променяме)
             user.Password = existingUser.Password;
         }
 
-        // Актуализираме всички останали данни
         await _userRepository.UpdateUser(user);
     }
-
-
 
     public async Task DeleteUser(int id)
     {
@@ -86,7 +80,6 @@ public class UserService
 
     public async Task<string> UpdateUserProfilePicture(int userId, IFormFile file)
     {
-        // Проверка дали файлът е предоставен
         if (file == null || file.Length == 0)
             throw new ArgumentException("No file uploaded.");
 
@@ -94,30 +87,25 @@ public class UserService
         if (user == null)
             throw new ArgumentException("User not found.");
 
-        // Път за съхранение на снимката
         var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProfilePictures");
 
-        // Създаване на директория, ако не съществува
         if (!Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath);
         }
 
-        // Запазване на файла с уникално име
-        var fileName = $"{userId}_{Path.GetFileName(file.FileName)}"; // Увери се, че името на файла е безопасно
+        var fileName = $"{userId}_{Path.GetFileName(file.FileName)}";
         var filePath = Path.Combine(directoryPath, fileName);
 
-        // Записване на файла
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        // Обновяване на профилната снимка в базата данни
         user.profileImage_url = Path.Combine("ProfilePictures", fileName);
         await _userRepository.UpdateUser(user);
 
-        return user.profileImage_url; // Връща URL на профилната снимка
+        return user.profileImage_url;
     }
 
     public async Task<string> GetUserProfilePictureUrl(int userId)
@@ -125,7 +113,7 @@ public class UserService
         var user = await _userRepository.GetUserById(userId);
         if (user == null) throw new ArgumentException("User not found.");
 
-        return user.profileImage_url; // Връща URL на профилната снимка
+        return user.profileImage_url;
     }
 
     public async Task<FileContentResult> GetUserProfilePicture(int userId)
@@ -178,18 +166,18 @@ public class UserService
             await _userRepository.UpdateLastName(id, lastName);
         }
     }
-
-    public async Task UpdateAge(int id, int age)
+    public async Task UpdateYearOfBirth(int id, int yearOfBirth)
     {
         var user = await _userRepository.GetUserById(id);
         if (user == null) throw new ArgumentException("User not found.");
 
-        // Обновяваме възрастта, само ако е различна от текущата
-        if (user.Age != age)
+        // Обновяваме само ако годината е различна от текущата
+        if (user.YearOfBirth != yearOfBirth)
         {
-            await _userRepository.UpdateAge(id, age);
+            await _userRepository.UpdateYearOfBirth(id, yearOfBirth);
         }
     }
+
 
     public async Task UpdateEmail(int id, string email)
     {
@@ -202,8 +190,6 @@ public class UserService
             await _userRepository.UpdateEmail(id, email);
         }
     }
-
-
     public async Task UpdatePassword(int id, string newPassword)
     {
         var user = await _userRepository.GetUserById(id);

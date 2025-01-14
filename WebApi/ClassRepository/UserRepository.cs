@@ -16,6 +16,15 @@ namespace SpoerStats2.ClassRepository
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        public async Task<bool> DoesEmailExist(string email)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT COUNT(1) FROM Users WHERE Email = @Email";
+                var count = await connection.ExecuteScalarAsync<int>(query, new { Email = email });
+                return count > 0;
+            }
+        }
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -40,24 +49,23 @@ namespace SpoerStats2.ClassRepository
                 return await connection.QuerySingleOrDefaultAsync<User>(query, new { Email = email });
             }
         }
-
         public async Task AddUser(User user)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = "INSERT INTO Users (FirstName, LastName, Age, Email, Password, Gender, RoleID, ClubID, profileImage_url) " +
-                            "VALUES (@FirstName, @LastName, @Age, @Email, @Password, @Gender, @RoleID, @ClubID, @profileImage_url)";
+                var query = "INSERT INTO Users (FirstName, LastName, Email, Password, Gender, RoleID, ClubID, profileImage_url, YearOfBirth) " +
+                            "VALUES (@FirstName, @LastName, @Email, @Password, @Gender, @RoleID, @ClubID, @profileImage_url, @YearOfBirth)";
                 await connection.ExecuteAsync(query, new
                 {
                     user.FirstName,
                     user.LastName,
-                    user.Age,
                     user.Email,
                     user.Password,
                     user.Gender,
                     user.RoleID,
                     user.ClubID,
-                    user.profileImage_url
+                    user.profileImage_url,
+                    user.YearOfBirth
                 });
             }
         }
@@ -65,22 +73,24 @@ namespace SpoerStats2.ClassRepository
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = "UPDATE Users SET FirstName = @FirstName, LastName = @LastName, Age = @Age, Email = @Email, " +
-                            "Gender = @Gender, profileImage_url = @profileImage_url, Password = @Password WHERE Id = @Id";
+                var query = "UPDATE Users SET FirstName = @FirstName, LastName = @LastName,Email = @Email, " +
+                            "Gender = @Gender, profileImage_url = @profileImage_url, Password = @Password, YearOfBirth = @YearOfBirth " +
+                            "WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("FirstName", user.FirstName);
                 parameters.Add("LastName", user.LastName);
-                parameters.Add("Age", user.Age);
                 parameters.Add("Email", user.Email);
                 parameters.Add("Gender", user.Gender);
                 parameters.Add("profileImage_url", user.profileImage_url);
                 parameters.Add("Password", user.Password);
+                parameters.Add("YearOfBirth", user.YearOfBirth);
                 parameters.Add("Id", user.Id);
 
                 await connection.ExecuteAsync(query, parameters);
             }
         }
+
         public async Task DeleteUser(int id)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -132,13 +142,12 @@ namespace SpoerStats2.ClassRepository
                 await connection.ExecuteAsync(query, new { LastName = lastName, Id = id });
             }
         }
-
-        public async Task UpdateAge(int id, int age)
+        public async Task UpdateYearOfBirth(int id, int yearOfBirth)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = "UPDATE Users SET Age = @Age WHERE Id = @Id";
-                await connection.ExecuteAsync(query, new { Age = age, Id = id });
+                var query = "UPDATE Users SET YearOfBirth = @YearOfBirth WHERE Id = @Id";
+                await connection.ExecuteAsync(query, new { YearOfBirth = yearOfBirth, Id = id });
             }
         }
 
@@ -167,5 +176,7 @@ namespace SpoerStats2.ClassRepository
                 return await connection.QueryAsync<User>(sqlQuery, new { Query = $"%{query}%" });
             }
         }
+
+
     }
 }
