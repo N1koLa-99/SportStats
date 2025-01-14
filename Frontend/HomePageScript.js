@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         window.location.href = 'Index.html';
         return;
     }
-    
     const userJson = localStorage.getItem('user');
+
     if (!userJson) {
         alert('Потребителят не е намерен. Пренасочване към началната страница.');
         window.location.href = 'Index.html';
