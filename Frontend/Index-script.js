@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
     const firstNameInput = document.getElementById('firstName');
     const lastNameInput = document.getElementById('lastName');
-    const ageInput = document.getElementById('age');
     const genderInput = document.getElementById('gender');
     const clubInput = document.getElementById('club');
     
@@ -31,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordError = createErrorElement('password-error');
     const firstNameError = createErrorElement('first-name-error');
     const lastNameError = createErrorElement('last-name-error');
-    const ageError = createErrorElement('age-error');
     const genderError = createErrorElement('gender-error');
     const clubError = createErrorElement('club-error');
     
@@ -39,14 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
     firstNameInput.parentNode.insertBefore(firstNameError, firstNameInput.nextSibling);
     lastNameInput.parentNode.insertBefore(lastNameError, lastNameInput.nextSibling);
-    ageInput.parentNode.insertBefore(ageError, ageInput.nextSibling);
     genderInput.parentNode.insertBefore(genderError, genderInput.nextSibling);
     clubInput.parentNode.insertBefore(clubError, clubInput.nextSibling);
 
     const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
     const namePattern = /^[A-Za-zА-Яа-я]+$/; 
-    const agePattern = /^(?:[1-9]|[1-9][0-9]|100)$/;
 
     registrationForm.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -112,18 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
             lastNameInput.classList.remove('error');
         }
 
-        // Age validation
-        if (!agePattern.test(ageInput.value)) {
-            ageError.textContent = 'Моля, въведете възраст между 1 и 100.';
-            ageError.style.display = 'block';
-            ageInput.classList.add('error');
-            formIsValid = false;
-        } else {
-            ageError.textContent = '';
-            ageError.style.display = 'none';
-            ageInput.classList.remove('error');
-        }
-
         // Gender validation
         if (!genderInput.value) {
             genderError.textContent = 'Моля, изберете пол.';
@@ -150,20 +134,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (formIsValid) {
             const formData = new FormData(registrationForm);
-            const age = parseInt(formData.get('age'), 10);
-            const yearOfBirth = parseInt(formData.get('yearOfBirth'), 10); // Потребителят въвежда годината на раждане
+            const yearOfBirth = parseInt(formData.get('yearOfBirth'), 10);
         
             const user = {
                 firstName: formData.get('firstName'),
                 lastName: formData.get('lastName'),
                 email: formData.get('email'),
                 password: formData.get('password'),
-                age: age, // Възраст
                 gender: formData.get('gender'),
                 roleID: 1,
                 clubID: parseInt(formData.get('club'), 10),
                 profileImage_url: "http://localhost:7198/ProfilePictures/ProfilePhoto2.jpg",
-                yearOfBirth: yearOfBirth 
+                yearOfBirth: yearOfBirth
             };
         
             try {
@@ -178,18 +160,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
         
                 const newUser = await response.json();
-                localStorage.setItem('user', JSON.stringify(newUser));
         
-                // Показване на съобщение за успешна регистрация
+                // Съхраняване на данните в localStorage
+                localStorage.setItem('user', JSON.stringify(newUser.user));
+                localStorage.setItem('userHash', newUser.userTokenHash);
+        
                 showMessageBox('Потребителят е регистриран успешно!', 'success');
-        
                 registrationForm.reset();
                 window.location.href = "HomePage.html";
             } catch (error) {
                 console.error('Грешка:', error);
-                showMessageBox('Възникна грешка при регистрацията.Ако имейлът ви е зает влезте в профила си от "Вход" ', 'error');
+                showMessageBox('Възникна грешка при регистрацията.', 'error');
             }
         }
+        
+        
         
     });
 

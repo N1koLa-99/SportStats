@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     
         try {
-            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results/${resultId}`, {
+            const response = await fetch(`https://localhost:7198/api/Results/${resultId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     
             alert('Резултатът е изтрит успешно!');
             const disciplineId = Number(document.getElementById('discipline').value);
-            const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/Users/club/${user.clubID}`);
-            const results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results`);
+            const clubUsers = await fetchJson(`https://localhost:7198/api/Users/club/${user.clubID}`);
+            const results = await fetchJson(`https://localhost:7198/api/Results`);
             displayUsersTable(clubUsers, results, disciplineId);
         } catch (error) {
             alert('Грешка при изтриване на резултата.');
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 ? getBestResult(userResults, disciplineId)
                 : 'Няма резултат';
     
-                const resultEntries = userResults
+            const resultEntries = userResults
                 .map(result => `
                     <tr>
                         <td>${formatResult(result.valueTime, disciplineId)}</td>
@@ -90,13 +90,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                         </td>
                     </tr>`)
                 .join('');
-            
     
+            // Промяна на реда за yearOfBirth вместо age
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${user.firstName}</td>
                 <td>${user.lastName}</td>
-                <td>${user.age}</td>
+                <td>${user.yearOfBirth ? user.yearOfBirth : 'Няма данни'}</td> <!-- Заменено с година на раждане -->
                 <td>${disciplineId ? bestResult : ''}</td>
                 <td>
                     <table>
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             `;
             tbody.appendChild(row);
         });
-
+    
         document.querySelectorAll('.delete-result').forEach(button => {
             button.addEventListener('click', async function () {
                 const resultId = this.getAttribute('data-result-id');
@@ -116,6 +116,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
         });
     }
+    
+    
     
     
     async function handleCoach() {
@@ -128,11 +130,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('coach-name').textContent = `${user.firstName} ${user.lastName}`;
     
         try {
-            const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
+            const disciplines = await fetchJson(`https://localhost:7198/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
             populateDropdown('discipline', disciplines, 'disciplineName', 'id');
     
-            const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
-            let results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results`);
+            const clubUsers = await fetchJson(`https://localhost:7198/api/Users/club/${user.clubID}`);
+            let results = await fetchJson(`https://localhost:7198/api/Results`);
     
             displayUsersTable(clubUsers, results);
     
@@ -153,8 +155,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
         
                 Promise.all([
-                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}`), 
-                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`)
+                    fetch(`https://localhost:7198/api/Users/${userId}`), 
+                    fetch(`https://localhost:7198/api/Users/profilePicture/${userId}`)
                 ])
                 .then(responses => {
                     if (!responses[0].ok) throw new Error('Неуспешно зареждане на данни за потребителя');
@@ -199,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
 
                 try {
-                    const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/search?query=${encodeURIComponent(query)}`);
+                    const response = await fetch(`https://localhost:7198/api/Users/search?query=${encodeURIComponent(query)}`);
         
                     if (!response.ok) {
                         if (response.status === 404) {
@@ -214,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     console.log('Намерени потребители:', users);
         
                     const disciplineId = Number(document.getElementById('discipline').value);
-                    const allResults = await fetchJson('https://sportstatsapi.azurewebsites.net/api/Results');
+                    const allResults = await fetchJson('https://localhost:7198/api/Results');
                     displayUsersTable(users, allResults, disciplineId);
         
                 } catch (error) {
@@ -296,12 +298,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
     
     async function setupAddResultForm() {
-        const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
+        const disciplines = await fetchJson(`https://localhost:7198/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
         populateDropdown('add-discipline', disciplines, 'disciplineName', 'id');
     
-        const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
-        populateDropdown('add-user', clubUsers, user => `${user.firstName} ${user.lastName} (${user.age})`, 'id');
-    
+        const clubUsers = await fetchJson(`https://localhost:7198/api/Users/club/${user.clubID}`);
+        // Промяна тук: показваме yearOfBirth вместо age
+        populateDropdown('add-user', clubUsers, user => `${user.firstName} ${user.lastName} (${user.yearOfBirth})`, 'id');
+        
         document.getElementById('add-discipline').addEventListener('change', function () {
             const disciplineId = this.value;
             const timeBasedIds = [
@@ -337,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         
             try {
-                const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Results', {
+                const response = await fetch('https://localhost:7198/api/Results', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -371,40 +374,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 console.error('Грешка:', error);
             }
         }); 
-        async function compareResultWithNorms(user, disciplineId, valueTime) {
-            const userAge = user.age;
-            const userGender = user.gender;
-        
-            console.log(`Пол: ${userGender}, Възраст: ${userAge}, Дисциплина: ${disciplineId}`);
-        
-            try {
-                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`);
-                if (!response.ok) throw new Error('Неуспешно извличане на нормативите');
-        
-                const norms = await response.json();
-                console.log('Получени нормативи:', norms);
-        
-                const genderMapping = { 'Male': 'M', 'Female': 'F' };
-                const mappedGender = genderMapping[userGender] || userGender;
-        
-                const norm = norms.find(norm => {
-                    return norm.gender === mappedGender && userAge >= norm.minAge && userAge <= norm.maxAge && norm.disciplineId == disciplineId;
-                });
-        
-                if (norm) {
-                    const isQualified = valueTime <= norm.requiredValue;
-                    alert(isQualified ? 'Поздравления! Вие отговаряте на нормата.' : 'Не отговаряте на нормата.');
-                    return isQualified; 
-                } else {
-                    console.log(`Не са намерени нормативи за възрастта ${userAge}, пола ${userGender} и дисциплина ${disciplineId}`);
-                    return false;
-                }
-            } catch (error) {
-                console.error('Грешка при сравняването на резултата с нормативите:', error);
-                return false;
-            }
-        }
     }
+    
     
     document.getElementById('go-home').addEventListener('click', function () {
         window.location.href = 'HomePage.html';

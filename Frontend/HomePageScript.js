@@ -1,35 +1,37 @@
-document.addEventListener('DOMContentLoaded', async function () { // Маркираме функцията като async
+document.addEventListener('DOMContentLoaded', async function () {
     let chart; // Глобална променлива за диаграмата
-    
-    const user = JSON.parse(localStorage.getItem('user'));
-    console.log(user);
-    const savedHash = localStorage.getItem('userHash');
 
+    const user = JSON.parse(localStorage.getItem('user'));
+    const savedHash = localStorage.getItem('userHash');
+    
     if (!user || !savedHash) {
         alert('Невалидни данни. Пренасочване към началната страница.');
         window.location.href = 'Index.html';
         return;
     }
-
+    
     async function hashUserData(user) {
-        const data = `${user.firstName}${user.lastName}${user.age}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`; // Добавяме yearOfBirth
+        const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
         const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
         return btoa(String.fromCharCode(...new Uint8Array(buffer)));
     }
-    const currentHash = await hashUserData(user);
-if (currentHash !== savedHash) {
-    alert('Не бъди злонамерен <3 ');
-    localStorage.clear();
-    window.location.href = 'Index.html';
-    return;
-}
-
-
     
+    const currentHash = await hashUserData(user);
+    
+    if (currentHash !== savedHash) {
+        alert('Не бъди злонамерен <3');
+        localStorage.clear();
+        window.location.href = 'Index.html';
+        return;
+    }
+    
+
     if (user) {
         document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
         document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
-        document.getElementById('age').textContent = user.age || 'Няма данни';
+
+        // Показваме набора (годината на раждане)
+        document.getElementById('year-of-birth').textContent = user.yearOfBirth || 'Няма данни';
 
         // Показване или скриване на бутона за треньор в зависимост от roleID
         if (user.roleID === 2) {
@@ -43,7 +45,7 @@ if (currentHash !== savedHash) {
         } else {
             document.getElementById('coach-button').classList.add('hidden');
         }
-        
+
         // Извличане на информация за клуба
         fetch(`https://localhost:7198/api/Clubs/${user.clubID}`)
             .then(response => {
@@ -69,30 +71,29 @@ if (currentHash !== savedHash) {
             }
         });
 
-if (user && user.id > 0) {
-    fetch(`https://localhost:7198/api/Users/profilePicture/${user.id}`)
-        .then(response => {
-            if (!response.ok) {
-                console.error('Неуспешно зареждане на профилната снимка:', response.status, response.statusText);
-                throw new Error('Неуспешно зареждане на профилната снимка');
-            }
-            return response.blob();
-        })
-        .then(imageBlob => {
-            const imageUrl = URL.createObjectURL(imageBlob);
-            document.getElementById('profile-picture').src = imageUrl;
-        })
-        .catch(error => {
-            console.error('Грешка при зареждане на профилната снимка:', error);
+        if (user.id > 0) {
+            fetch(`https://localhost:7198/api/Users/profilePicture/${user.id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Неуспешно зареждане на профилната снимка:', response.status, response.statusText);
+                        throw new Error('Неуспешно зареждане на профилната снимка');
+                    }
+                    return response.blob();
+                })
+                .then(imageBlob => {
+                    const imageUrl = URL.createObjectURL(imageBlob);
+                    document.getElementById('profile-picture').src = imageUrl;
+                })
+                .catch(error => {
+                    console.error('Грешка при зареждане на профилната снимка:', error);
+                    document.getElementById('profile-picture').src = 'https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg';
+                    document.getElementById('profile-picture').alt = 'Профилната снимка не е налична';
+                });
+        } else {
+            console.warn('Невалиден user.id:', user ? user.id : 'user не е дефиниран');
             document.getElementById('profile-picture').src = 'https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg';
             document.getElementById('profile-picture').alt = 'Профилната снимка не е налична';
-        });
-
-} else {
-    console.warn('Невалиден user.id:', user ? user.id : 'user не е дефиниран');
-    document.getElementById('profile-picture').src = 'https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg';
-    document.getElementById('profile-picture').alt = 'Профилната снимка не е налична';
-}  
+        }
     }
 
     function fetchDisciplinesByClubId(clubId) {
@@ -163,8 +164,6 @@ function fetchResults(disciplineId, userId) {
         });
 }
 
-    
-    
 function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender, results) {
     fetch(`https://localhost:7198/api/Normatives/discipline/${disciplineId}`)
         .then(response => {

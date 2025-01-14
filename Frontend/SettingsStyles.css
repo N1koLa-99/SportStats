@@ -209,6 +209,52 @@ input[type="password"] {
         align-items: flex-start;
     }
 }
+/* Основен стил за dropdown */
+select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #16314A;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #16314A;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Сянка и плавен преход */
+select:hover,
+select:focus {
+    border-color: #00A0E1;
+    box-shadow: 0 4px 8px rgba(0, 160, 225, 0.3);
+}
+
+/* Стрелка на dropdown */
+select::after {
+    content: ' ▼';
+    position: absolute;
+    right: 15px;
+    top: 12px;
+    pointer-events: none;
+}
+
+/* Падащо меню (към option) */
+option {
+    padding: 10px;
+    background-color: #ffffff;
+    color: #16314A;
+    font-size: 16px;
+}
+
+/* Hover ефект за опции */
+option:hover {
+    background-color: #00A0E1;
+    color: white;
+}
+
 @media (max-width: 450px) {
     .container {
         background: url(https://sportstats.blob.core.windows.net/$web/SettingsImg.jpg) no-repeat center bottom fixed;

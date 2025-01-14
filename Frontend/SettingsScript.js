@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         window.location.href = 'index.html';
         return;
     }
-    
+
     // Display user information
     displayUserInfo(user);
 
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     try {
         // Load club information
-        const clubResponse = await fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`);
+        const clubResponse = await fetch(`https://localhost:7198/api/Clubs/${user.clubID}`);
         if (!clubResponse.ok) throw new Error('Грешка при зареждане на информация за клуба.');
 
         const club = await clubResponse.json();
@@ -34,13 +34,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 function displayUserInfo(user) {
     document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
     document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
-    document.getElementById('age').textContent = user.age || 'Няма данни';
+    document.getElementById('year-of-birth').textContent = user.yearOfBirth || 'Няма данни';
     document.getElementById('email').textContent = user.email || 'Няма данни';
+    loadYearOptions(user.yearOfBirth);
 }
 
 async function loadProfilePicture(userId) {
     try {
-        const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`);
+        const response = await fetch(`https://localhost:7198/api/Users/profilePicture/${userId}`);
         if (!response.ok) throw new Error('Неуспешно зареждане на профилната снимка');
 
         const imageBlob = await response.blob();
@@ -65,7 +66,7 @@ function setupProfileImageUpdate(userId) {
             formData.append('file', file);
 
             try {
-                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/uploadProfilePicture/${userId}`, {
+                const response = await fetch(`https://localhost:7198/api/Users/uploadProfilePicture/${userId}`, {
                     method: 'POST',
                     body: formData
                 });
@@ -108,12 +109,12 @@ async function saveProfileChanges(user) {
     const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
     const namePattern = /^[A-Za-zА-Яа-я]+$/;
-    const agePattern = /^(?:[1-9]|[1-9][0-9]|100)$/;
+    const yearOfBirthPattern = /^(?:[1-9][0-9]{3})$/;
    
     const updatedUser = {
         firstName: document.getElementById('edit-first-name').value.trim() || user.firstName,
         lastName: document.getElementById('edit-last-name').value.trim() || user.lastName,
-        age: document.getElementById('edit-age').value.trim() || user.age,
+        yearOfBirth: document.getElementById('edit-year-of-birth').value.trim() || user.yearOfBirth,
         email: document.getElementById('edit-email').value.trim() || user.email
     };
 
@@ -127,8 +128,8 @@ async function saveProfileChanges(user) {
         return; 
     }
 
-    if (!agePattern.test(updatedUser.age)) {
-        alert('Възрастта трябва да бъде между 1 и 100.');
+    if (!yearOfBirthPattern.test(updatedUser.yearOfBirth)) {
+        alert('Годината на раждане трябва да бъде валидна.');
         return;
     }
 
@@ -136,6 +137,7 @@ async function saveProfileChanges(user) {
         alert('Моля, въведете валиден имейл адрес (напр. user@example.com)');
         return;
     }
+
     const password = document.getElementById('edit-password').value.trim();
     const confirmPassword = document.getElementById('edit-confirm-password').value.trim();
     if (password && confirmPassword && password !== confirmPassword) {
@@ -168,18 +170,24 @@ async function saveProfileChanges(user) {
     }
 }
 
-
-
-function displayUserInfo(user) {
-    document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
-    document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
-    document.getElementById('age').textContent = user.age || 'Няма данни';
-    document.getElementById('email').textContent = user.email || 'Няма данни';
+function loadYearOptions(selectedYear) {
+    const yearSelect = document.getElementById('edit-year-of-birth');
+    const currentYear = new Date().getFullYear();
+    
+    for (let year = currentYear - 100; year <= currentYear; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (year === selectedYear) {
+            option.selected = true;
+        }
+        yearSelect.appendChild(option);
+    }
 }
 
 async function updateField(userId, fieldName, value, fieldLabel) {
     try {
-        const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}/update-${fieldName}`, {
+        const response = await fetch(`https://localhost:7198/api/Users/${userId}/update-${fieldName}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(value)
@@ -193,7 +201,7 @@ async function updateField(userId, fieldName, value, fieldLabel) {
 }
 
 function toggleEditFields(editing) {
-    ['first-name', 'last-name', 'age', 'email'].forEach(field => {
+    ['first-name', 'last-name', 'year-of-birth', 'email'].forEach(field => {
         document.getElementById(field).style.display = editing ? 'none' : 'inline';
         document.getElementById(`edit-${field}`).style.display = editing ? 'block' : 'none';
     });
@@ -204,4 +212,3 @@ function toggleEditFields(editing) {
     document.getElementById('cancel-profile').style.display = editing ? 'block' : 'none';
     document.getElementById('edit-profile').style.display = editing ? 'none' : 'block';
 }
-
