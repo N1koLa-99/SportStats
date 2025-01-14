@@ -173,7 +173,7 @@ namespace SpoerStats2.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving the profile picture." });
             }
         }
-       
+
         // Update FirstName
         [HttpPost("{id}/update-firstname")]
         public async Task<IActionResult> UpdateFirstName(int id, [FromBody] string firstName)
@@ -198,16 +198,20 @@ namespace SpoerStats2.Controllers
             return Ok("Last name updated successfully.");
         }
 
-        // Update Age
-        [HttpPost("{id}/update-age")]
-        public async Task<IActionResult> UpdateAge(int id, [FromBody] int age)
+        // Update YearOfBirth
+        [HttpPost("{id}/update-yearofbirth")]
+        public async Task<IActionResult> UpdateYearOfBirth(int id, [FromBody] int yearOfBirth)
         {
             var user = await _userService.GetUserById(id);
-            if (user == null) return NotFound("User not found.");
+            if (user == null)
+                return NotFound("User not found.");
 
-            user.Age = age;
+            if (yearOfBirth < 1900 || yearOfBirth > DateTime.Now.Year)
+                return BadRequest("Invalid Year of Birth.");
+
+            user.YearOfBirth = yearOfBirth;
             await _userService.UpdateUser(user);
-            return Ok("Age updated successfully.");
+            return Ok("Year of birth updated successfully.");
         }
 
         // Update Email
