@@ -238,24 +238,29 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
         relevantNormatives = normatives.filter(normative => {
             const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
             const normativeValue = normative.valueStandart;
-            const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
-
-            return difference <= 0;
+            const difference = isTimeDiscipline 
+                ? bestResult.valueTime - normativeValue 
+                : normativeValue - bestResult.valueTime;
+        
+            console.log(`Норматив (${poolType}): ${normativeValue}, Разлика: ${difference.toFixed(2)}`);
+            return true; // Включваме всички нормативи
         });
 
         if (relevantNormatives.length > 0) {
             relevantNormatives.forEach(normative => {
                 const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
                 const normativeValue = normative.valueStandart;
-                const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
-
+                const difference = isTimeDiscipline 
+                    ? bestResult.valueTime - normativeValue 
+                    : normativeValue - bestResult.valueTime;
+            
                 normativeValueText += `Норматив (${poolType}): ${formatTime(normativeValue)}<br>`;
                 normativeDifferenceText += `Разлика с норматив (${poolType}): ${difference.toFixed(2)} сек<br>`;
-
+            
                 const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; 
                 normativeStatusText += `
                     <div style="display: inline-block; width: 80px; height: 40px; background-color: ${statusColor}; 
-                    color: black; text-align: center; line-height: 40px; border-radius: 5px;margin-right: -3px; font-weight: bold;margin-left: 14px;">
+                    color: black; text-align: center; line-height: 40px; border-radius: 5px; margin-right: -3px; font-weight: bold; margin-left: 14px;">
                         ${poolType}
                     </div><br>`;
             });
