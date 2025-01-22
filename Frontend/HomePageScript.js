@@ -183,8 +183,8 @@ function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender,
             console.log('Получени нормативи:', normatives);
 
             // Съпоставяне на пола на потребителя към нормативите
-            const genderMapping = { 'Male': 'M', 'Female': 'F' };
-            const mappedGender = genderMapping[userGender.charAt(0).toUpperCase() + userGender.slice(1)] || userGender;
+            const genderMapping = { 'male': 'M', 'female': 'F' };
+            const mappedGender = genderMapping[userGender.toLowerCase()] || userGender;
 
             // Филтриране на нормативите само по година на раждане и пол
             const relevantNormatives = normatives.filter(normative => {
@@ -204,70 +204,68 @@ function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender,
         });
 } 
     
-    function displayResults(disciplineId, dateOfBirth, userGender, results, normatives) {
-        console.log('Резултати:', results);
-        console.log('Нормативи:', normatives);
-    
-        const latestResult = results.reduce((latest, result) => 
-            new Date(result.resultDate) > new Date(latest.resultDate) ? result : latest, results[0]
-        );
-    
-        let bestResult;
-        let normativeDifferenceText = '';
-        let normativeValueText = '';
-        let normativeStatusText = '';
-        let relevantNormatives = []; // Declare relevantNormatives here
-    
-        const timeDisciplines = Array.from({ length: 18 }, (_, i) => i + 1); // Нов списък на времеви дисциплини
-        const isTimeDiscipline = timeDisciplines.includes(disciplineId); // Проверка дали е времева дисциплина
-    
-       
-        function findBestResult(results, isTimeDiscipline) {
-            return results.reduce((best, result) => {
-                if (isTimeDiscipline) {
-                    return result.valueTime < best.valueTime ? result : best;
-                } else {
-                    return result.valueTime > best.valueTime ? result : best;
-                }
-            }, results[0]);
-        }
-    
-        bestResult = findBestResult(results, isTimeDiscipline);
-    
-        if (normatives.length > 0) {
-            console.log('Търсене на нормативи за:', { dateOfBirth, userGender, disciplineId });
-            relevantNormatives = normatives.filter(normative => {
+function displayResults(disciplineId, yearOfBirth, userGender, results, normatives) {
+    console.log('Резултати:', results);
+    console.log('Нормативи:', normatives);
+
+    const latestResult = results.reduce((latest, result) => 
+        new Date(result.resultDate) > new Date(latest.resultDate) ? result : latest, results[0]
+    );
+
+    let bestResult;
+    let normativeDifferenceText = '';
+    let normativeValueText = '';
+    let normativeStatusText = '';
+    let relevantNormatives = []; // Declare relevantNormatives here
+
+    const timeDisciplines = Array.from({ length: 18 }, (_, i) => i + 1); // Нов списък на времеви дисциплини
+    const isTimeDiscipline = timeDisciplines.includes(disciplineId); // Проверка дали е времева дисциплина
+
+    function findBestResult(results, isTimeDiscipline) {
+        return results.reduce((best, result) => {
+            if (isTimeDiscipline) {
+                return result.valueTime < best.valueTime ? result : best;
+            } else {
+                return result.valueTime > best.valueTime ? result : best;
+            }
+        }, results[0]);
+    }
+
+    bestResult = findBestResult(results, isTimeDiscipline);
+
+    if (normatives.length > 0) {
+        console.log('Търсене на нормативи за:', { yearOfBirth, userGender, disciplineId });
+        relevantNormatives = normatives.filter(normative => {
+            const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
+            const normativeValue = normative.valueStandart;
+            const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
+
+            return difference <= 0;
+        });
+
+        if (relevantNormatives.length > 0) {
+            relevantNormatives.forEach(normative => {
                 const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
                 const normativeValue = normative.valueStandart;
                 const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
-    
-                return difference <= 0;
+
+                normativeValueText += `Норматив (${poolType}): ${formatTime(normativeValue)}<br>`;
+                normativeDifferenceText += `Разлика с норматив (${poolType}): ${difference.toFixed(2)} сек<br>`;
+
+                const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; 
+                normativeStatusText += `
+                    <div style="display: inline-block; width: 80px; height: 40px; background-color: ${statusColor}; 
+                    color: black; text-align: center; line-height: 40px; border-radius: 5px;margin-right: -3px; font-weight: bold;margin-left: 14px;">
+                        ${poolType}
+                    </div><br>`;
             });
-    
-            if (relevantNormatives.length > 0) {
-                relevantNormatives.forEach(normative => {
-                    const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
-                    const normativeValue = normative.valueStandart;
-                    const difference = isTimeDiscipline ? bestResult.valueTime - normativeValue : normativeValue - bestResult.valueTime;
-    
-                    normativeValueText += `Норматив (${poolType}): ${formatTime(normativeValue)}<br>`;
-                    normativeDifferenceText += `Разлика с норматив (${poolType}): ${difference.toFixed(2)} сек<br>`;
-    
-                    const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; 
-                    normativeStatusText += `
-                        <div style="display: inline-block; width: 80px; height: 40px; background-color: ${statusColor}; 
-                        color: black; text-align: center; line-height: 40px; border-radius: 5px;margin-right: -3px; font-weight: bold;margin-left: 14px;">
-                            ${poolType}
-                        </div><br>`;
-                });
-            } else {
-                normativeValueText = 'Няма норматив за тази възрастова група и дисциплина.';
-            }
         } else {
-            normativeValueText = 'Няма налични нормативи.';
+            normativeValueText = 'Няма норматив за тази възрастова група и дисциплина.';
         }
-        
-        
+    } else {
+        normativeValueText = 'Няма налични нормативи.';
+    }
+       
         const chartLabels = results.map(result => new Date(result.resultDate).toLocaleDateString());
         const chartData = results.map(result => result.valueTime);
 
