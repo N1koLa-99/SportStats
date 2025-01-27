@@ -71,12 +71,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                 document.getElementById('club').textContent = 'Грешка при зареждане на клуба';
             });
 
-        // Добавяне на събитие за формата за дисциплина
-        document.getElementById('discipline-form').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const disciplineId = parseInt(document.getElementById('discipline').value, 10);
+        document.getElementById('discipline').addEventListener('change', function () {
+            const disciplineId = parseInt(this.value, 10); // Взема избрания ID на дисциплината
             if (disciplineId) {
-                fetchResults(disciplineId, user.id);
+                fetchResults(disciplineId, user.id); // Извиква fetchResults с избраната дисциплина и ID на потребителя
             }
         });
 
@@ -442,12 +440,9 @@ chart = new Chart(ctx, {
             easing: 'easeInOutElastic',
         }
     }
-});
-
-     
+});   
     }
      
-        
         document.getElementById('best-result').textContent = bestResult 
             ? `Най-добър резултат: ${formatTime(bestResult.valueTime)}` 
             : 'Няма налични резултати.';
