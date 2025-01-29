@@ -500,7 +500,7 @@ button:active {
         padding-bottom: 100%;
         width: 100vw;
         background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)),
-         url(https://sportstats.blob.core.windows.net/$web/3829eb724b977bdef7c9cec9b1a356c0.jpg)center center fixed;
+         url(https://sportstats.blob.core.windows.net/$web/SnimkaTel.jpg)center center fixed;
         animation: backgroundAnimation 0s infinite alternate;
     }
 
@@ -588,21 +588,23 @@ button:active {
 
     #chart-info {
         margin-left: 26px;
-        margin-top: 13px;
+        margin-top: 40px;
         padding: 20px;
         border-radius: 38px;
         font-size: 16px;
         line-height: 16px;
+        
     }
     #chart-info p {
-        margin: 15px 0;
+        margin: 20px 0;
         display: flex;
         justify-content: space-between;
-        padding: 13px 15px;
+        padding: 18px 16px;
         border-bottom: 1px solid #ddd;
-        margin-top: -13px;
-        margin-right: -8px;
-        font-size: 14px;
+        margin-top: -10px;
+        margin-right: -10px;
+        font-size: 15px;
+        line-height: 25px;
     }
 
     #chart-info span {
@@ -673,8 +675,8 @@ button:active {
     }
     #chart-info {
         margin-left: 26px;
-        margin-top: 13px;
-        padding: 20px;
+        margin-top: 39px;
+        padding: 17px;
         border-radius: 38px;
         font-size: 16px;
         line-height: 17px;
@@ -736,13 +738,12 @@ button:active {
         margin-bottom: 5px;
     }
     #chart-info {
-        margin-left: 37px;
-        margin-right: 9px;
-        margin-top: 13px;
-        padding: 20px;
-        border-radius: 38px;
-        font-size: 16px;
-        line-height: 17px;
+        margin-left: 10px;
+        margin-right: -16px;
+        margin-top: 20px;
+        padding: 21px;
+        border-radius: 28px;
+        line-height: 20px;
     }
     .profile-image {
         margin-top: 38%;
@@ -754,6 +755,10 @@ button:active {
     .results h2 {
         font-size: 22px;
         margin-top: 31px;
+    }
+    .container{
+        padding: 0px;
+        padding-bottom: 110%;
     }
 }
 
