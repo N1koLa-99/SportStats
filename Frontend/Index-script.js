@@ -144,12 +144,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 gender: formData.get('gender'),
                 roleID: 1,
                 clubID: parseInt(formData.get('club'), 10),
-                profileImage_url: "http://localhost:7198/ProfilePictures/ProfilePhoto2.jpg",
+                profileImage_url: "https://sportstatsapi.azurewebsites.net/ProfilePictures/ProfilePhoto2.jpg",
                 yearOfBirth: yearOfBirth
             };
         
             try {
-                const response = await fetch('https://localhost:7198/api/Users', {
+                const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user),
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         try {
-            const response = await fetch('https://localhost:7198/api/Users/login', {
+            const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(loginData)
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function checkEmailAvailability(email) {
         try {
-            const response = await fetch(`https://localhost:7198/api/Users/email-exists/${email}`);
+            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/email-exists/${email}`);
             if (!response.ok) {
                 throw new Error('Грешка при проверка на имейла: ' + response.statusText);
             }
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchClubs() {
         try {
-            const response = await fetch('https://localhost:7198/api/Clubs');
+            const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Clubs');
             if (!response.ok) {
                 throw new Error('Грешка при извличане на данни от API: ' + response.statusText);
             }

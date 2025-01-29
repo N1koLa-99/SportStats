@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         // Извличане на информация за клуба
-        fetch(`https://localhost:7198/api/Clubs/${user.clubID}`)
+        fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
 
         if (user.id > 0) {
-            fetch(`https://localhost:7198/api/Users/profilePicture/${user.id}`)
+            fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${user.id}`)
                 .then(response => {
                     if (!response.ok) {
                         console.error('Неуспешно зареждане на профилната снимка:', response.status, response.statusText);
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function fetchDisciplinesByClubId(clubId) {
         // Извличане на дисциплините свързани само с този клуб
-        fetch(`https://localhost:7198/api/ClubDisciplines/disciplines-by-club/${clubId}`)
+        fetch(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${clubId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
@@ -153,7 +153,7 @@ function fetchResults(disciplineId, userId) {
     document.getElementById('best-result').textContent = 'Зареждане...';
     document.getElementById('latest-result').textContent = 'Зареждане...';
 
-    fetch(`https://localhost:7198/api/Results/by-user/${userId}/by-discipline/${disciplineId}`)
+    fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${userId}/by-discipline/${disciplineId}`)
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
@@ -172,7 +172,7 @@ function fetchResults(disciplineId, userId) {
 }
 
 function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender, results) {
-    fetch(`https://localhost:7198/api/Normatives/discipline/${disciplineId}`)
+    fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`)
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
             return response.json();

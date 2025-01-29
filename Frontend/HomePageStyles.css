@@ -23,8 +23,6 @@ body {
     animation: backgroundAnimation 15s infinite alternate;
 }
 
-
-
 @keyframes backgroundAnimation {
     0% {
         background-position: center center;

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     try {
         // Load club information
-        const clubResponse = await fetch(`https://localhost:7198/api/Clubs/${user.clubID}`);
+        const clubResponse = await fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`);
         if (!clubResponse.ok) throw new Error('Грешка при зареждане на информация за клуба.');
 
         const club = await clubResponse.json();
@@ -41,7 +41,7 @@ function displayUserInfo(user) {
 
 async function loadProfilePicture(userId) {
     try {
-        const response = await fetch(`https://localhost:7198/api/Users/profilePicture/${userId}`);
+        const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`);
         if (!response.ok) throw new Error('Неуспешно зареждане на профилната снимка');
 
         const imageBlob = await response.blob();
@@ -66,7 +66,7 @@ function setupProfileImageUpdate(userId) {
             formData.append('file', file);
 
             try {
-                const response = await fetch(`https://localhost:7198/api/Users/uploadProfilePicture/${userId}`, {
+                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/uploadProfilePicture/${userId}`, {
                     method: 'POST',
                     body: formData
                 });
@@ -187,7 +187,7 @@ function loadYearOptions(selectedYear) {
 
 async function updateField(userId, fieldName, value, fieldLabel) {
     try {
-        const response = await fetch(`https://localhost:7198/api/Users/${userId}/update-${fieldName}`, {
+        const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}/update-${fieldName}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(value)
