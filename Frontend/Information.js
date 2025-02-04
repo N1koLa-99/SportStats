@@ -78,21 +78,28 @@ function updateCharts(users, results, disciplineId, athleteId) {
 
     const lineCanvas = document.getElementById('lineChart');
     const barCanvas = document.getElementById('barChart');
+    const radarCanvas = document.getElementById('radarChart');
 
-    if (!lineCanvas || !barCanvas) {
-        console.error("Графиките не са намерени в HTML.");
+    if (!lineCanvas || !barCanvas || !radarCanvas) {
+        console.error("Някои от графиките не са намерени в HTML.");
         return;
     }
 
     const ctxLine = lineCanvas.getContext('2d');
     const ctxBar = barCanvas.getContext('2d');
+    const ctxRadar = radarCanvas.getContext('2d');
 
-    if (!ctxLine || !ctxBar) {
+    if (!ctxLine || !ctxBar || !ctxRadar) {
         console.error("Грешка при инициализация на контекста за графиките.");
         return;
     }
 
+    // Унищожаваме предишните графики, ако съществуват
     if (window.myChart) window.myChart.destroy();
+    if (window.myBarChart) window.myBarChart.destroy();
+    if (window.myRadarChart) window.myRadarChart.destroy();
+
+    // Линейна диаграма
     window.myChart = new Chart(ctxLine, {
         type: 'line',
         data: {
@@ -106,11 +113,21 @@ function updateCharts(users, results, disciplineId, athleteId) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    reverse: true,  // Обръщаме ос Y, за да покажем по-малкото време най-горе
+                    ticks: {
+                        beginAtZero: false,
+                        min: Math.min(...chartData) - 5, // Най-добрият резултат (по-малко време)
+                        max: Math.max(...chartData) + 5  // Най-лошият резултат (по-голямо време)
+                    }
+                }
+            }
         }
     });
 
-    if (window.myBarChart) window.myBarChart.destroy();
+    // Бар диаграма
     window.myBarChart = new Chart(ctxBar, {
         type: 'bar',
         data: {
@@ -123,49 +140,45 @@ function updateCharts(users, results, disciplineId, athleteId) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-    const radarCanvas = document.getElementById('radarChart');
-
-if (!radarCanvas) {
-    console.error("Радарната диаграма не е намерена в HTML.");
-    return;
-}
-
-const ctxRadar = radarCanvas.getContext('2d');
-if (!ctxRadar) {
-    console.error("Грешка при инициализация на контекста за радарната диаграма.");
-    return;
-}
-
-// Унищожаваме предишната диаграма, ако има такава
-if (window.myRadarChart) window.myRadarChart.destroy();
-
-window.myRadarChart = new Chart(ctxRadar, {
-    type: 'radar',
-    data: {
-        labels: chartLabels,
-        datasets: [{
-            label: 'Резултати',
-            data: chartData,
-            backgroundColor: 'rgba(0, 160, 225, 0.3)',
-            borderColor: '#00A0E1',
-            pointBackgroundColor: '#16314A'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            r: {
-                suggestedMin: Math.min(...chartData) - 5,
-                suggestedMax: Math.max(...chartData) + 5
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    ticks: {
+                        beginAtZero: false,
+                        min: Math.min(...chartData) - 5, // Най-добрият резултат (по-малко време)
+                        max: Math.max(...chartData) + 5  // Най-лошият резултат (по-голямо време)
+                    }
+                }
             }
         }
-    }
-});
+    });
 
+    // Радарна диаграма
+    window.myRadarChart = new Chart(ctxRadar, {
+        type: 'radar',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Резултати',
+                data: chartData,
+                backgroundColor: 'rgba(0, 160, 225, 0.3)',
+                borderColor: '#00A0E1',
+                pointBackgroundColor: '#16314A'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    ticks: {
+                        min: Math.min(...chartData) - 5, // Най-добрият резултат (по-малко време)
+                        max: Math.max(...chartData) + 5  // Най-лошият резултат (по-голямо време)
+                    }
+                }
+            }
+        }
+    });
 }
 
 
