@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 })
                 .then(([user, imageBlob]) => {
                     console.log('Избран потребител:', user);
-                    console.log('Възраст:', user.age);
+                    console.log('Възраст:', user.yearOfBirth);
                     console.log('Пол:', user.gender);
                     
                     const imageUrl = URL.createObjectURL(imageBlob);
@@ -288,14 +288,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
-        const millis = Math.round((seconds % 1) * 100);
-
+        let millis = Math.round((seconds % 1) * 100);
+    
+        // Осигуряване на двуцифрен формат за милисекундите
+        millis = millis < 10 ? `0${millis}` : `${millis}`;
+    
         let timeString = '';
         if (hours > 0) timeString += `${hours} ч `;
         if (minutes > 0 || hours > 0) timeString += `${minutes} мин `;
         timeString += `${secs}.${millis} сек`;
         return timeString;
     }
+    
     
     async function setupAddResultForm() {
         const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
