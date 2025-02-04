@@ -39,14 +39,14 @@ async function handleCoach(user) {
 
         document.getElementById('discipline').addEventListener('change', function () {
             const disciplineId = Number(this.value);
-            const selectedAthleteId = Number(document.getElementById('athlete-select').value);
-            updateCharts(clubUsers, results, disciplineId, selectedAthleteId);
+            const selectedUserId = Number(document.getElementById('athlete-select').value);
+            updateCharts(clubUsers, results, disciplineId, selectedUserId);
         });
 
         document.getElementById('athlete-select').addEventListener('change', function () {
-            const selectedAthleteId = Number(this.value);
+            const selectedUserId = Number(this.value);
             const disciplineId = Number(document.getElementById('discipline').value);
-            updateCharts(clubUsers, results, disciplineId, selectedAthleteId);
+            updateCharts(clubUsers, results, disciplineId, selectedUserId);
         });
     } catch (error) {
         console.error('Грешка при зареждане на данните:', error);
@@ -66,13 +66,13 @@ function populateDropdown(elementId, items, textProperty, valueProperty) {
     }
 }
 
-function updateCharts(users, results, disciplineId, athleteId) {
-    if (!athleteId || !disciplineId) {
+function updateCharts(users, results, disciplineId, userId) {
+    if (!userId || !disciplineId) {
         console.warn("Моля, изберете състезател и дисциплина.");
         return;
     }
 
-    const athleteResults = results.filter(result => result.userId === athleteId && result.disciplineId === disciplineId);
+    const athleteResults = results.filter(result => result.userId === userId && result.disciplineId === disciplineId);
     const chartLabels = athleteResults.map(result => new Date(result.resultDate).toLocaleDateString());
     const chartData = athleteResults.map(result => result.valueTime);
 
@@ -180,7 +180,5 @@ function updateCharts(users, results, disciplineId, athleteId) {
         }
     });
 }
-
-
 
 document.addEventListener('DOMContentLoaded', loadUser);
