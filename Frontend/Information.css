@@ -1,0 +1,62 @@
+/* Центриране на цялото съдържание */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Стил за заглавието */
+h2 {
+    color: #16314A;
+}
+
+/* Контейнер за диаграмите */
+#charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Стил за кутиите на диаграмите */
+.chart-box {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 400px;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Фиксирани размери на диаграмите */
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Стил за падащите менюта */
+label {
+    font-weight: bold;
+    color: #16314A;
+}
+
+select {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    border: 1px solid #00A0E1;
+    background-color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Анимация при hover */
+select:hover {
+    background-color: #e6f7ff;
+}

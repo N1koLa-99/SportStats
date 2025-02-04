@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="bg">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Треньорски Панел</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="Information.css">
+    </head>
+<body>
+    <h2 id="coach-name">Треньор: </h2>
+    
+    <label for="discipline">Избери дисциплина:</label>
+    <select id="discipline">
+        <option value="">-- Избери --</option>
+    </select>
+    
+    <label for="athlete-select">Избери състезател:</label>
+<select id="athlete-select">
+    <option value="">-- Избери --</option>
+</select>
+    <div id="charts-container">
+        <div class="chart-box">
+            <h3>Линейна диаграма</h3>
+            <canvas id="lineChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>Бар диаграма</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>Радарна диаграма</h3>
+            <canvas id="radarChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="Information.js"></script>
+</body>
+</html>
