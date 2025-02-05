@@ -128,7 +128,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             disciplineSelect.appendChild(option);
         });
     }
-
     console.log('Потребителски данни:', user);
 
 function fetchResults(disciplineId, userId) {
@@ -456,7 +455,7 @@ chart = new Chart(ctx, {
         document.getElementById('normative-value').innerHTML = normativeValueText + 
             (normativeStatusText ? normativeStatusText : '');
     }    
-    // Функция за форматиране на време
+
     function formatTime(seconds) {
         if (seconds === undefined || seconds === null || isNaN(seconds)) {
             return 'Неизвестна стойност';
