@@ -1,45 +1,103 @@
 /* Основен стил за body */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8ff;
     margin: 0;
     padding: 20px;
     color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.3s ease;
 }
 
 /* Стил за заглавието */
 h2 {
-    color: #16314A;
-    font-size: 2em;
-    margin-bottom: 30px;
+    color: #1e3a8a;
+    font-size: 3.5em;
+    margin-bottom: 40px;
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: color 0.3s ease;
+}
+
+#select-container {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+/* Основен контейнер за потребителската информация и диаграмата */
+#main-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    margin-top: 40px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#user-info {
+    display: block;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #ffffff, #f7f7f7);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+#user-info img {
+    width: 200px;
+    height: 200px;
+    border-radius: 12%;
+    object-fit: cover;
+    margin: 17px auto 15px;
+    margin-bottom: 37px;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+#user-info img:hover {
+    transform: rotate(5deg);
+}
+
+#user-info h3, #user-info p {
+    text-align: center;
+    color: #1a202c;
+    font-size: 25px;
 }
 
 /* Контейнер за диаграмите */
 #charts-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 40px;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
 }
 
 /* Стил за кутиите на диаграмите */
 .chart-box {
-    background: white;
+    background: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    width: 80%;
-    max-width: 900px;
-    height: 500px;
+    width: 100%;
+    max-width: 1200px;
+    height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px;
+    transition: transform 0.3s ease;
 }
 
-/* Фиксирани размери на диаграмите */
+/* Стил за канваса */
 canvas {
     width: 100% !important;
     height: 100% !important;
@@ -58,15 +116,16 @@ select {
     margin: 10px;
     border-radius: 8px;
     border: 1px solid #00A0E1;
-    background-color: white;
+    background: linear-gradient(145deg, #ffffff, #f7f7f7);
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Анимация при hover за падащи менюта */
 select:hover {
     background-color: #e6f7ff;
+    box-shadow: 0 4px 8px rgba(0, 162, 225, 0.3);
 }
 
 /* Стил за най-добър резултат */
@@ -74,19 +133,20 @@ select:hover {
     font-size: 20px;
     font-weight: bold;
     color: #fff;
-    background-color: #4CAF50;
+    background: linear-gradient(145deg, #4CAF50, #387f33); /* Gradient background */
     padding: 10px 20px;
     border-radius: 5px;
     margin-top: 20px;
     width: fit-content;
     text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 /* Hover ефект за най-добър резултат */
 .best-result:hover {
-    background-color: #45a049;
+    background: linear-gradient(145deg, #45a049, #3d7e36);
+    transform: translateY(-3px);
 }
 
 /* За контейнера на най-добрия резултат */
@@ -101,30 +161,43 @@ select:hover {
     font-size: 16px;
     font-weight: bold;
     color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: none;
+    transition: transform 0.3s ease;
+}
+
+#best-result.show {
+    display: block;
+    transform: translateX(0);
 }
 
 /* Стил за контейнера с резултати */
 #results-container {
-    width: 80%;
-    margin: 20px auto;
+    width: 90%;
+    margin-top: 58px;
+    margin-bottom: -7px;
     padding: 15px;
-    background-color: #e0f7fa;
+    background: linear-gradient(145deg, #e0f7fa, #b2ebf2); /* Gradient background */
     border-radius: 8px;
     font-size: 1.2em;
     color: #00796b;
     font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+#results-container:hover {
+    transform: translateY(-5px);
 }
 
 /* Стил за контейнера с нормативи */
 #normatives-container {
-    width: 80%;
+    width: 90%;
     margin: 20px auto;
     padding: 15px;
-    background-color: #f1f8e9;
+    background: linear-gradient(145deg, #f1f8e9, #d9e8d6); /* Gradient background */
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Списък с нормативи */
@@ -134,24 +207,25 @@ select:hover {
 }
 
 #normatives-container li {
-    background-color: #ffffff;
+    background: #ffffff;
     margin: 10px 0;
     padding: 15px;
     border: 1px solid #ced4da;
     border-radius: 8px;
     font-size: 1.1em;
     color: #495057;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 /* За цвета на нормативите при hover */
 #normatives-container li:hover {
     background-color: #f1f1f1;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transform: translateX(5px); /* Slight hover effect */
 }
 
 /* Текста за пол и година */
@@ -164,4 +238,115 @@ select:hover {
     font-size: 1.2em;
     font-weight: normal;
     color: #e83e8c;
+}
+#normatives-section h3 {
+    font-size: 24px;
+    color: #2C3E50;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    margin-top: 88px;
+    margin-bottom: 21px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+}#normatives-buttons {
+    display: flex; /* Използване на Flexbox */
+    justify-content: center; /* Центриране по хоризонтала */
+    align-items: center; /* Центриране по вертикала */
+    margin-top: 20px; /* Отстояние отгоре */
+}
+
+#normatives-buttons button {
+    background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Градиентен фон */
+    border: none; /* Без рамка */
+    padding: 12px 24px; /* Отстояние на бутона */
+    color: white; /* Цвят на текста */
+    font-size: 16px; /* Размер на шрифта */
+    font-weight: bold; /* Удебелен текст */
+    border-radius: 50px; /* Закръглени ръбове */
+    cursor: pointer; /* Ръка при задържане */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Сенки */
+    transition: all 0.3s ease; /* Плавен преход за ефекти */
+    position: relative; /* За позициониране на вътрешни елементи */
+}
+
+#normatives-buttons button::before {
+    content: ''; /* Псевдоелемент */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2); /* Лека прозрачност */
+    border-radius: 50px;
+    opacity: 0; /* Скрит по подразбиране */
+    transition: opacity 0.3s ease; /* Плавен преход */
+}
+
+#normatives-buttons button:hover::before {
+    opacity: 1; /* Показване на ефект при hover */
+}
+
+#normatives-buttons button:hover {
+    transform: scale(1.05); /* Леко уголемяване при hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* По-силни сенки */
+}
+@media (max-width: 450px) {
+    #main-container {
+        flex-direction: column; /* Подреждаме елементите вертикално */
+        align-items: center;
+    }
+
+    #user-info {
+        margin-bottom: 20px; /* Отстояние между информацията и диаграмата */
+        width: 90%;
+    }
+    #user-info h3, #user-info p {
+        font-size: 21px;
+    }
+    #user-info img {
+        width: 150px;
+        height: 151px;
+    }
+
+    #charts-container {
+        width: 100%; /* Увеличаваме ширината на диаграмата */
+        margin-top: 20px;
+    }
+
+    #results-container, #normatives-container {
+        width: 87%;
+        margin-top: 24px;
+    }
+
+    /* Избор на дисциплина и потребител при малък екран */
+    #select-container {
+        flex-direction: column; /* Подреждаме елементите вертикално */
+        gap: 10px; /* Намаляваме разстоянието между тях */
+        width: 100%; /* За да се съобразим с ширината на екрана */
+    }
+    .chart-box {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 100%;
+        max-width: 1200px;
+        height: 350px;
+        display: flex
+    ;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 13%;
+        transition: transform 0.3s ease;
+    }
+    #normatives-section h3 {
+        font-size: 21px;
+        margin-top: 56px;
+
+    }
+    #normatives-container li {
+        font-size: 12px;
+    }
 }

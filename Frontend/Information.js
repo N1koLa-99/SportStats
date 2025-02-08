@@ -47,30 +47,31 @@ async function handleCoach(user) {
         populateDropdown('athlete-select', clubUsers, user => `${user.firstName} ${user.lastName}`, 'id');
 
         async function fetchAndDisplayResults() {
-            resetResults();  // Изчистваме предишните резултати и диаграма
-
+            resetResults();
+        
             const selectedUserId = Number(document.getElementById('athlete-select').value);
             const disciplineId = Number(document.getElementById('discipline').value);
-
+        
             if (selectedUserId && disciplineId) {
                 try {
                     const userResults = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}`);
                     const selectedUser = clubUsers.find(u => u.id === selectedUserId);
-                    console.log(`Резултати за ${selectedUser.firstName} ${selectedUser.lastName}:`, userResults);
+        
 
-                    // Изчисляване на годината на раждане
+                    displayUserInfo(selectedUser);
+
+        
                     const currentYear = new Date().getFullYear();
                     const yearOfBirth = currentYear - selectedUser.age;
-
-                    // Извикваме функцията за нормативите
+        
                     fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, userResults, selectedUser);
-
                     updateCharts(userResults);
                 } catch (error) {
                     console.error("Грешка при зареждане на резултатите:", error);
                 }
             }
         }
+        
 
         document.getElementById('discipline').addEventListener('change', fetchAndDisplayResults);
         document.getElementById('athlete-select').addEventListener('change', fetchAndDisplayResults);
@@ -269,6 +270,25 @@ function updateCharts(results) {
             }
         }
     });
+}
+
+function displayUserInfo(user) {
+    const userInfoContainer = document.getElementById('user-info');
+    const profilePicture = document.getElementById('profile-picture');
+    const userName = document.getElementById('user-name');
+    const userBirthDate = document.getElementById('user-birthdate');
+
+    // Показване на контейнера
+    userInfoContainer.style.display = 'block';
+
+    // Зареждане на профилната снимка
+    profilePicture.src = `https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${user.id}`;
+
+    // Показване на името
+    userName.textContent = `${user.firstName} ${user.lastName}`;
+
+    // Показване на датата на раждане
+    userBirthDate.textContent = `Година на раждане: ${user.yearOfBirth}`;
 }
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -10,27 +10,51 @@
 <body>
     <h2 id="coach-name">Треньор: </h2>
 
-    <label for="discipline">Избери дисциплина:</label>
-    <select id="discipline">
-        <option value="">-- Избери --</option>
-    </select>
+    <!-- Нов контейнер за избор на дисциплина и състезател -->
+    <div id="select-container">
+        <div>
+            <label for="discipline">Избери дисциплина:</label>
+            <select id="discipline">
+                <option value="">-- Избери --</option>
+            </select>
+        </div>
 
-    <label for="athlete-select">Избери състезател:</label>
-    <select id="athlete-select">
-        <option value="">-- Избери --</option>
-    </select>
+        <div>
+            <label for="athlete-select">Избери състезател:</label>
+            <select id="athlete-select">
+                <option value="">-- Избери --</option>
+            </select>
+        </div>
+    </div>
 
-    <div id="charts-container">
-        <div class="chart-box">
-            <h3>Линейна диаграма</h3>
-            <canvas id="lineChart"></canvas>
+    <div id="main-container">
+        <div id="user-info">
+            <img id="profile-picture" src="" alt="Профилна снимка">
+            <h3 id="user-name"></h3>
+            <p id="user-birthdate"></p>
+
+            <!-- Нов контейнер за нормативи с бутони под профила -->
+            <div id="normatives-section">
+                <h3>Виж нормативите тук:</h3>
+                <div id="normatives-buttons">
+                    <button onclick="window.open('https://bul-swimming.org/dokumenti/bf-pluvni-sportove/2025-godina')">Нормативи БФПС</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="charts-container">
+            <div class="chart-box">
+                <h3>Линейна диаграма</h3>
+                <canvas id="lineChart"></canvas>
+            </div>
         </div>
     </div>
 
     <div id="best-result" class="best-result"></div>
 
-    <div id="results-container"></div> <!-- Добавен елемент за резултати -->
-    <div id="normatives-container"></div> <!-- Тук ще показваме нормативите -->
+    <div id="results-container"></div>
+
+    <div id="normatives-container"></div>
 
     <script src="Information.js"></script>
 </body>
