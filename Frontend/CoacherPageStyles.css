@@ -288,6 +288,11 @@ tbody tr:hover {
     #hours-label {
         margin-right: 0px;
     }
+    #detailed-info-link {
+        margin-left: 48% !important;
+        font-weight: bold;
+        font-size: 12px;
+    }
     
     #minutes-label {
         margin-left: 0px;

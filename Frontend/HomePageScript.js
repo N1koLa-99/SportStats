@@ -2,26 +2,27 @@ document.addEventListener('DOMContentLoaded', async function () {
     let chart; // Глобална променлива за диаграмата
 
     const user = JSON.parse(localStorage.getItem('user'));
-    const savedHash = localStorage.getItem('userHash');
-    
+    const savedHash = localStorage.getItem('userHash'); // Make sure you're getting the updated hash
+
     if (!user || !savedHash) {
         alert('Невалидни данни. Пренасочване към началната страница.');
-        window.location.href = 'Index.html';
+        window.location.href = 'index.html';
         return;
     }
-    
+
     async function hashUserData(user) {
         const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
         const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
         return btoa(String.fromCharCode(...new Uint8Array(buffer)));
     }
-    
+
+    // Recalculate hash and compare
     const currentHash = await hashUserData(user);
-    
     if (currentHash !== savedHash) {
+        console.log("Hash mismatch, redirecting...");
         alert('Не бъди злонамерен <3');
         localStorage.clear();
-        window.location.href = 'Index.html';
+        window.location.href = 'index.html';
         return;
     }
     const userJson = localStorage.getItem('user');

@@ -8,15 +8,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
     }
 
-    async function hashUserData(user) {
-        const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
-        const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
-        return btoa(String.fromCharCode(...new Uint8Array(buffer)));
-    }
-
     const currentHash = await hashUserData(user);
     if (currentHash !== savedHash) {
-        alert('Не бъди злонамерен <3');
+        alert('Профилът беше променен. Моля, влезте отново.');
         localStorage.clear();
         window.location.href = 'index.html';
         return;
@@ -46,6 +40,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('club').textContent = 'Грешка при зареждане на клуба';
     }
 });
+
+async function hashUserData(user) {
+    const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
+    const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+}
 
 function displayUserInfo(user) {
     document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
@@ -134,6 +134,7 @@ async function saveProfileChanges(user) {
         email: document.getElementById('edit-email').value.trim() || user.email
     };
 
+    // Validation
     if (!namePattern.test(updatedUser.firstName)) {
         alert('Името трябва да съдържа само букви.');
         return; 
@@ -171,17 +172,23 @@ async function saveProfileChanges(user) {
     try {
         for (const [field, value] of Object.entries(updatedUser)) {
             if (value && value !== user[field]) {
+                console.log(`Updating ${field} to ${value}`);
                 await updateField(user.id, field, value, field);
             }
         }
 
-        // Update local storage
+        // Update local storage with the new user data
         const newUser = { ...user, ...updatedUser };
         localStorage.setItem('user', JSON.stringify(newUser));
         displayUserInfo(newUser);
+
+        // Recalculate the hash and update localStorage with the new hash
+        const newHash = await hashUserData(newUser);
+        localStorage.setItem('userHash', newHash);  // Ensure hash is updated
+
         alert('Профилът е успешно обновен!');
     } catch (error) {
-        console.error(error.message);
+        console.error("Error updating profile: ", error.message);
         alert('Възникна грешка при обновяване на профила.');
     }
 }
