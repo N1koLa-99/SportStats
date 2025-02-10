@@ -80,19 +80,28 @@ function setupProfileImageUpdate(userId) {
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
-
+    
             try {
                 const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/uploadProfilePicture/${userId}`, {
                     method: 'POST',
                     body: formData
                 });
                 if (!response.ok) throw new Error(await response.text());
-
+    
                 const data = await response.json();
-                document.getElementById('profile-image').src = data.profileImage_url;
-
+    
+                // Обновяване на профилната снимка навсякъде в DOM
+                const profileImageUrl = data.profileImage_url;
+                document.getElementById('profile-image').src = profileImageUrl;
+    
+                // Ако имаш други елементи, които показват снимката, актуализирай ги
+                const profileImageElements = document.querySelectorAll('.profile-image');
+                profileImageElements.forEach(element => {
+                    element.src = profileImageUrl;
+                });
+    
                 // Update local storage
-                const updatedUser = { ...JSON.parse(localStorage.getItem('user')), profileImage_url: data.profileImage_url };
+                const updatedUser = { ...JSON.parse(localStorage.getItem('user')), profileImage_url: profileImageUrl };
                 localStorage.setItem('user', JSON.stringify(updatedUser));
             } catch (error) {
                 console.error(error.message);
@@ -100,6 +109,7 @@ function setupProfileImageUpdate(userId) {
             }
         }
     });
+    
 }
 
 function setupProfileEditing(user) {
