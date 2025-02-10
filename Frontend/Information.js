@@ -2,16 +2,33 @@ async function fetchJson(url) {
     const response = await fetch(url);
     return response.json();
 }
+
+async function hashUserData(user) {
+    const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
+    const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+}
+
 async function loadUser() {
     try {
         let storedUser = localStorage.getItem('user');
-        if (!storedUser) {
+        const savedHash = localStorage.getItem('userHash');
+
+        if (!storedUser || !savedHash) {
             alert('Няма достъп до тази страница.');
             window.location.href = 'HomePage.html';
             return;
         }
 
         let user = JSON.parse(storedUser);
+        const currentHash = await hashUserData(user);
+
+        if (currentHash !== savedHash) {
+            alert('Не бъди злонамерен <3');
+            localStorage.clear();
+            window.location.href = 'Index.html';
+            return;
+        }
 
         if (user.roleID !== 2) {
             alert('Нямате права за достъп.');

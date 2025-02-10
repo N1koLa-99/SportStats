@@ -322,30 +322,41 @@ select:hover {
 
     /* Избор на дисциплина и потребител при малък екран */
     #select-container {
+        display: flex;
         flex-direction: column; /* Подреждаме елементите вертикално */
-        gap: 10px; /* Намаляваме разстоянието между тях */
-        width: 100%; /* За да се съобразим с ширината на екрана */
+        gap: 10px; /* Разстояние между тях */
+        width: 100%;
+        align-items: center; /* Центриране по хоризонтала */
+        justify-content: center; /* Центриране по вертикала, ако е нужно */
     }
+
+    /* Центриране на самите падащи менюта */
+    #select-container select {
+        width: 90%; /* Заема 90% от ширината на екрана */
+        max-width: 300px; /* Ограничение за максимална ширина */
+        text-align: center; /* Центриране на текста вътре */
+    }
+
     .chart-box {
         background: #ffffff;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        padding: 20px;
+        padding: 75px;
         width: 100%;
         max-width: 1200px;
-        height: 350px;
-        display: flex
-    ;
+        height: 270px;
+        display: flex;
         flex-direction: column;
         align-items: center;
         margin-bottom: 13%;
         transition: transform 0.3s ease;
     }
+
     #normatives-section h3 {
         font-size: 21px;
         margin-top: 56px;
-
     }
+
     #normatives-container li {
         font-size: 12px;
     }
