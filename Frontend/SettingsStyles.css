@@ -196,63 +196,82 @@ input[type="password"] {
 }
 .message-box {
     position: fixed;
-    top: 20px;  /* Позиционирай на най-горната част на екрана */
-    left: 5%;    /* Центрирай хоризонтално */
-    transform: translateX(-50%);  /* Подравняване на елемента в център */
-    width: 300px;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;  /* Използване на Flexbox за центриране */
-    justify-content: center;  /* Центриране по хоризонтала */
-    align-items: center;  /* Центриране по вертикала */
-    border-radius: 10px;
-    z-index: 1000;
-    color: white;
-    font-family: 'Arial', sans-serif;
-    font-size: 16px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.3s forwards;
-}
-
-/* Стилове за съдържанието на съобщението */
-.message-box-content {
-    background: #6a6a6a;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-/* Без бутон за затваряне */
-.message-box-close {
+    top: 20px;
+    left: 5%;
+    transform: translateX(-50%);
+    width: 350px;
+    background: linear-gradient(145deg, #1a2b3c, #2a3b4c);
     display: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 15px;
+    z-index: 1000;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out forwards;
+    padding: 25px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1); /* Добавяне на рамка с леко замъгляване */
+    transform: translateY(-30px);  /* Начален изходен ефект на анимацията */
 }
 
-/* Стилове за прогреса */
+/* Съдържание на съобщението */
+.message-box-content {
+    background: rgba(255, 255, 255, 0.05); /* Прозрачен фон */
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Бутон за затваряне с икона */
+.message-box-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 22px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transform: scale(1);
+}
+
+.message-box-close:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
 .message-box-progress {
     width: 100%;
-    height: 5px;
-    background-color: #555;
-    border-radius: 3px;
-    margin-top: 10px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
+    margin-top: 15px;
     overflow: hidden;
 }
 
-/* Прогрес бар стилове */
 .message-box-progress-bar {
     height: 100%;
-    background-color: #4CAF50;
+    background: #4CAF50;
     width: 0;
-    border-radius: 3px;
-    animation: progressBar 2s linear forwards;
+    border-radius: 5px;
+    animation: progressBar 3s ease-out forwards;
 }
 
-
+/* Анимация за показване */
 @keyframes fadeIn {
     0% {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-30px);
     }
     100% {
         opacity: 1;
@@ -260,6 +279,7 @@ input[type="password"] {
     }
 }
 
+/* Анимация за прогрес бара */
 @keyframes progressBar {
     0% {
         width: 0%;
@@ -268,6 +288,7 @@ input[type="password"] {
         width: 100%;
     }
 }
+
 
 @media (max-width: 768px) {
     .container {
@@ -427,7 +448,7 @@ option:hover {
     }
     .message-box {
         width: 90%;  /* Ширината да заема 90% от екрана */
-        left: 3%;
+        left: 1%;
         top: 7%;  /* Все още центриран */
         transform: translateX(-50%);  /* Центриране на елемента */
         padding: 15px;  /* По-малко отстояние */

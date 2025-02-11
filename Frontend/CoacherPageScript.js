@@ -414,20 +414,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Apply a red border for negative messages
         if (isNegative) {
             messageBox.style.border = '4px solid red';
-        } else {
-            messageBox.style.border = '4px solid rgba(11, 186, 72, 0.64)';
-        }
+        } 
         
         // Automatically close the message box after the progress bar completes (2 seconds)
         setTimeout(() => {
             messageBox.style.opacity = '0';  // Fading out
             messageBox.style.transform = 'translateY(-20px)';
-        }, 2000); // 2 seconds for message duration (progress bar time)
+        }, 3000); // 2 seconds for message duration (progress bar time)
         
         // Hide the message box after the animation completes
         setTimeout(() => {
             messageBox.style.display = 'none';
-        }, 2200); // Hides the message box 200ms after the fade-out
+        }, 3200); // Hides the message box 200ms after the fade-out
     }
     
     

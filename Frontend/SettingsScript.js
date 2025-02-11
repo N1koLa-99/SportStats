@@ -283,12 +283,12 @@ function showMessageBox(message) {
     setTimeout(() => {
         messageBox.style.opacity = '0';  // Fading out
         messageBox.style.transform = 'translateY(-20px)';
-    }, 2000); // 2 seconds for message duration (progress bar time)
+    }, 3000); // 2 seconds for message duration (progress bar time)
     
     // Hide the message box after the animation completes
     setTimeout(() => {
         messageBox.style.display = 'none';
-    }, 2200); // Hides the message box 200ms after the fade-out
+    }, 3200); // Hides the message box 200ms after the fade-out
 }
 
 

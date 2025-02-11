@@ -236,57 +236,72 @@ tbody tr:hover {
 .message-box {
     position: fixed;
     top: 20px;
-    left: 50%;
+    left: 5%;
     transform: translateX(-50%);
-    width: 300px;
-    background: rgba(0, 0, 0, 0.7);
+    width: 320px;
+    background: linear-gradient(145deg, #4e5d6a, #2a373f);
     display: none;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 12px;
     z-index: 1000;
-    color: white;
-    font-family: 'Arial', sans-serif;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
     font-size: 16px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    padding: 20px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
     opacity: 0;
-    animation: fadeIn 0.3s forwards;
+    animation: fadeIn 0.5s ease-out forwards;
+    padding: 20px;
+    overflow: hidden;
 }
 
 .message-box-content {
-    background: #6a6a6a;
+    background: rgba(255, 255, 255, 0.1);
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: center;
+    width: 100%;
 }
 
 .message-box-close {
-    display: none;  /* No need for close button */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.message-box-close:hover {
+    opacity: 1;
 }
 
 .message-box-progress {
     width: 100%;
-    height: 5px;
-    background-color: #555;
+    height: 6px;
+    background: #555;
     border-radius: 3px;
-    margin-top: 10px;
+    margin-top: 12px;
     overflow: hidden;
 }
 
 .message-box-progress-bar {
     height: 100%;
-    background-color: #4CAF50;
+    background: #66bb6a;
     width: 0;
     border-radius: 3px;
-    animation: progressBar 2s linear forwards; /* Faster progress bar animation */
+    animation: progressBar 2s linear forwards;
 }
 
 @keyframes fadeIn {
     0% {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-30px);
     }
     100% {
         opacity: 1;
@@ -302,10 +317,6 @@ tbody tr:hover {
         width: 100%;
     }
 }
-
-
-
-
 @media (max-width: 450px) {
     .container {
         padding: 15px;
@@ -441,6 +452,28 @@ tbody tr:hover {
     select, input
     {
         margin-right: 15px;
+    }
+    .message-box {
+        width: 83%;  /* Ширината да заема 90% от екрана */
+        top: 7%;  /* Все още центриран */
+        transform: translateX(-50%);  /* Центриране на елемента */
+        padding: 10px;  /* По-малко отстояние */
+    }
+
+    .message-box-content {
+        padding: 15px;  /* Малко намалена дистанция */
+    }
+
+    .message-box-progress {
+        height: 4px;  /* По-малка височина на прогрес бар */
+    }
+
+    .message-box-progress-bar {
+        height: 100%;
+        background-color: #4CAF50;
+        width: 0;
+        border-radius: 3px;
+        animation: progressBar 2s linear forwards;
     }
     
     
