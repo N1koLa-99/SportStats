@@ -80,37 +80,52 @@ function setupProfileImageUpdate(userId) {
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
-    
+
             try {
                 const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/uploadProfilePicture/${userId}`, {
                     method: 'POST',
                     body: formData
                 });
                 if (!response.ok) throw new Error(await response.text());
-    
+
                 const data = await response.json();
-    
-                // Обновяване на профилната снимка навсякъде в DOM
-                const profileImageUrl = data.profileImage_url;
-                document.getElementById('profile-image').src = profileImageUrl;
-    
-                // Ако имаш други елементи, които показват снимката, актуализирай ги
+
+                // Зареждане на новата снимка като Blob
+                const imageResponse = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}?t=${new Date().getTime()}`);
+                if (!imageResponse.ok) throw new Error('Грешка при зареждане на новата снимка');
+
+                const imageBlob = await imageResponse.blob();
+                const newImageUrl = URL.createObjectURL(imageBlob);
+
+                // Обновяване на профилната снимка веднага
+                const profileImage = document.getElementById('profile-image');
+                profileImage.src = newImageUrl;
+
+                // Ако има други елементи със същата снимка
                 const profileImageElements = document.querySelectorAll('.profile-image');
                 profileImageElements.forEach(element => {
-                    element.src = profileImageUrl;
+                    element.src = newImageUrl;
                 });
-    
-                // Update local storage
-                const updatedUser = { ...JSON.parse(localStorage.getItem('user')), profileImage_url: profileImageUrl };
+
+                // Обновяване на потребителските данни и хеша в localStorage
+                const user = JSON.parse(localStorage.getItem('user'));
+                const updatedUser = { ...user, profileImage_url: data.profileImage_url };
                 localStorage.setItem('user', JSON.stringify(updatedUser));
+
+                const newHash = await hashUserData(updatedUser);
+                localStorage.setItem('userHash', newHash);
+
+                alert('Профилната снимка е успешно обновена!');
             } catch (error) {
                 console.error(error.message);
                 alert('Грешка при качване на снимката: ' + error.message);
             }
         }
     });
-    
 }
+
+
+
 
 function setupProfileEditing(user) {
     const editProfileButton = document.getElementById('edit-profile');
