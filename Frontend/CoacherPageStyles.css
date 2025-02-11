@@ -169,6 +169,74 @@ tbody tr:hover {
 .delete-result:hover {
     color: darkred;
 }
+
+
+/* Основен стил за ролерите */
+#time-input {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+#time-input select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 70px;
+    height: 70px;
+    padding: 10px;
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #007bff;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    box-shadow: inset 3px 3px 6px #d1d1d1, inset -3px -3px 6px #ffffff;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    transition: all 0.3sease;
+    cursor: pointer;
+}
+
+#time-input select:focus {
+    outline: none;
+    border-color: #0056b3;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    transform: scale(1.05);
+}
+
+#time-input option {
+    padding: 10px;
+    background-color: #fff;
+    transition: background-color 0.3s ease-in-out;
+}
+
+#time-input option:hover, #time-input option:checked {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+/* Анимация при показване */
+#time-input.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+#time-input.hide {
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.5s, opacity 0.5s;
+}
+
+
+
+
 @media (max-width: 450px) {
     .container {
         padding: 15px;

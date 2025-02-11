@@ -32,7 +32,7 @@
                     <tr>
                         <th>Първо име</th>
                         <th>Фамилия</th>
-                        <th>Година на раждане</th> <!-- Заменено с година на раждане -->
+                        <th>Година на раждане</th>
                         <th>Най-добър резултат</th>
                         <th>Старите резултати</th>
                     </tr>
@@ -45,30 +45,24 @@
         <div id="add-result-form">
             <h3>Добавяне на резултат</h3>
             <label for="add-discipline">Дисциплина:</label>
-            <select id="add-discipline">
-            </select>
+            <select id="add-discipline"></select>
             
             <div id="add-user-container">
                 <label for="add-user">Потребител:</label>
-                <select id="add-user">
-                </select>
+                <select id="add-user"></select>
                 <img id="user-profile-picture" alt="Профилна снимка на потребителя" />
             </div>
             
             <div id="time-input" style="display: none;">
-                <label id="hours-label" for="hours">Час:</label>
-                <input type="number" id="hours" min="0" value="0">
+                <select id="hours">${Array.from({length: 13}, (_, i) => `<option value="${i}"> час </option>`).join('')}</select>
                 
-                <label id="minutes-label" for="minutes">Минути:</label>
-                <input type="number" id="minutes" min="0" value="0">
+                <select id="minutes">${Array.from({length: 60}, (_, i) => `<option value="${i}"> мин </option>`).join('')}</select>
                 
-                <label id="seconds-label" for="seconds">Секунди:</label>
-                <input type="number" id="seconds" min="0" value="0">
+                <select id="seconds">${Array.from({length: 60}, (_, i) => `<option value="${i}"> сек </option>`).join('')}</select>
                 
-                <label id="milliseconds-label" for="milliseconds">Стотни:</label>
-                <input type="number" id="milliseconds" min="0" max="99" value="0">
+                <select id="milliseconds">${Array.from({length: 100}, (_, i) => `<option value="${i}"> стот </option>`).join('')}</select>
             </div>
-            
+
             <div id="decimal-input" style="display: none;">
                 <label for="decimal-result">Резултат:</label>
                 <input type="number" id="decimal-result" step="0.01">

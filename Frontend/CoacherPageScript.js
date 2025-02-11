@@ -116,10 +116,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
         });
     }
-    
-    
-    
-    
+
     async function handleCoach() {
         if (!user || user.roleID !== 2) {
             alert('Няма достъп до тази страница.');
@@ -306,9 +303,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         populateDropdown('add-discipline', disciplines, 'disciplineName', 'id');
     
         const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
-        // Промяна тук: показваме yearOfBirth вместо age
         populateDropdown('add-user', clubUsers, user => `${user.firstName} ${user.lastName} (${user.yearOfBirth})`, 'id');
-        
+    
         document.getElementById('add-discipline').addEventListener('change', function () {
             const disciplineId = this.value;
             const timeBasedIds = [
@@ -336,8 +332,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 valueTime = parseFloat(document.getElementById('decimal-result').value);
             }
         
-            console.log('Submitting result:', { disciplineId, userId, valueTime });
-        
             if (isNaN(valueTime) || valueTime === undefined) {
                 alert('Моля, въведете валиден резултат.');
                 return;
@@ -353,31 +347,49 @@ document.addEventListener('DOMContentLoaded', async function () {
                         userId: userId,
                         disciplineId: disciplineId,
                         valueTime: valueTime,
-                        resultDate: new Date().toISOString() 
+                        resultDate: new Date().toISOString()
                     })
                 });
         
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Failed to add result:', { status: response.status, errorText });
-                    throw new Error('Неуспешно добавяне на резултата');
+                    throw new Error('Неуспешно добавяне на резултата.');
                 }
         
-                const responseData = await response.json();
                 alert('Резултатът е добавен успешно!');
         
-                const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
-                
-                if (isQualified) {
-                    const points = 50;
-                    await addPointsToRankings(userId, disciplineId, points);
+                try {
+                    const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
+        
+                    if (isQualified) {
+                        const points = 50;
+                        await addPointsToRankings(userId, disciplineId, points);
+                    }
+                } catch (comparisonError) {
+                    console.warn('Грешка при проверка на норматива или добавяне на точки:', comparisonError);
                 }
         
             } catch (error) {
-                alert('Грешка при добавяне на резултата.');
                 console.error('Грешка:', error);
+                alert('Грешка при добавяне на резултата.');
             }
-        }); 
+        });        
+    
+        populateRoller('hours', 0, 23);
+        populateRoller('minutes', 0, 59);
+        populateRoller('seconds', 0, 59);
+        populateRoller('milliseconds', 0, 99);
+    }
+    
+    function populateRoller(id, start, end) {
+        const select = document.getElementById(id);
+        for (let i = start; i <= end; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i.toString().padStart(2, '0');
+            select.appendChild(option);
+        }
     }
     
     
