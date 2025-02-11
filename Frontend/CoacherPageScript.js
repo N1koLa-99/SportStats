@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function deleteResult(resultId) {
         const confirmation = prompt('Сигурни ли сте, че искате да изтриете резултата? Напишете 1 за потвърждение.');
         if (confirmation !== '1') {
-            alert('Изтриването е отменено.');
+            showMessageBox('Изтриването е отменено.');
             return; 
         }
     
@@ -35,13 +35,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 throw new Error('Неуспешно изтриване на резултата');
             }
     
-            alert('Резултатът е изтрит успешно!');
+            showMessageBox('Резултатът е изтрит успешно!');
             const disciplineId = Number(document.getElementById('discipline').value);
             const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
             const results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results`);
             displayUsersTable(clubUsers, results, disciplineId);
         } catch (error) {
-            alert('Грешка при изтриване на резултата.');
+            showMessageBox('Грешка при изтриване на резултата.', true);
             console.error('Грешка:', error);
         }
     }
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     async function handleCoach() {
         if (!user || user.roleID !== 2) {
-            alert('Няма достъп до тази страница.');
+            showMessageBox('Няма достъп до тази страница.', true);
             window.location.href = 'HomePage.html';
             return;
         }
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         
                 const query = document.getElementById('search').value.trim();
                 if (!query) {
-                    alert('Моля, въведете име или част от име за търсене.');
+                    showMessageBox('Моля, въведете име или част от име за търсене.');
                     return;
                 }
 
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         
                     if (!response.ok) {
                         if (response.status === 404) {
-                            alert('Не бяха намерени потребители, отговарящи на заявката.');
+                            showMessageBox('Не бяха намерени потребители, отговарящи на заявката.');
                             return;
                         }
                         throw new Error(`Грешка при търсенето: ${response.statusText}`);
@@ -218,14 +218,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         
                 } catch (error) {
                     console.error('Грешка при търсенето:', error);
-                    alert('Възникна грешка при извършване на търсенето.');
+                    showMessageBox('Възникна грешка при извършване на търсенето.');
                 }
             });
 
             
     
         } catch (error) {
-            alert('Не можа да се извлекат данните.');
+            showMessageBox('Не можа да се извлекат данните.', true);
             console.error('Грешка при извличане на данни:', error);
         }
     }    
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         
             if (isNaN(valueTime) || valueTime === undefined) {
-                alert('Моля, въведете валиден резултат.');
+                showMessageBox('Моля, въведете валиден резултат.');
                 return;
             }
         
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     throw new Error('Неуспешно добавяне на резултата.');
                 }
         
-                alert('Резултатът е добавен успешно!');
+                showMessageBox('Резултатът е добавен успешно!');
         
                 try {
                     const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         
             } catch (error) {
                 console.error('Грешка:', error);
-                alert('Грешка при добавяне на резултата.');
+                showMessageBox('Грешка при добавяне на резултата.', true);
             }
         });        
     
@@ -391,6 +391,45 @@ document.addEventListener('DOMContentLoaded', async function () {
             select.appendChild(option);
         }
     }
+
+    function showMessageBox(message, isNegative = false) {
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-box-text');
+        const progressBar = document.getElementById('message-box-progress-bar');
+        
+        // Set the message text
+        messageText.textContent = message;
+        
+        // Show the message box with animation
+        messageBox.style.display = 'flex';
+        
+        // Set the progress bar to 0% initially
+        progressBar.style.width = '0%';
+        
+        // Start the progress bar animation
+        setTimeout(() => {
+            progressBar.style.width = '100%';
+        }, 50);
+        
+        // Apply a red border for negative messages
+        if (isNegative) {
+            messageBox.style.border = '4px solid red';
+        } else {
+            messageBox.style.border = '4px solid rgba(11, 186, 72, 0.64)';
+        }
+        
+        // Automatically close the message box after the progress bar completes (2 seconds)
+        setTimeout(() => {
+            messageBox.style.opacity = '0';  // Fading out
+            messageBox.style.transform = 'translateY(-20px)';
+        }, 2000); // 2 seconds for message duration (progress bar time)
+        
+        // Hide the message box after the animation completes
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 2200); // Hides the message box 200ms after the fade-out
+    }
+    
     
     
     document.getElementById('go-home').addEventListener('click', function () {

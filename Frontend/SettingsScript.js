@@ -3,18 +3,20 @@ document.addEventListener('DOMContentLoaded', async function () {
     const savedHash = localStorage.getItem('userHash');
 
     if (!user || !savedHash) {
-        alert('Невалидни данни. Пренасочване към началната страница.');
-        window.location.href = 'index.html';
+        showMessageBox('Невалидни данни. Пренасочване към началната страница.');
+        setTimeout(() => window.location.href = 'index.html', 4000); // Delay before redirection
         return;
     }
+    
 
     const currentHash = await hashUserData(user);
     if (currentHash !== savedHash) {
-        alert('Профилът беше променен. Моля, влезте отново.');
+        showMessageBox('Профилът беше променен. Моля, влезте отново.');
         localStorage.clear();
-        window.location.href = 'index.html';
+        setTimeout(() => window.location.href = 'index.html', 4000); // Delay before redirection
         return;
     }
+    
 
     // Display user information
     displayUserInfo(user);
@@ -115,17 +117,14 @@ function setupProfileImageUpdate(userId) {
                 const newHash = await hashUserData(updatedUser);
                 localStorage.setItem('userHash', newHash);
 
-                alert('Профилната снимка е успешно обновена!');
+                showMessageBox('Профилната снимка е успешно обновена!');
             } catch (error) {
                 console.error(error.message);
-                alert('Грешка при качване на снимката: ' + error.message);
+                showMessageBox('Грешка при качване на снимката: ' + error.message);
             }
         }
     });
 }
-
-
-
 
 function setupProfileEditing(user) {
     const editProfileButton = document.getElementById('edit-profile');
@@ -141,7 +140,7 @@ function setupProfileEditing(user) {
             toggleEditFields(false);
         } catch (error) {
             console.error(error.message);
-            alert('Възникна грешка при обновяване на профила.');
+            showMessageBox('Възникна грешка при обновяване на профила.');
         }
     });
 }
@@ -161,33 +160,33 @@ async function saveProfileChanges(user) {
 
     // Validation
     if (!namePattern.test(updatedUser.firstName)) {
-        alert('Името трябва да съдържа само букви.');
+        showMessageBox('Името трябва да съдържа само букви.');
         return; 
     }
 
     if (!namePattern.test(updatedUser.lastName)) {
-        alert('Фамилията трябва да съдържа само букви.');
+        showMessageBox('Фамилията трябва да съдържа само букви.');
         return; 
     }
 
     if (!yearOfBirthPattern.test(updatedUser.yearOfBirth)) {
-        alert('Годината на раждане трябва да бъде валидна.');
+        showMessageBox('Годината на раждане трябва да бъде валидна.');
         return;
     }
 
     if (!emailPattern.test(updatedUser.email)) {
-        alert('Моля, въведете валиден имейл адрес (напр. user@example.com)');
+        showMessageBox('Моля, въведете валиден имейл адрес (напр. user@example.com)');
         return;
     }
 
     const password = document.getElementById('edit-password').value.trim();
     const confirmPassword = document.getElementById('edit-confirm-password').value.trim();
     if (password && confirmPassword && password !== confirmPassword) {
-        alert('Паролите не съвпадат. Моля, опитайте отново.');
+        showMessageBox('Паролите не съвпадат. Моля, опитайте отново.');
         return;
     }
     if (password && !passwordPattern.test(password)) {
-        alert('Паролата трябва да съдържа поне 8 символа, да включва главна буква и цифра.');
+        showMessageBox('Паролата трябва да съдържа поне 8 символа, да включва главна буква и цифра.');
         return;
     }
     if (password && confirmPassword && password === confirmPassword) {
@@ -211,10 +210,10 @@ async function saveProfileChanges(user) {
         const newHash = await hashUserData(newUser);
         localStorage.setItem('userHash', newHash);  // Ensure hash is updated
 
-        alert('Профилът е успешно обновен!');
+        showMessageBox('Профилът е успешно обновен!');
     } catch (error) {
         console.error("Error updating profile: ", error.message);
-        alert('Възникна грешка при обновяване на профила.');
+        showMessageBox('Възникна грешка при обновяване на профила.');
     }
 }
 
@@ -243,7 +242,7 @@ async function updateField(userId, fieldName, value, fieldLabel) {
         if (!response.ok) throw new Error(`Грешка при актуализиране на ${fieldLabel}`);
     } catch (error) {
         console.error(error.message);
-        alert(error.message);
+        showMessageBox(error.message);
         throw error;
     }
 }
@@ -260,3 +259,37 @@ function toggleEditFields(editing) {
     document.getElementById('cancel-profile').style.display = editing ? 'block' : 'none';
     document.getElementById('edit-profile').style.display = editing ? 'none' : 'block';
 }
+
+function showMessageBox(message) {
+    const messageBox = document.getElementById('message-box');
+    const messageText = document.getElementById('message-box-text');
+    const progressBar = document.getElementById('message-box-progress-bar');
+
+    // Set the message text
+    messageText.textContent = message;
+
+    // Show the message box with animation
+    messageBox.style.display = 'flex';
+
+    // Set the progress bar to 0% initially
+    progressBar.style.width = '0%';
+
+    // Start the progress bar animation
+    setTimeout(() => {
+        progressBar.style.width = '100%';
+    }, 50);
+
+    // Automatically close the message box after the progress bar completes (2 seconds)
+    setTimeout(() => {
+        messageBox.style.opacity = '0';  // Fading out
+        messageBox.style.transform = 'translateY(-20px)';
+    }, 2000); // 2 seconds for message duration (progress bar time)
+    
+    // Hide the message box after the animation completes
+    setTimeout(() => {
+        messageBox.style.display = 'none';
+    }, 2200); // Hides the message box 200ms after the fade-out
+}
+
+
+

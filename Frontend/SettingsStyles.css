@@ -194,6 +194,81 @@ input[type="password"] {
     border-radius: 4px;
     display: none;
 }
+.message-box {
+    position: fixed;
+    top: 20px;  /* Позиционирай на най-горната част на екрана */
+    left: 5%;    /* Центрирай хоризонтално */
+    transform: translateX(-50%);  /* Подравняване на елемента в център */
+    width: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;  /* Използване на Flexbox за центриране */
+    justify-content: center;  /* Центриране по хоризонтала */
+    align-items: center;  /* Центриране по вертикала */
+    border-radius: 10px;
+    z-index: 1000;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+}
+
+/* Стилове за съдържанието на съобщението */
+.message-box-content {
+    background: #6a6a6a;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Без бутон за затваряне */
+.message-box-close {
+    display: none;
+}
+
+/* Стилове за прогреса */
+.message-box-progress {
+    width: 100%;
+    height: 5px;
+    background-color: #555;
+    border-radius: 3px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+/* Прогрес бар стилове */
+.message-box-progress-bar {
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0;
+    border-radius: 3px;
+    animation: progressBar 2s linear forwards;
+}
+
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes progressBar {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -350,6 +425,30 @@ option:hover {
     .cancel-button {
         margin-top: -15%;
     }
+    .message-box {
+        width: 90%;  /* Ширината да заема 90% от екрана */
+        left: 3%;
+        top: 7%;  /* Все още центриран */
+        transform: translateX(-50%);  /* Центриране на елемента */
+        padding: 15px;  /* По-малко отстояние */
+    }
+
+    .message-box-content {
+        padding: 15px;  /* Малко намалена дистанция */
+    }
+
+    .message-box-progress {
+        height: 4px;  /* По-малка височина на прогрес бар */
+    }
+
+    .message-box-progress-bar {
+        height: 100%;
+        background-color: #4CAF50;
+        width: 0;
+        border-radius: 3px;
+        animation: progressBar 2s linear forwards;
+    }
+
 }
 @media (max-width: 430px) {
     .cancel-button {
