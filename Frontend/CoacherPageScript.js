@@ -411,11 +411,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             progressBar.style.width = '100%';
         }, 50);
         
-        // Apply a red border for negative messages
-        if (isNegative) {
-            messageBox.style.border = '4px solid red';
-        } 
-        
         // Automatically close the message box after the progress bar completes (2 seconds)
         setTimeout(() => {
             messageBox.style.opacity = '0';  // Fading out
