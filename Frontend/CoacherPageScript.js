@@ -332,8 +332,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 valueTime = parseFloat(document.getElementById('decimal-result').value);
             }
         
-            if (isNaN(valueTime) || valueTime === undefined) {
-                showMessageBox('Моля, въведете валиден резултат.');
+            if (isNaN(valueTime) || valueTime < 0 || valueTime > 86400) {
+                showMessageBox('Моля, въведете валиден резултат. Стойността трябва да бъде между 0 и 86400 секунди.');
                 return;
             }
         
