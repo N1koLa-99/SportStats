@@ -131,46 +131,51 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
     console.log('Потребителски данни:', user);
 
-function fetchResults(disciplineId, userId) {
-    if (!disciplineId || !userId) {
-        console.error('Липсват данни: disciplineId или userId.');
-        return;
-    }
-
-    if (!user || !user.yearOfBirth || !user.gender) {
-        console.error('Липсват данни за потребителя: yearOfBirth или gender.');
-        return;
-    }
-
-    const NO_RESULTS_MESSAGE = 'Няма налични резултати.';
-
-    function displayNoResults() {
-        document.getElementById('best-result').textContent = NO_RESULTS_MESSAGE;
-        document.getElementById('latest-result').textContent = NO_RESULTS_MESSAGE;
-        document.getElementById('normative-difference').textContent = '';
-    }
-
-    document.getElementById('best-result').textContent = 'Зареждане...';
-    document.getElementById('latest-result').textContent = 'Зареждане...';
-
-    fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${userId}/by-discipline/${disciplineId}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(results => {
-            if (!Array.isArray(results) || results.length === 0) {
+    function fetchResults(disciplineId, userId) {
+        const user = JSON.parse(localStorage.getItem('user')); // Извличаме user от localStorage
+    
+        if (!disciplineId || !userId) {
+            console.error('Липсват данни: disciplineId или userId.');
+            return;
+        }
+    
+        if (!user || !user.id || !user.yearOfBirth || !user.gender) {
+            console.error('Липсват данни за потребителя: id, yearOfBirth или gender.');
+            return;
+        }
+    
+        const requesterId = user.id; // Извличаме requesterId от user.id
+    
+        const NO_RESULTS_MESSAGE = 'Няма налични резултати.';
+    
+        function displayNoResults() {
+            document.getElementById('best-result').textContent = NO_RESULTS_MESSAGE;
+            document.getElementById('latest-result').textContent = NO_RESULTS_MESSAGE;
+            document.getElementById('normative-difference').textContent = '';
+        }
+    
+        document.getElementById('best-result').textContent = 'Зареждане...';
+        document.getElementById('latest-result').textContent = 'Зареждане...';
+    
+        fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${userId}/by-discipline/${disciplineId}?requesterId=${requesterId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(results => {
+                if (!Array.isArray(results) || results.length === 0) {
+                    displayNoResults();
+                    return;
+                }
+                fetchNormativesAndDisplayResults(disciplineId, user.yearOfBirth, user.gender, results);
+            })
+            .catch(error => {
+                console.error('Грешка при извличане на резултатите:', error);
                 displayNoResults();
-                return;
-            }
-            fetchNormativesAndDisplayResults(disciplineId, user.yearOfBirth, user.gender, results);
-        })
-        .catch(error => {
-            console.error('Грешка при извличане на резултатите:', error);
-            displayNoResults();
-        });
-}
-
+            });
+    }
+    
+    
 function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender, results) {
     fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`)
         .then(response => {

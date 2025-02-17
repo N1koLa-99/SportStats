@@ -71,16 +71,16 @@ async function handleCoach(user) {
         
             if (selectedUserId && disciplineId) {
                 try {
-                    const userResults = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}`);
+                    const requesterId = user.id; // Взимаме requesterId от user.id
+                    
+                    const userResults = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}?requesterId=${requesterId}`);
                     const selectedUser = clubUsers.find(u => u.id === selectedUserId);
-        
 
                     displayUserInfo(selectedUser);
 
-        
                     const currentYear = new Date().getFullYear();
                     const yearOfBirth = currentYear - selectedUser.age;
-        
+
                     fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, userResults, selectedUser);
                     updateCharts(userResults);
                 } catch (error) {
@@ -88,7 +88,6 @@ async function handleCoach(user) {
                 }
             }
         }
-        
 
         document.getElementById('discipline').addEventListener('change', fetchAndDisplayResults);
         document.getElementById('athlete-select').addEventListener('change', fetchAndDisplayResults);
@@ -97,6 +96,7 @@ async function handleCoach(user) {
         console.error('Грешка при зареждане на данните:', error);
     }
 }
+
 
 function resetResults() {
 
