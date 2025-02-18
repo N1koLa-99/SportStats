@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.error('Грешка:', error);
         }
     }
-    
+
 
     function populateDropdown(elementId, items, textProperty, valueProperty) {
         const select = document.getElementById(elementId);
@@ -60,71 +60,17 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.log('Populated dropdown with ID:', elementId);
         }
     }
-
-    let searchTimeout;
-    let currentUsers = [];
-    let selectedDiscipline = null;
     
-    document.getElementById('search-input').addEventListener('input', function () {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            searchUsers(this.value);
-        }, 2000);
-    });
-    
-    const disciplineSelect = document.getElementById('discipline-select');
-    if (disciplineSelect) {
-        disciplineSelect.addEventListener('change', function () {
-            selectedDiscipline = this.value;
-            displayUsersTable(currentUsers, selectedDiscipline);
-        });
-    } else {
-        console.warn("Елементът #discipline-select не е намерен в DOM.");
-    }
-    
-    async function searchUsers(query) {
-        if (!query.trim()) {
-            showMessageBox('Моля, въведете текст за търсене.');
-            return;
-        }
-        try {
-            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/search?query=${encodeURIComponent(query)}`);
-            if (!response.ok) {
-                throw new Error(`HTTP грешка! Статус: ${response.status}`);
-            }
-            const users = await response.json();
-            if (!Array.isArray(users)) {
-                throw new Error('Невалиден отговор от сървъра.');
-            }
-            currentUsers = users;
-            displayUsersTable(users, selectedDiscipline);
-        } catch (error) {
-            showMessageBox('Грешка при търсенето на потребители.', true);
-            console.error('Грешка:', error);
-        }
-    }
-    
-    
-    function displayUsersTable(users, disciplineId = null) {
+    function displayUsersTable(users, results, disciplineId = null) {
         const usersTable = document.getElementById('users-table');
-        if (!usersTable) {
-            console.error('Таблицата с потребители не е намерена в DOM.');
-            return;
-        }
-        
         const tbody = usersTable.querySelector('tbody');
         tbody.innerHTML = '';
         console.log('Показване на таблицата с потребители с ID на дисциплината:', disciplineId);
         
+        if (!disciplineId) return;
+        
         users.forEach(user => {
-            if (!user || !user.firstName || !user.lastName) {
-                console.warn('Пропуснат потребител с липсващи данни:', user);
-                return;
-            }
-            
-            const userResults = disciplineId 
-                ? user.results.filter(result => result.disciplineId == disciplineId)
-                : user.results;
+            const userResults = results.filter(result => result.userId === user.id && result.disciplineId == disciplineId);
             
             console.log('Потребител:', user.firstName, user.lastName, 'Резултати:', userResults);
             
@@ -132,34 +78,36 @@ document.addEventListener('DOMContentLoaded', async function () {
                 ? getBestResult(userResults, disciplineId)
                 : 'Няма резултат';
     
-            const resultEntries = userResults.map(result => `
-                <tr>
-                    <td>${formatResult(result.valueTime, disciplineId)}</td>
-                    <td>${new Date(result.resultDate).toLocaleDateString()}</td>
-                    <td>
-                        <button class="delete-result" data-result-id="${result.id}" title="Изтрий">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>`).join('');
+            const resultEntries = userResults
+                .map(result => `
+                    <tr>
+                        <td>${formatResult(result.valueTime, disciplineId)}</td>
+                        <td>${new Date(result.resultDate).toLocaleDateString()}</td>
+                        <td>
+                            <button class="delete-result" data-result-id="${result.id}" title="Изтрий">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`)
+                .join('');
     
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${user.firstName}</td>
                 <td>${user.lastName}</td>
                 <td>${user.yearOfBirth ? user.yearOfBirth : 'Няма данни'}</td>
-                <td>${disciplineId ? bestResult : ''}</td>
+                <td>${bestResult}</td>
                 <td>
                     <table>
                         <tbody>
-                            ${resultEntries || (disciplineId ? '<tr><td colspan="3">Няма резултати</td></tr>' : '')}
+                            ${resultEntries || '<tr><td colspan="3">Няма резултати</td></tr>'}
                         </tbody>
                     </table>
                 </td>
             `;
             tbody.appendChild(row);
         });
-        
+    
         document.querySelectorAll('.delete-result').forEach(button => {
             button.addEventListener('click', async function () {
                 const resultId = this.getAttribute('data-result-id');
@@ -168,10 +116,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
     
-
-    
-
-
     async function handleCoach() {
         if (!user || user.roleID !== 2) {
             showMessageBox('Няма достъп до тази страница.', true);
@@ -189,20 +133,55 @@ document.addEventListener('DOMContentLoaded', async function () {
             let results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results?requesterId=${user.id}`);
             console.log('Резултати за потребителя:', results);
     
-            displayUsersTable(clubUsers, results, null);
-    
+            let selectedDisciplineId = null;
             document.getElementById('discipline').addEventListener('change', function () {
-                const disciplineId = parseInt(this.value, 10); // Преобразуваме към число
-                console.log('Discipline changed to:', disciplineId);
-    
-                displayUsersTable(clubUsers, results, disciplineId); // Правилно подаваме disciplineId
+                selectedDisciplineId = parseInt(this.value, 10);
+                console.log('Discipline changed to:', selectedDisciplineId);
+                displayUsersTable(clubUsers, results, selectedDisciplineId);
             });
     
+            const searchInput = document.getElementById('search-input');
+            const datalist = document.createElement('datalist');
+            datalist.id = 'users-list';
+            searchInput.setAttribute('list', 'users-list');
+            document.body.appendChild(datalist);
+            
+            searchInput.addEventListener('input', function () {
+                const query = searchInput.value.toLowerCase();
+                datalist.innerHTML = '';
+                clubUsers.forEach(user => {
+                    if (`${user.firstName} ${user.lastName}`.toLowerCase().includes(query)) {
+                        const option = document.createElement('option');
+                        option.value = `${user.firstName} ${user.lastName}`;
+                        datalist.appendChild(option);
+                    }
+                });
+            });
+    
+            document.getElementById('search-form').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const query = searchInput.value.trim();
+                if (!query) {
+                    showMessageBox('Моля, въведете търсен текст.', true);
+                    return;
+                }
+                try {
+                    const searchResults = clubUsers.filter(user => `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase()));
+                    displayUsersTable(searchResults, results.filter(result => selectedDisciplineId && result.disciplineId == selectedDisciplineId), selectedDisciplineId);
+                } catch (error) {
+                    showMessageBox('Няма намерени потребители.', true);
+                    console.error('Грешка при търсене на потребители:', error);
+                }
+            });
         } catch (error) {
             showMessageBox('Не можа да се извлекат данните.', true);
             console.error('Грешка при извличане на данни:', error);
         }
     }
+    
+    
+
+    
        
 
     function getBestResult(results, disciplineId) {
