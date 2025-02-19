@@ -1,14 +1,15 @@
-document.addEventListener('DOMContentLoaded', async function () {
-    let chart; // Глобална променлива за диаграмата
+document.addEventListener("DOMContentLoaded", async () => {
 
-    const user = JSON.parse(localStorage.getItem('user'));
-    const savedHash = localStorage.getItem('userHash'); // Make sure you're getting the updated hash
+    let chart;
+    const userJson = localStorage.getItem('user');
+    const savedHash = localStorage.getItem('userHash');
 
-    if (!user || !savedHash) {
-        alert('Невалидни данни. Пренасочване към началната страница.');
-        window.location.href = 'index.html';
+    if (!userJson || !savedHash) {
+        redirectToIndex("Невалидни данни. Пренасочване към началната страница.");
         return;
     }
+
+    const user = JSON.parse(userJson);
 
     async function hashUserData(user) {
         const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
@@ -16,24 +17,25 @@ document.addEventListener('DOMContentLoaded', async function () {
         return btoa(String.fromCharCode(...new Uint8Array(buffer)));
     }
 
-    // Recalculate hash and compare
-    const currentHash = await hashUserData(user);
-    if (currentHash !== savedHash) {
-        console.log("Hash mismatch, redirecting...");
-        alert('Не бъди злонамерен <3');
-        localStorage.clear();
-        window.location.href = 'index.html';
-        return;
-    }
-    const userJson = localStorage.getItem('user');
+    try {
+        const currentHash = await hashUserData(user);
+        if (currentHash !== savedHash) {
+            redirectToIndex("Не бъди злонамерен <3");
+            return;
+        }
 
-    if (!userJson) {
-        alert('Потребителят не е намерен. Пренасочване към началната страница.');
-        window.location.href = 'Index.html';
-    } else {
-        const user = JSON.parse(userJson);
-        console.log('Зареден потребител:', user);
+        console.log("Успешно зареден потребител:", user);
+    } catch (error) {
+        console.error("Грешка при хеширането:", error);
+        redirectToIndex("Възникна грешка. Пренасочване...");
     }
+
+    function redirectToIndex(message) {
+         alert(message);
+         localStorage.clear();
+         window.location.href = "index.html";
+    }
+
     
 
     
@@ -48,15 +50,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             const coachButton = document.getElementById('coach-button');
             coachButton.classList.remove('hidden');
 
-            // Добавяне на обработчик на събитието за бутона на треньора
             coachButton.addEventListener('click', function () {
-                window.location.href = 'CoacherPage.html'; // Пренасочване към CoacherPage.html
+                window.location.href = 'CoacherPage.html';
             });
         } else {
             document.getElementById('coach-button').classList.add('hidden');
         }
 
-        // Извличане на информация за клуба
         fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             })
             .then(club => {
                 document.getElementById('club').textContent = club.name || 'Няма данни';
-                // Извличане на дисциплините на клуба
                 fetchDisciplinesByClubId(user.clubID);
             })
             .catch(error => {
@@ -73,9 +72,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
 
         document.getElementById('discipline').addEventListener('change', function () {
-            const disciplineId = parseInt(this.value, 10); // Взема избрания ID на дисциплината
+            const disciplineId = parseInt(this.value, 10);
             if (disciplineId) {
-                fetchResults(disciplineId, user.id); // Извиква fetchResults с избраната дисциплина и ID на потребителя
+                fetchResults(disciplineId, user.id);
             }
         });
 
@@ -105,7 +104,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function fetchDisciplinesByClubId(clubId) {
-        // Извличане на дисциплините свързани само с този клуб
         fetch(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${clubId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
@@ -132,19 +130,22 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.log('Потребителски данни:', user);
 
     function fetchResults(disciplineId, userId) {
-        const user = JSON.parse(localStorage.getItem('user')); // Извличаме user от localStorage
-    
+        const user = JSON.parse(localStorage.getItem('user'));
+        
         if (!disciplineId || !userId) {
             console.error('Липсват данни: disciplineId или userId.');
             return;
         }
-    
+        
         if (!user || !user.id || !user.yearOfBirth || !user.gender) {
             console.error('Липсват данни за потребителя: id, yearOfBirth или gender.');
             return;
         }
     
-        const requesterId = user.id; // Извличаме requesterId от user.id
+        if (user.id !== userId) {
+            alert('Нямате права да виждате тези резултати!');
+            return;
+        }
     
         const NO_RESULTS_MESSAGE = 'Няма налични резултати.';
     
@@ -157,23 +158,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('best-result').textContent = 'Зареждане...';
         document.getElementById('latest-result').textContent = 'Зареждане...';
     
-        fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${userId}/by-discipline/${disciplineId}?requesterId=${requesterId}`)
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(results => {
-                if (!Array.isArray(results) || results.length === 0) {
-                    displayNoResults();
-                    return;
-                }
-                fetchNormativesAndDisplayResults(disciplineId, user.yearOfBirth, user.gender, results);
-            })
-            .catch(error => {
-                console.error('Грешка при извличане на резултатите:', error);
+        fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${userId}/by-discipline/${disciplineId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Requester-Id': user.id
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(results => {
+            if (!Array.isArray(results) || results.length === 0) {
                 displayNoResults();
-            });
+                return;
+            }
+    
+            fetchNormativesAndDisplayResults(disciplineId, user.yearOfBirth, user.gender, results);
+        })
+        .catch(error => {
+            console.error('Грешка при извличане на резултатите:', error);
+            displayNoResults();
+        });
     }
+    
+    
+    
+
     
     
 function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender, results) {

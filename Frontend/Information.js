@@ -55,8 +55,11 @@ function populateDropdown(elementId, items, textProperty, valueProperty) {
         });
     }
 }
+
+
 async function handleCoach(user) {
     try {
+
         const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
         populateDropdown('discipline', disciplines, 'disciplineName', 'id');
 
@@ -65,15 +68,25 @@ async function handleCoach(user) {
 
         async function fetchAndDisplayResults() {
             resetResults();
-        
+
             const selectedUserId = Number(document.getElementById('athlete-select').value);
             const disciplineId = Number(document.getElementById('discipline').value);
-        
+
             if (selectedUserId && disciplineId) {
                 try {
-                    const requesterId = user.id; // Взимаме requesterId от user.id
-                    
-                    const userResults = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}?requesterId=${requesterId}`);
+                    const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Requester-Id': user.id 
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Грешка: ${response.status} - ${response.statusText}`);
+                    }
+
+                    const userResults = await response.json();
                     const selectedUser = clubUsers.find(u => u.id === selectedUserId);
 
                     displayUserInfo(selectedUser);
@@ -85,6 +98,7 @@ async function handleCoach(user) {
                     updateCharts(userResults);
                 } catch (error) {
                     console.error("Грешка при зареждане на резултатите:", error);
+                    showMessageBox("Грешка при зареждане на резултатите!", true);
                 }
             }
         }
@@ -94,6 +108,7 @@ async function handleCoach(user) {
 
     } catch (error) {
         console.error('Грешка при зареждане на данните:', error);
+        showMessageBox("Грешка при зареждане на данните!", true);
     }
 }
 
@@ -123,37 +138,30 @@ function displayResults(disciplineId, yearOfBirth, gender, results, normatives) 
     resultsContainer.innerHTML = '';
     normativesContainer.innerHTML = '';
 
-    // Проверяваме дали има резултати
     let bestResult = null;
     if (results.length > 0) {
-        // Изчисляваме най-добрия резултат (минималното време)
         bestResult = Math.min(...results.map(result => result.valueTime));
         resultsContainer.innerHTML = `Най-добрият резултат: ${formatTime(bestResult)} сек`;
     } else {
         resultsContainer.innerHTML = 'Няма налични резултати за този атлет.';
     }
 
-    // Проверяваме дали има нормативи и показваме разликата
     if (normatives.length > 0) {
         const list = document.createElement('ul');
         normatives.forEach(normative => {
-            const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m'; // Определяме типа на басейна
-            const genderText = normative.gender === 'M' ? 'Мъже' : 'Жени'; // Превеждаме пола
-            const formattedTime = formatTime(normative.valueStandart); // Форматираме времето
+            const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
+            const genderText = normative.gender === 'M' ? 'Мъже' : 'Жени'; 
+            const formattedTime = formatTime(normative.valueStandart);
 
-            // Изчисляваме разликата между резултата и норматива
             const timeDifference = bestResult - normative.valueStandart;
 
-            // Проверяваме дали нормативът е покрит
-            const isNormativeCovered = timeDifference <= 0; // Нормативът е покрит, ако разликата е отрицателна или 0
+            const isNormativeCovered = timeDifference <= 0;
             const resultText = isNormativeCovered
                 ? `Нормативът е покрит! Разлика: ${formatTime(Math.abs(timeDifference))} сек.`
                 : `Нормативът не е покрит! Разлика: ${formatTime(Math.abs(timeDifference))} сек.`;
 
-            // Определяме цветове в зависимост от покрития норматив
             const resultTextColor = isNormativeCovered ? 'green' : 'red';
 
-            // Създаваме новия елемент за всеки норматив
             const item = document.createElement('li');
             item.innerHTML = `${genderText} - ${normative.minYearOfBorn} до ${normative.maxYearOfBorn} години, норматив: ${formattedTime} сек (${poolType}) <br> <span style="color: ${resultTextColor};">${resultText}</span>`;
             list.appendChild(item);
@@ -200,12 +208,12 @@ function fetchNormativesAndCompare(disciplineId, yearOfBirth, userGender, result
     })
     .catch(error => {
         console.error('Грешка при извличане на нормативите:', error);
-        displayResults(disciplineId, yearOfBirth, userGender, results, []); // Показваме празен списък при грешка
+        displayResults(disciplineId, yearOfBirth, userGender, results, []); 
     });
 }
 function displayNormativesInHTML(normatives) {
     const container = document.getElementById('normatives-container');
-    container.innerHTML = ''; // Изчистваме предишното съдържание
+    container.innerHTML = ''; 
 
     if (normatives.length > 0) {
         const list = document.createElement('ul');
@@ -221,15 +229,14 @@ function displayNormativesInHTML(normatives) {
 }
 
 function formatTime(time) {
-    // Пресмятаме минутите и секундите
     const minutes = Math.floor(time / 60);
-    const seconds = (time % 60).toFixed(2); // Форматираме секундите с две десетични места
+    const seconds = (time % 60).toFixed(2); 
 
-    // Добавяме водеща нула, ако минутите или секундите са по-малко от 10
+
     const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
     const formattedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
 
-    // Връщаме времето в желания формат mm:ss.xx
+
     return `${formattedMinutes}:${formattedSeconds}`;
 }
 
@@ -295,16 +302,12 @@ function displayUserInfo(user) {
     const userName = document.getElementById('user-name');
     const userBirthDate = document.getElementById('user-birthdate');
 
-    // Показване на контейнера
     userInfoContainer.style.display = 'block';
 
-    // Зареждане на профилната снимка
     profilePicture.src = `https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${user.id}`;
 
-    // Показване на името
     userName.textContent = `${user.firstName} ${user.lastName}`;
 
-    // Показване на датата на раждане
     userBirthDate.textContent = `Година на раждане: ${user.yearOfBirth}`;
 }
 
@@ -315,5 +318,5 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
     
-    loadUser();  // Може би този метод се използва за зареждане на потребителски данни
+    loadUser(); 
 });

@@ -18,34 +18,56 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
     
     async function deleteResult(resultId) {
+        if (!resultId || isNaN(resultId)) {
+            showMessageBox('Грешка: Невалиден резултат за изтриване.');
+            console.error('Грешка: resultId е невалиден', resultId);
+            return;
+        }
+    
         const confirmation = prompt('Сигурни ли сте, че искате да изтриете резултата? Напишете 1 за потвърждение.');
         if (confirmation !== '1') {
             showMessageBox('Изтриването е отменено.');
-            return; 
+            return;
         }
     
+        console.log(`Изтриване на резултат с ID: ${resultId}`);
+        console.log('Изпращане на хедъри:', {
+            'Requester-Id': user.id,
+            'Role-Id': user.roleID,
+            'Club-Id': user.clubID
+        });
+    
         try {
-            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results/${resultId}?requesterId=${user.id}&roleId=${user.roleID}&clubId=${user.clubID}`, {
+            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results/${resultId}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Requester-Id': user.id,
+                    'Role-Id': user.roleID,
+                    'Club-Id': user.clubID
+                }
             });
-            
     
             if (!response.ok) {
-                throw new Error('Неуспешно изтриване на резултата');
+                const errorText = await response.text();
+                console.error('Неуспешно изтриване на резултата:', { status: response.status, errorText });
+                throw new Error(`Грешка при изтриване: ${response.status} - ${errorText}`);
             }
     
             showMessageBox('Резултатът е изтрит успешно!');
+            
             const disciplineId = Number(document.getElementById('discipline').value);
             const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
             const results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results?requesterId=${user.id}`);
             displayUsersTable(clubUsers, results, disciplineId);
+    
         } catch (error) {
             showMessageBox('Грешка при изтриване на резултата.', true);
-            console.error('Грешка:', error);
+            console.error('Грешка при заявката за изтриване:', error);
         }
     }
-
+    
+    
 
     function populateDropdown(elementId, items, textProperty, valueProperty) {
         const select = document.getElementById(elementId);
@@ -178,11 +200,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.error('Грешка при извличане на данни:', error);
         }
     }
-    
-    
-
-    
-       
 
     function getBestResult(results, disciplineId) {
         const timeBasedIds = [
@@ -241,7 +258,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         const secs = Math.floor(seconds % 60);
         let millis = Math.round((seconds % 1) * 100);
     
-        // Осигуряване на двуцифрен формат за милисекундите
         millis = millis < 10 ? `0${millis}` : `${millis}`;
     
         let timeString = '';
@@ -261,9 +277,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     
         document.getElementById('add-discipline').addEventListener('change', function () {
             const disciplineId = Number(this.value);
-            const timeBasedIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-    
+            const timeBasedIds = Array.from({ length: 18 }, (_, i) => i + 1);
             const isTimeBased = timeBasedIds.includes(disciplineId);
+            
             document.getElementById('time-input').style.display = isTimeBased ? 'block' : 'none';
             document.getElementById('decimal-input').style.display = isTimeBased ? 'none' : 'block';
         });
@@ -279,14 +295,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         
             try {
                 const [userResponse, imageResponse] = await Promise.all([
-                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}`), 
+                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}`),
                     fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`)
                 ]);
         
                 if (!userResponse.ok) throw new Error('Грешка при зареждане на потребителските данни');
-        
-                const user = await userResponse.json();
-                console.log('Избран потребител:', user);
         
                 if (imageResponse.ok) {
                     const imageBlob = await imageResponse.blob();
@@ -302,25 +315,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                 userProfilePicture.style.display = 'block';
             }
         });
-        
-        
-        
     
         document.getElementById('submit-result').addEventListener('click', async function () {
             const disciplineId = Number(document.getElementById('add-discipline').value);
             const userId = Number(document.getElementById('add-user').value);
             const isTimeBased = document.getElementById('time-input').style.display === 'block';
     
-            let valueTime;
-            if (isTimeBased) {
-                const hours = parseInt(document.getElementById('hours').value, 10) || 0;
-                const minutes = parseInt(document.getElementById('minutes').value, 10) || 0;
-                const seconds = parseInt(document.getElementById('seconds').value, 10) || 0;
-                const milliseconds = parseInt(document.getElementById('milliseconds').value, 10) || 0;
-                valueTime = hours * 3600 + minutes * 60 + seconds + milliseconds / 100;
-            } else {
-                valueTime = parseFloat(document.getElementById('decimal-result').value);
-            }
+            let valueTime = isTimeBased 
+                ? calculateTimeValue() 
+                : parseFloat(document.getElementById('decimal-result').value);
     
             if (isNaN(valueTime) || valueTime < 0 || valueTime > 86400) {
                 showMessageBox('Моля, въведете валиден резултат. Стойността трябва да бъде между 0 и 86400 секунди.');
@@ -328,13 +331,18 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
     
             try {
-                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results?requesterId=${user.id}`, {
+                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Requester-Id': user.id,
+                        'Role-Id': user.roleID,
+                        'Club-Id': user.clubID
+                    },
                     body: JSON.stringify({
-                        userId: userId,
-                        disciplineId: disciplineId,
-                        valueTime: valueTime,
+                        userId,
+                        disciplineId,
+                        valueTime,
                         resultDate: new Date().toISOString()
                     })
                 });
@@ -345,32 +353,42 @@ document.addEventListener('DOMContentLoaded', async function () {
                     throw new Error('Неуспешно добавяне на резултата.');
                 }
     
-                showMessageBox('Резултатът е добавен успешно!');
-    
-                try {
-                    const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
-    
-                    if (isQualified) {
-                        const points = 50;
-                        await addPointsToRankings(userId, disciplineId, points);
-                    }
-                } catch (comparisonError) {
-                    console.warn('Грешка при проверка на норматива или добавяне на точки:', comparisonError);
-                }
-    
+                showMessageBox('Резултатът е добавен успешно! Презареди страницата!');
+                await handleRankingUpdate(userId, disciplineId, valueTime);
             } catch (error) {
                 console.error('Грешка:', error);
                 showMessageBox('Грешка при добавяне на резултата.', true);
             }
         });
     
+        populateRollers();
+    }
+    
+    function calculateTimeValue() {
+        const hours = parseInt(document.getElementById('hours').value, 10) || 0;
+        const minutes = parseInt(document.getElementById('minutes').value, 10) || 0;
+        const seconds = parseInt(document.getElementById('seconds').value, 10) || 0;
+        const milliseconds = parseInt(document.getElementById('milliseconds').value, 10) || 0;
+        return hours * 3600 + minutes * 60 + seconds + milliseconds / 100;
+    }
+    
+    async function handleRankingUpdate(userId, disciplineId, valueTime) {
+        try {
+            const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
+            if (isQualified) {
+                await addPointsToRankings(userId, disciplineId, 50);
+            }
+        } catch (error) {
+            console.warn('Грешка при проверка на норматива или добавяне на точки:', error);
+        }
+    }
+    
+    function populateRollers() {
         populateRoller('hours', 0, 23);
         populateRoller('minutes', 0, 59);
         populateRoller('seconds', 0, 59);
         populateRoller('milliseconds', 0, 99);
     }
-    
-    
     
     function populateRoller(id, start, end) {
         const select = document.getElementById(id);
@@ -381,36 +399,31 @@ document.addEventListener('DOMContentLoaded', async function () {
             select.appendChild(option);
         }
     }
+    
 
     function showMessageBox(message, isNegative = false) {
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-box-text');
         const progressBar = document.getElementById('message-box-progress-bar');
         
-        // Set the message text
         messageText.textContent = message;
         
-        // Show the message box with animation
         messageBox.style.display = 'flex';
         
-        // Set the progress bar to 0% initially
         progressBar.style.width = '0%';
         
-        // Start the progress bar animation
         setTimeout(() => {
             progressBar.style.width = '100%';
         }, 50);
         
-        // Automatically close the message box after the progress bar completes (2 seconds)
         setTimeout(() => {
-            messageBox.style.opacity = '0';  // Fading out
+            messageBox.style.opacity = '0';
             messageBox.style.transform = 'translateY(-20px)';
-        }, 3000); // 2 seconds for message duration (progress bar time)
+        }, 3000);
         
-        // Hide the message box after the animation completes
         setTimeout(() => {
             messageBox.style.display = 'none';
-        }, 3200); // Hides the message box 200ms after the fade-out
+        }, 3200);
     }
     
     
