@@ -386,6 +386,11 @@ button:active {
     background-color: #e60000;
 }
 
+#status-button, .status-button {
+    margin-right: 20px; /* Можеш да добавиш отстояние от десния край */
+}
+
+
 
 @media (max-width: 1600px) {
     .results h2 {
