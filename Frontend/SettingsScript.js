@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 async function hashUserData(user) {
-    const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
+    const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}${user.statusID}`;
     const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
     return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }
@@ -290,6 +290,59 @@ function showMessageBox(message) {
         messageBox.style.display = 'none';
     }, 3200); // Hides the message box 200ms after the fade-out
 }
+document.addEventListener('DOMContentLoaded', function () {
+    const logoutButton = document.getElementById('logout-button');
 
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function () {
+            showLogoutConfirmation();
+        });
+    }
+});
 
+document.addEventListener('DOMContentLoaded', function () {
+    const logoutButton = document.getElementById('logout-button');
 
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function () {
+            showLogoutConfirmation();
+        });
+    }
+});
+
+function showLogoutConfirmation() {
+    // Премахваме старото потвърждение, ако има
+    const existingBox = document.querySelector('.confirmation-overlay');
+    if (existingBox) existingBox.remove();
+
+    // Създаваме оверлей и прозорец
+    const overlay = document.createElement('div');
+    overlay.classList.add('confirmation-overlay');
+    overlay.innerHTML = `
+        <div class="confirmation-box">
+            <p>Сигурни ли сте, че искате да излезете от профила си?</p>
+            <button id="confirm-logout" class="confirm-button">Да</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Изход при клик извън прозореца
+    overlay.addEventListener('click', function (e) {
+        if (!e.target.closest('.confirmation-box')) {
+            overlay.remove();
+        }
+    });
+
+    // Логика за потвърждение
+    document.getElementById('confirm-logout').addEventListener('click', function () {
+        localStorage.removeItem('user');
+        localStorage.removeItem('userHash');
+        sessionStorage.removeItem('user');
+
+        showMessageBox("Успешно излязохте!", "success");
+
+        setTimeout(() => {
+            window.location.href = "Index.html";
+        }, 1000);
+    });
+}

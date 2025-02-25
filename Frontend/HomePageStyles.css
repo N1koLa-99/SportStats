@@ -360,6 +360,32 @@ button:active {
 .coach-button:hover {
     color: #1e90ff;
 }
+.waiting-container, .rejected-container {
+    text-align: center;
+    margin-top: 50px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.waiting-container h2, .rejected-container h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+.rejected-container button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.rejected-container button:hover {
+    background-color: #e60000;
+}
+
 
 @media (max-width: 1600px) {
     .results h2 {

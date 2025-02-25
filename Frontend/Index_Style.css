@@ -72,6 +72,7 @@
     font-size: 18px; /* Малко по-голям текст */
     padding-bottom: 21px;
     padding-top: 0px;
+    width: 462px;
 }
 
 /* Вътрешно текстово съдържание */
@@ -142,7 +143,7 @@
     width: 100%; /* Запълва наличното пространство */
     background: #fff; /* Фон на съдържанието */
     padding: 5px; /* Вътрешно разстояние */
-    border-radius: 8px; /* Заоблени ъгли */
+    border-radius: 40px;/* Заоблени ъгли */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Лека сянка */
     text-align: center; /* Центриране на текста */
     margin-top: 80px;
@@ -656,13 +657,59 @@ input.error {
         margin-left: 5%;
         color: #d21e1b6e;
     }
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        width: 399px;
+        margin-top: 12px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px !important;
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        width: 20px;
+    }
 }
+@media (max-width: 414px) {
 
+    .select2-container--default .select2-selection--single {
+        width: 377px;
+    }
+}
+@media (max-width: 390px) {
+
+    .select2-container--default .select2-selection--single {
+        width: 355px;
+    }
+
+}
 @media (max-width: 375px) {
     .content h1 {
         font-size: 28px;
         margin-bottom: 12%;
         display: table;
         margin-left: -7px;
+    }
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        width: 334px;
+        margin-top: 12px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px !important;
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        width: 20px;
+    }
+}
+@media (max-width: 344px) {
+
+    .select2-container--default .select2-selection--single {
+        width: 305px;
     }
 }

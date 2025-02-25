@@ -12,8 +12,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const user = JSON.parse(userJson);
 
     async function hashUserData(user) {
-        const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
-        const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+        const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}${user.statusID}`;
+        const encoder = new TextEncoder();
+        const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+        
         return btoa(String.fromCharCode(...new Uint8Array(buffer)));
     }
 
@@ -35,26 +37,158 @@ document.addEventListener("DOMContentLoaded", async () => {
          localStorage.clear();
          window.location.href = "index.html";
     }
+// Функция за зареждане на клубовете от API-то
+async function loadClubs() {
+    try {
+        const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Clubs');
+        if (!response.ok) {
+            throw new Error("Грешка при зареждане на клубовете.");
+        }
+        const clubs = await response.json();
+
+        // Създаваме падащо меню
+        const clubSelectHTML = `
+            <div class="club-selection-container">
+                <h2>Изберете нов клуб</h2>
+                <select id="club-select">
+                    <option value="" disabled selected>Изберете клуб...</option>
+                    ${clubs.map(club => `<option value="${club.id}">${club.name}</option>`).join('')}
+                </select>
+                <button id="confirm-change-club">Потвърди</button>
+            </div>
+        `;
+
+        // Добавяме селекта към документа
+        document.body.innerHTML = clubSelectHTML;
+
+        // Добавяме събитие към бутона за потвърждение
+        document.getElementById('confirm-change-club').addEventListener('click', async function () {
+            const selectedClubId = document.getElementById('club-select').value;
+            if (!selectedClubId) {
+                alert("Моля, изберете клуб.");
+                return;
+            }
+
+            const selectedClubName = document.getElementById('club-select').selectedOptions[0].textContent;
+            const isConfirmed = confirm(`Сигурни ли сте, че искате да се присъедините към клуб "${selectedClubName}"?`);
+
+            if (isConfirmed) {
+                await changeUserClub(user.id, selectedClubId);
+            }
+        });
+
+    } catch (error) {
+        console.error("Грешка:", error);
+        alert("Неуспешно зареждане на клубовете.");
+    }
+}
+
+// Функция за изпращане на заявка за смяна на клуба
+// Функция за смяна на клуб
+async function changeUserClub(userId, newClubId) {
+    try {
+        console.log(`Изпращане на заявка за смяна на клуб: userId=${userId}, newClubId=${newClubId}`);
+
+        const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/users/${userId}/ChangeClub`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newClubId)
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            console.error("Грешка при смяна на клуба:", errorMessage);
+            alert(`Грешка: ${errorMessage}`);
+            return;
+        }
+
+        console.log("Клубът е сменен успешно.");
+        alert("Клубът е сменен успешно. Очаква се одобрение.");
+
+        // Обновяване на user.clubID и statusID
+        user.clubID = newClubId;
+        user.statusID = 1;
+
+        // Изпращаме заявка за одобрение
+        await sendApprovalRequest(user);
+
+        window.location.reload(); // Презареждане на страницата
+    } catch (error) {
+        console.error("Грешка при изпращане на заявка:", error);
+        alert("Възникна грешка при смяната на клуба.");
+    }
+}
+
+// Функция за изпращане на заявка за одобрение
+async function sendApprovalRequest(user) {
+    try {
+        console.log("Изпращане на заявка за одобрение:", user);
+
+        const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/approvalRequests`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: user.id,
+                clubId: user.clubID,
+                status: "pending"
+            }),
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            console.error("Грешка при изпращане на заявката за одобрение:", errorMessage);
+            alert(`Грешка: ${errorMessage}`);
+            return;
+        }
+
+        console.log('Заявката за одобрение е изпратена успешно!');
+    } catch (error) {
+        console.error('Грешка при изпращане на заявката за одобрение:', error);
+        alert("Грешка при изпращане на заявката за одобрение.");
+    }
+}
+
+  
+
+// Проверяваме статуса на потребителя и показваме бутон за смяна на клуба
+if (user.statusID === 1 || user.statusID === 3) {
+    document.body.innerHTML = `
+        <div class="status-container">
+            <h2>${user.statusID === 1 ? "Вашата заявка е в процес на одобрение." : "Вашата заявка е отхвърлена."}</h2>
+            <p>${user.statusID === 1 ? "Моля, изчакайте одобрение от администратора." : "Можете да изберете друг клуб."}</p>
+            <button id="change-club-button">Смени клуба</button>
+        </div>
+    `;
+
+    // Добавяне на събитие за смяна на клуба
+    document.getElementById('change-club-button').addEventListener('click', loadClubs);
+}
 
     
-
-    
-
     if (user) {
         document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
         document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
-
         document.getElementById('year-of-birth').textContent = user.yearOfBirth || 'Няма данни';
+    
 
         if (user.roleID === 2) {
             const coachButton = document.getElementById('coach-button');
             coachButton.classList.remove('hidden');
-
+    
             coachButton.addEventListener('click', function () {
                 window.location.href = 'CoacherPage.html';
             });
+    
+            // Показваме и бутона за заявките
+            const statusButton = document.getElementById('status-button');
+            statusButton.classList.remove('hidden');
+    
+            statusButton.addEventListener('click', function () {
+                window.location.href = 'Status.html';
+            });
         } else {
             document.getElementById('coach-button').classList.add('hidden');
+            document.getElementById('status-button').classList.add('hidden');
         }
 
         fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
@@ -78,6 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
+        
         if (user.id > 0) {
             fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${user.id}`)
                 .then(response => {

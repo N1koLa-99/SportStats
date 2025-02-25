@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
+   
+    /*
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+        const user = JSON.parse(savedUser);
+        showMessageBox(`Здравей, ${user.firstName}!`, 'success');
+
+        // Пренасочване след кратко време
+        setTimeout(() => {
+            window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+        }, 1500);
+    */
     
+
     const yearOfBirthSelect = document.getElementById('yearOfBirth');
     const startYear = 1924;
     const endYear = 2020;
@@ -145,7 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 roleID: 1,
                 clubID: parseInt(formData.get('club'), 10),
                 profileImage_url: "https://sportstatsapi.azurewebsites.net/ProfilePictures/ProfilePhoto2.jpg",
-                yearOfBirth: yearOfBirth
+                yearOfBirth: yearOfBirth,
+                statusID: 1 // "чакащ"
             };
         
             try {
@@ -154,21 +168,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user),
                 });
-            
+        
                 if (!response.ok) {
                     throw new Error('Грешка при изпращане на данните: ' + response.statusText);
                 }
-            
-                // Логнете отговора, за да го инспектирате
+        
                 const responseBody = await response.text();
                 console.log('Отговор от сървъра:', responseBody);
-            
+        
                 const newUser = JSON.parse(responseBody);
-            
-                // Съхраняване на данните в localStorage
+        
                 localStorage.setItem('user', JSON.stringify(newUser.user));
                 localStorage.setItem('userHash', newUser.userTokenHash);
-            
+        
+                // Изпращаме заявка за одобрение
+                await sendApprovalRequest(newUser.user);
+        
                 showMessageBox('Потребителят е регистриран успешно!', 'success');
                 registrationForm.reset();
                 window.location.href = "HomePage.html";
@@ -178,10 +193,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Функция за изпращане на заявка за одобрение
+        async function sendApprovalRequest(user) {
+            try {
+                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/approvalRequests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        clubId: user.clubID,
+                        status: "pending"
+                    }),
+                });
         
+                if (!response.ok) {
+                    throw new Error('Грешка при изпращане на заявката за одобрение: ' + response.statusText);
+                }
         
+                console.log('Заявката за одобрение е изпратена успешно!');
+            } catch (error) {
+                console.error('Грешка при изпращане на заявката за одобрение:', error);
+            }
+        }   
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        // Проверка дали има запазен потребител и автоматично влизане
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            showMessageBox(`Добре дошъл обратно, ${user.firstName}!`, 'success');
+    
+            // Пренасочване след кратко време
+            setTimeout(() => {
+                window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+            }, 1500);
+        }
+    
+        // Динамично добавяне на години в падащото меню
+        const yearOfBirthSelect = document.getElementById('yearOfBirth');
+        const startYear = 1924;
+        const endYear = new Date().getFullYear();
+    
+        for (let year = startYear; year <= endYear; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearOfBirthSelect.appendChild(option);
+        }
+    
+        // Активиране на Select2 за стилни dropdown менюта
+        $('#yearOfBirth, #gender, #club').select2({
+            placeholder: '',
+            allowClear: true,
+        });
+    
+        fetchClubs();
+    });
+    
     const loginForm = document.getElementById('login-form');
 
     loginForm.addEventListener('submit', async function (event) {
@@ -206,17 +275,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const user = await response.json();
+
+            // Запазване в localStorage за автоматично логване
             localStorage.setItem('user', JSON.stringify(user));
             localStorage.setItem('userHash', user.userTokenHash);
 
-            showMessageBox('Входът е успешен! Добре дошли, ' + user.firstName + '!', 'success');
+            showMessageBox(`Входът е успешен! Добре дошли, ${user.firstName}!`, 'success');
 
-            window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+            // Пренасочване към началната страница
+            setTimeout(() => {
+                window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+            }, 1000);
         } catch (error) {
             console.error('Грешка при влизането:', error);
             showMessageBox('Възникна грешка при влизането. Моля, проверете имейла и паролата и опитайте отново.', 'error');
         }
     });
+   
 
     function createErrorElement(id) {
         const errorElement = document.createElement('div');
@@ -284,6 +359,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
+
+    document.querySelector('.tab-button[data-tab="login"]').classList.add('active');
+    document.getElementById('login-form').classList.add('active');
+
 
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
