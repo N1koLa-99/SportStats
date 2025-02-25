@@ -360,6 +360,23 @@ button:active {
 .coach-button:hover {
     color: #1e90ff;
 }
+#status-button, .status-button{
+    position: fixed;
+    top: 36px;
+    right: 15%;
+    font-size: 20px;
+    color: #ffffff;
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 1000;
+
+}
+
+
+
 .waiting-container, .rejected-container {
     text-align: center;
     margin-top: 50px;
@@ -415,6 +432,12 @@ button:active {
     }
     .coach-button {
         top: 95px;
+        right: 5px;
+        font-size: 17px;
+        padding: 7px;
+    }
+    #status-button, .status-button{
+        top: 150px;
         right: 5px;
         font-size: 17px;
         padding: 7px;
@@ -547,7 +570,7 @@ button:active {
     .profile-image {
         width: 120px;
         height: 120px;
-        margin-top: 40%;
+        margin-top: 67%;
         margin-left: 60%;
         margin-bottom: 4%;
     }
@@ -612,7 +635,7 @@ button:active {
         max-width: 100%;
         padding: 13px;
         max-width: 380px;
-        margin-top: 55%;
+        margin-top: 68%;
         margin-right: -9%;
         background: rgba(255, 255, 255, 0);
     }
@@ -680,6 +703,7 @@ button:active {
         top: 20px;
         right: 10px;
     }
+    
 
     button {
         border-radius: 18px;
@@ -689,9 +713,18 @@ button:active {
     }
     #coach-button {
         font-size: 11px;
-        top: 16px;
-        right: 49px;
+        top: 19px;
+        right: 60px;
         padding: 11px;
+        background: #ffffff78;
+        border: 2px solid #000000;
+        color: black;
+    }
+    #status-button {
+        top: 21px;
+        right: 129px;
+        font-size: 13px;
+        padding: 9px;
         background: #ffffff78;
         border: 2px solid #000000;
         color: black;
@@ -740,16 +773,15 @@ button:active {
 
 @media (max-width: 390px) {
     .results {
-        margin-top: 51%;
+        margin-top: 78%;
         margin-right: -44px;
     }
 
     .profile-image {
-        margin-top: 38%;
+        margin-top: 80%;
         margin-left: 55%;
         margin-bottom: 6%;
     }
-
     .info .info-col .value {
         margin-left: 78px;
     }
@@ -790,6 +822,13 @@ button:active {
     .container{
         padding: 0px;
         padding-bottom: 110%;
+    }
+
+    #status-button, .status-button {
+        top: 119px;
+        right: -10px;
+        font-size: 17px;
+        padding: 7px;
     }
 }
 
@@ -847,6 +886,17 @@ button:active {
         background: linear-gradient(to right, #1e90ff, #00d2ff);
         color: #fff;
         border: none;
+    }
+    #status-button, .status-button{
+        font-size: 12px;
+        top: 16px;
+        right: 400px;
+        padding: 11px;
+        color: #000000;
+        background: linear-gradient(to right, #1e90ff, #00d2ff);
+        color: #fff;
+        border: none;
+    
     }
     .profile-image {
         margin-top: 113px;
