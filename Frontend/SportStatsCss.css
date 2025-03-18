@@ -21,7 +21,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 50px;
+    padding: 0px 50px;
     background: var(--white);
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
     position: sticky;
@@ -62,13 +62,17 @@ h1 {
 }
 
 .hero {
-    padding: 130px 20px;
+    padding: 150px 20px;
     background: linear-gradient(135deg, var(--secondary-color) 40%, var(--highlight-color) 100%);
     color: var(--white);
     text-align: center;
     position: relative;
     opacity: 0;
     animation: fadeIn 1.5s ease-out forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.2s ease-out;
 }
 
 @keyframes fadeIn {
@@ -98,6 +102,7 @@ h1 {
     animation: fadeInUp 1.5s ease-out;
     color: #ffffffb3;
     line-height: 1.6;
+    max-width: 600px;
 }
 
 .cta-button {
@@ -123,8 +128,9 @@ h1 {
     display: flex;
     justify-content: center;
     gap: 40px;
-    padding: 70px 50px;
+    padding: 42px 50px;
     flex-wrap: wrap;
+    background: linear-gradient(to bottom, var(--background-color), rgba(0,0,0,0.05));
 }
 
 .feature-box {
@@ -138,7 +144,7 @@ h1 {
 }
 
 .feature-box:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
     box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.2);
 }
 
