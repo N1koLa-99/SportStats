@@ -1,18 +1,19 @@
 :root {
-    --gamboge: #F1A106ff;
-    --murrey: #801A41ff;
-    --cardinal: #C33545ff;
-    --persian-green: #089B83ff;
-    --white: #FFFEFEff;
+    --primary-color: #F1A106;
+    --secondary-color: #801A41;
+    --accent-color: #C33545;
+    --highlight-color: #089B83;
+    --background-color: #F8F9FA;
+    --white: #FFFFFF;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
-    background: var(--white);
+    background: var(--background-color);
     text-align: center;
-    color: var(--persian-green);
+    color: var(--secondary-color);
     overflow-x: hidden;
 }
 
@@ -20,103 +21,139 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 50px;
+    padding: 4px 50px;
     background: var(--white);
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: background 0.3s ease-in-out;
+}
+
+nav:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+nav img {
+    height: 50px;
+    width: auto;
 }
 
 h1 {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: bold;
-    color: var(--cardinal);
+    color: var(--accent-color);
 }
 
 .get-started {
-    background-color: var(--gamboge);
+    background: linear-gradient(135deg, var(--primary-color), var(--highlight-color));
     color: var(--white);
     border: none;
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 14px 28px;
+    font-size: 18px;
     cursor: pointer;
-    border-radius: 8px;
-    transition: background 0.3s ease;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .get-started:hover {
-    background-color: var(--cardinal);
+    transform: scale(1.1);
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
 }
 
 .hero {
-    padding: 120px 20px;
-    background: linear-gradient(135deg, var(--persian-green) 40%, #6BABA6 100%);
+    padding: 130px 20px;
+    background: linear-gradient(135deg, var(--secondary-color) 40%, var(--highlight-color) 100%);
     color: var(--white);
     text-align: center;
     position: relative;
-    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 1.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .hero h2 {
-    font-size: 48px;
+    font-size: 50px;
     font-weight: bold;
     margin-bottom: 15px;
+    animation: typing 3s steps(40, end) forwards;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 4px solid var(--white);
+    width: 0;
+    margin: 0 auto;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; border-right: none; }
 }
 
 .hero p {
-    font-size: 20px;
+    font-size: 22px;
+    animation: fadeInUp 1.5s ease-out;
+    color: #ffffffb3;
+    line-height: 1.6;
 }
 
 .cta-button {
-    background-color: var(--cardinal);
+    background: var(--accent-color);
     color: var(--white);
     border: none;
-    padding: 16px 32px;
-    font-size: 20px;
+    padding: 18px 36px;
+    font-size: 22px;
     cursor: pointer;
-    border-radius: 10px;
-    margin-top: 25px;
-    transition: background 0.3s ease, transform 0.3s ease;
+    border-radius: 12px;
+    margin-top: 30px;
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
 }
 
 .cta-button:hover {
-    background-color: var(--persian-green);
+    background: var(--highlight-color);
     transform: scale(1.1);
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .features {
     display: flex;
     justify-content: center;
     gap: 40px;
-    padding: 80px;
+    padding: 70px 50px;
     flex-wrap: wrap;
 }
 
 .feature-box {
     background: var(--white);
-    padding: 25px;
-    width: 280px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 320px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
 }
 
 .feature-box:hover {
     transform: scale(1.05);
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .feature-box h3 {
-    color: var(--gamboge);
+    color: var(--primary-color);
+    font-size: 24px;
 }
 
 .feature-box img {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     margin-bottom: 15px;
     transition: transform 0.3s ease;
 }
 
 .feature-box:hover img {
-    transform: rotate(10deg);
+    transform: rotate(8deg);
 }
