@@ -19,7 +19,7 @@ body, html {
         ),
         url('https://sportstats.blob.core.windows.net/$web/SwimmingAi2.webp') no-repeat center center fixed;
     background-size: 107% auto;
-    padding: 20px;
+    padding: 0px;
     color: #fff;
     box-sizing: border-box;
     overflow-y: auto; /* Позволява скролиране в контейнера, ако е необходимо */
