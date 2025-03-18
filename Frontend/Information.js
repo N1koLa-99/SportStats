@@ -4,7 +4,7 @@ async function fetchJson(url) {
 }
 
 async function hashUserData(user) {
-    const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}`;
+    const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}${user.statusID}`;
     const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
     return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }

@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
    
-    /*
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
         const user = JSON.parse(savedUser);
@@ -10,9 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
         }, 1500);
-    */
     
-
+    }
     const yearOfBirthSelect = document.getElementById('yearOfBirth');
     const startYear = 1924;
     const endYear = 2020;

@@ -252,26 +252,21 @@ select:hover {
 }
 
 button {
-    background: linear-gradient(to right, #1e90ff, #00d2ff);
     color: #fff;
     border: none;
-    border-radius: 8px;
     padding: 12px 24px;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 button:hover {
-    background: linear-gradient(to right, #1c7ed6, #00aaff);
+color: #1c7ed6;
     transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 button:active {
     transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .settings-button {
@@ -288,48 +283,19 @@ button:active {
 }
 
 .settings-button:hover {
-    color: #1e90ff;
+    transform: scale(1.05);
 }
+
 .results h2 {
     color: white;
- }
+}
 
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-.points-and-rank {
-    position: fixed;
-    bottom: 7%;
-    left: 6%;
-    background: linear-gradient(135deg, #ff9900, #0c76b3);
-    border-radius: 15px;
-    padding: 20px;
-    color: white;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    font-family: 'Poppins', sans-serif;
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000; /* Ensures it's on top */
-}
 
-.points-and-rank:hover {
-    transform: scale(1.05);
-}
-
-#total-points {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-
-#rank-name {
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: 1px;
-}
 
 @keyframes fadeIn {
     0% { opacity: 0; transform: translateY(10px); }
@@ -339,44 +305,43 @@ button:active {
 #total-points, #rank-name {
     animation: fadeIn 0.5s ease-in-out;
 }
+
 .hidden {
     display: none; /* Задържане на стил, ако е необходимо да се скрие */
 }
 
-.coach-button {
+/* Стилове за бутоните само с икони */
+.icon-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-top: -5px;
+    transition: color 0.3s;
+    margin-right: 48px;
+}
+
+.icon-button i {
+    font-size: 50px; /* Размер на иконата */
+    color: #ffffff; /* Цвят на иконата */
+}
+
+/* Позициониране на бутоните */
+#coach-button {
     position: fixed;
     top: 36px;
     right: 6%;
-    font-size: 20px;
-    color: #ffffff;
-    text-decoration: none;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    transition: color 0.3s;
     z-index: 1000;
 }
 
-.coach-button:hover {
-    color: #1e90ff;
-}
-#status-button, .status-button{
+#status-button {
     position: fixed;
     top: 36px;
     right: 15%;
-    font-size: 20px;
-    color: #ffffff;
-    text-decoration: none;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    transition: color 0.3s;
     z-index: 1000;
-
 }
 
-
-
+/* Останалите стилове */
 .waiting-container, .rejected-container {
     text-align: center;
     margin-top: 50px;
@@ -403,11 +368,9 @@ button:active {
     background-color: #e60000;
 }
 
-#status-button, .status-button {
+#status-button {
     margin-right: 20px; /* Можеш да добавиш отстояние от десния край */
 }
-
-
 
 @media (max-width: 1600px) {
     .results h2 {
@@ -504,6 +467,15 @@ button:active {
         color: #ffffff;
         font-size: 24px;
     }
+    .icon-button {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        margin-top: 104px;
+        transition: color 0.3s;
+        margin-right: -49px;
+    }
 }
 
 @media (max-width: 1550) {
@@ -570,7 +542,7 @@ button:active {
     .profile-image {
         width: 120px;
         height: 120px;
-        margin-top: 67%;
+        margin-top: 37%;
         margin-left: 60%;
         margin-bottom: 4%;
     }
@@ -635,7 +607,7 @@ button:active {
         max-width: 100%;
         padding: 13px;
         max-width: 380px;
-        margin-top: 68%;
+        margin-top: 50%;
         margin-right: -9%;
         background: rgba(255, 255, 255, 0);
     }
@@ -699,35 +671,39 @@ button:active {
     }
 
     .settings-button, .coach-button {
-        font-size: 30px;
+        font-size: 34px;
         top: 20px;
-        right: 10px;
+        right: 9px;
     }
     
-
     button {
         border-radius: 18px;
         padding: 13px 30px;
         font-size: 13px;
         margin-left: 4%;
     }
-    #coach-button {
-        font-size: 11px;
-        top: 19px;
-        right: 60px;
-        padding: 11px;
-        background: #ffffff78;
-        border: 2px solid #000000;
-        color: black;
+
+    .icon-button i {
+        font-size: 36px;
+        color: #ffffff;
+        margin-top: 120%;
+        margin-left: 58%;
     }
-    #status-button {
-        top: 21px;
-        right: 129px;
-        font-size: 13px;
-        padding: 9px;
-        background: #ffffff78;
-        border: 2px solid #000000;
-        color: black;
+    .icon-button {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        margin-top: 6px;
+        transition: color 0.3s;
+        margin-right: 4px;
+    }
+
+    #status-button, .status-button {
+        top: 97px;
+        right: 0px;
+        font-size: 17px;
+        padding: 7px;
     }
 }
 
@@ -755,13 +731,28 @@ button:active {
     .results h2{
         font-size: 25px;
     }
+
+    #status-button, .status-button {
+        top: 97px;
+        right: 1px;
+        font-size: 17px;
+        padding: 7px;
+    }
 }
 
 @media(max-width: 412px){
     .results {
-        margin-top: 52%;
+        margin-top: 59%;
         margin-right: -43px;
     }
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        margin-top: 57%;
+        margin-left: 60%;
+        margin-bottom: 4%;
+    }
+
     button {
         border-radius: 18px;
         padding: 13px 30px;
@@ -773,17 +764,17 @@ button:active {
 
 @media (max-width: 390px) {
     .results {
-        margin-top: 78%;
+        margin-top: 56%;
         margin-right: -44px;
     }
 
     .profile-image {
-        margin-top: 80%;
+        margin-top: 37%;
         margin-left: 55%;
         margin-bottom: 6%;
     }
     .info .info-col .value {
-        margin-left: 78px;
+        margin-left: 66px;
     }
 }
 
@@ -809,7 +800,7 @@ button:active {
         line-height: 20px;
     }
     .profile-image {
-        margin-top: 38%;
+        margin-top: 43%;
         margin-left: 61%;
         margin-bottom: 5%;
         width: 100px;
@@ -825,8 +816,8 @@ button:active {
     }
 
     #status-button, .status-button {
-        top: 119px;
-        right: -10px;
+        top: 93px;
+        right: 1px;
         font-size: 17px;
         padding: 7px;
     }
@@ -875,29 +866,30 @@ button:active {
     .container {
         width: 101vw;
     }
+
+    .icon-button {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        margin-top: 1px;
+        transition: color 0.3s;
+        margin-right: -37px;
+    }
+    #status-button, .status-button {
+        top: 97px;
+        right: -36px;
+        font-size: 17px;
+        padding: 5px;
+    }
+    .settings-button, .coach-button {
+        font-size: 34px;
+        top: 18px;
+        right: 10px;
+    }
 }
 @media(max-width: 335px){
-    #coach-button {
-        font-size: 12px;
-        top: 16px;
-        right: 235px;
-        padding: 11px;
-        color: #000000;
-        background: linear-gradient(to right, #1e90ff, #00d2ff);
-        color: #fff;
-        border: none;
-    }
-    #status-button, .status-button{
-        font-size: 12px;
-        top: 16px;
-        right: 400px;
-        padding: 11px;
-        color: #000000;
-        background: linear-gradient(to right, #1e90ff, #00d2ff);
-        color: #fff;
-        border: none;
     
-    }
     .profile-image {
         margin-top: 113px;
     }
