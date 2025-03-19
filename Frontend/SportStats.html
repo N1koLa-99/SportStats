@@ -3,40 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sport Stats - Оптимизирайте тренировките си</title>
+    <title>Sport Stats</title>
     <link rel="stylesheet" href="SportStatsCss.css">
-    <script src="SportStatsJs.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&family=Domine:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav>
-            <h1>Sport Stats</h1>
-            <button class="get-started" onclick="location.href='Index.html'">Вход</button>
-        </nav>
-        <div class="hero">
-            <h2>Създайте по-добри спортни резултати</h2>
-            <p>Проследявайте напредъка и анализирайте представянето в реално време.</p>
-            <button class="cta-button" onclick="location.href='Index.html'">Започни сега</button>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-logo">
+            <img src="Image/SportStats.jpg.png" alt="Sport Stats Logo">
+            Sport Stats
         </div>
-    </header>
-    <main>
-        <section class="features">
-            <div class="feature-box">
-                <img src="Image/real-time.png" alt="Реално време">
-                <h3>Реално време</h3>
-                <p>Следете резултатите мигновено и без усилия.</p>
-            </div>
-            <div class="feature-box">
-                <img src="Image/data-chart.png" alt="Анализ с диаграми">
-                <h3>Анализ с диаграми</h3>
-                <p>Визуализирайте напредъка си лесно и интуитивно.</p>
-            </div>
-            <div class="feature-box">
-                <img src="Image/data-storage.png" alt="Достъп навсякъде">
-                <h3>Достъп навсякъде</h3>
-                <p>Всички данни се съхраняват в облака за удобен достъп.</p>
-            </div>
-        </section>
-    </main>
+        <div class="header-buttons">
+            <button class="button signup">SingUp</button>
+            <button class="button login">logIn</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-title">Sport Stats</div>
+        <div class="hero-subtitle">Твоят личен спортен анализатор</div>
+        <button class="hero-button">Започни сега</button>
+    </div>
+
+    <!-- Features Section -->
+    <div class="cards-container">
+        <div class="card">
+            <img src="Image/real-time.png" alt="Икона">
+            <div class="card-title">Реално време</div>
+            <div class="card-text">Следете резултатите мигновено и без усилия.</div>
+        </div>
+        <div class="card">
+            <img src="Image/data-chart.png" alt="Икона">
+            <div class="card-title">Анализ с диаграми</div>
+            <div class="card-text">Следете резултатите мигновено и без усилия.</div>
+        </div>
+        <div class="card">
+            <img src="Image/data-storage.png" alt="Икона">
+            <div class="card-title">Достъп навсякъде</div>
+            <div class="card-text">Следете резултатите мигновено и без усилия.</div>
+        </div>
+    </div>
+    <!-- Success Path Section -->
+    <div class="success-path">
+        <div class="success-title">Пътят към успеха</div>
+        <div class="success-steps">
+            <div class="step step-left">Анализирай</div>
+            <svg class="connector" width="100" height="60" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10,50 C30,10 70,10 90,50" stroke="#56CFE1" stroke-width="3" fill="transparent"/>
+                <circle cx="10" cy="50" r="5" fill="#56CFE1"/>
+                <circle cx="90" cy="50" r="5" fill="#56CFE1"/>
+            </svg>
+            <div class="step step-center">Подобрявай</div>
+            <svg class="connector" width="100" height="60" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10,10 C30,50 70,50 90,10" stroke="#56CFE1" stroke-width="3" fill="transparent"/>
+                <circle cx="10" cy="10" r="5" fill="#56CFE1"/>
+                <circle cx="90" cy="10" r="5" fill="#56CFE1"/>
+            </svg>
+            <div class="step step-right">Побеждавай</div>
+        </div>
+    </div>
+    <!-- Info Section -->
+    <div class="info-section">
+        <h2 class="info-title">Sport Stats</h2>
+        <p class="info-text">
+            Революционно приложение, което променя начина, по който се следят, записват и анализират резултати. 
+            С него можете в реално време да виждате постиженията на състезателите си и автоматично да ги сравнявате с нормативите. 
+            Приложението не само показва разликата, но и ви помага да проследите напредъка им по начин, който е лесен за разбиране. 
+            Вече няма нужда да носите тетрадки – всичко е в джоба ви, готово за мигновено използване.
+        </p>
+        <p class="info-text">
+            Треньорите могат лесно да въвеждат времената на състезателите. Те имат възможността да проследяват 
+            най-добрите постижения на своите състезатели и да видят точно колко остава, за да покрият нормативите 
+            за участие в ДЛОП. Това прави процеса не само по-ефективен, но и много по-мотивиращ за всички.
+        </p>
+    </div>
 </body>
 </html>

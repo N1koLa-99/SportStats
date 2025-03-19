@@ -1,165 +1,588 @@
-:root {
-    --primary-color: #F1A106;
-    --secondary-color: #801A41;
-    --accent-color: #C33545;
-    --highlight-color: #089B83;
-    --background-color: #F8F9FA;
-    --white: #FFFFFF;
-}
-
 body {
-    font-family: 'Montserrat', sans-serif;
     margin: 0;
-    padding: 0;
-    background: var(--background-color);
-    text-align: center;
-    color: var(--secondary-color);
-    overflow-x: hidden;
+    font-family: 'Cairo', sans-serif;
+    background-color: #0A2A43;
+    color: white;
 }
-
-nav {
+/* Header */
+.header {
+    width: 90%;
+    max-width: 1260px;
+    height: 75px;
+    background: rgba(255, 255, 255, 100); /* Прозрачност, за да се вижда под него */
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0px 50px;
-    background: var(--white);
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    transition: background 0.3s ease-in-out;
+    justify-content: space-between;
+    padding: 0 20px;
+    margin: auto;
+    border-radius: 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative; /* Оставяме го над hero секцията */
+    z-index: 10;
+    top: 20px; /* Леко повдигнат над секцията */
 }
 
-nav:hover {
-    background: rgba(255, 255, 255, 0.9);
-}
-
-nav img {
-    height: 50px;
-    width: auto;
-}
-
-h1 {
-    font-size: 32px;
+.header-logo {
+    display: flex;
+    align-items: center;
+    font-size: 28px;
     font-weight: bold;
-    color: var(--accent-color);
+    color: black;
 }
 
-.get-started {
-    background: linear-gradient(135deg, var(--primary-color), var(--highlight-color));
-    color: var(--white);
+.header-logo img {
+    height: 60px;
+    margin-right: 10px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.button {
+    width: 120px;
+    height: 40px;
+    font-size: 16px;
+    font-weight: bold;
     border: none;
-    padding: 14px 28px;
-    font-size: 18px;
+    border-radius: 20px;
     cursor: pointer;
-    border-radius: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.get-started:hover {
-    transform: scale(1.1);
-    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
+.signup {
+    background: #D4EC5B;
+    color: black;
 }
 
+.login {
+    background: #57C0E8;
+    color: black;
+}
+
+/* Hero Section */
 .hero {
-    padding: 150px 20px;
-    background: linear-gradient(135deg, var(--secondary-color) 40%, var(--highlight-color) 100%);
-    color: var(--white);
-    text-align: center;
-    position: relative;
-    opacity: 0;
-    animation: fadeIn 1.5s ease-out forwards;
+    width: 100%;
+    height: 750px;
+    background: linear-gradient(to top, rgb(0 0 0) 0%, rgb(0 0 0 / 0%) 77%, rgb(0 0 0 / 0%) 100%), url(file:///C:/Users/User/Downloads/gentrit-sylejmani-JjUyjE-oEbM-unsplash.jpg) no-repeat center center / cover;
+    margin: auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    transition: background 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.hero h2 {
-    font-size: 50px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    animation: typing 3s steps(40, end) forwards;
-    white-space: nowrap;
-    overflow: hidden;
-    border-right: 4px solid var(--white);
-    width: 0;
-    margin: 0 auto;
-}
-
-@keyframes typing {
-    from { width: 0; }
-    to { width: 100%; border-right: none; }
-}
-
-.hero p {
-    font-size: 22px;
-    animation: fadeInUp 1.5s ease-out;
-    color: #ffffffb3;
-    line-height: 1.6;
-    max-width: 600px;
-}
-
-.cta-button {
-    background: var(--accent-color);
-    color: var(--white);
-    border: none;
-    padding: 18px 36px;
-    font-size: 22px;
-    cursor: pointer;
-    border-radius: 12px;
-    margin-top: 30px;
-    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
-}
-
-.cta-button:hover {
-    background: var(--highlight-color);
-    transform: scale(1.1);
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.features {
-    display: flex;
     justify-content: center;
-    gap: 40px;
-    padding: 42px 50px;
-    flex-wrap: wrap;
-    background: linear-gradient(to bottom, var(--background-color), rgba(0,0,0,0.05));
+    align-items: center;
+    color: white;
+    margin-top: -121px;
 }
 
-.feature-box {
-    background: var(--white);
-    padding: 30px;
-    width: 320px;
-    border-radius: 15px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.hero-title {
+font-size: 48px;
+font-weight: bold;
+margin-bottom: -16px;
+margin-top: 35%;
+position: relative;
+z-index: 1;
 }
 
-.feature-box:hover {
-    transform: scale(1.1);
-    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.2);
+.hero-subtitle {
+font-family: 'Jura', sans-serif;
+font-size: 32px;
+font-weight: bold;
+color: #ffffff63;
+margin-bottom: 20px;
+position: relative;
+z-index: 1;
 }
 
-.feature-box h3 {
-    color: var(--primary-color);
-    font-size: 24px;
+.hero-button {
+font-family: 'Jura', sans-serif;
+font-size: 24px;
+font-weight: bold;
+background-color: #CAE457;
+color: black;
+border: none;
+padding: 10px 30px;
+border-radius: 10px;
+cursor: pointer;
+position: relative;
+z-index: 1;
+margin-bottom: 64px;
 }
 
-.feature-box img {
-    width: 110px;
-    height: 110px;
-    margin-bottom: 15px;
-    transition: transform 0.3s ease;
+ /* Cards Section */
+.cards-container {
+display: flex;
+justify-content: center;
+gap: 25px;
+background-color: #0A2A43;
+padding: 35px 20px;
 }
 
-.feature-box:hover img {
-    transform: rotate(8deg);
+.card {
+background: #CFD8DC;
+width: 300px;
+height: 320px;
+padding: 30px;
+border-radius: 20px;
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+text-align: center;
+color: black;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.card:hover {
+transform: translateY(-10px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.card img {
+width: 90px;
+height: 90px;
+margin-bottom: 20px;
+}
+
+.card-title {
+font-family: 'Jura', sans-serif;
+font-size: 22px;
+font-weight: bold;
+color: #003C4D;
+margin-bottom: 36px;
+}
+
+.card-text {
+font-family: 'Jura', sans-serif;
+font-size: 18px;
+line-height: 21.6px;
+color: rgba(0, 46, 67, 0.58);
+}
+.success-path {
+text-align: center;
+background: url('file:///C:/Users/User/Downloads/tim-marshall-dYO_5KOMEkA-unsplash.jpg') no-repeat center center / cover;
+padding: 50px 20px;
+color: white;
+position: relative;
+width: 100%;
+height: 300px;
+margin: auto;
+}
+.success-path::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgb(10 42 67 / 17%);
+backdrop-filter: blur(6px);
+}
+.success-title {
+font-family: 'Jura', sans-serif;
+font-size: 32px;
+font-weight: bold;
+margin-bottom: 64px;
+position: relative;
+z-index: 1;
+}
+.success-steps {
+font-family: 'Jura', sans-serif;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 20px;
+position: relative;
+z-index: 1;
+}
+
+.step {
+background: #C4E538;
+padding: 15px 30px;
+border-radius: 15px;
+font-size: 24px;
+font-weight: bold;
+color: black;
+position: relative;
+bottom: 121px;
+}
+
+.step-center {
+margin-top: 17%;
+}
+
+.connector {
+width: 50px;
+height: 3px;
+background: transparent;
+position: relative;
+}
+
+.connector::after {
+content: "→";
+font-size: 24px;
+color: #C4E538;
+position: absolute;
+top: -8px;
+left: 50%;
+transform: translateX(-50%);
+}
+.info-section {
+    background-color: #002A43;
+    color: white;
+    text-align: left;
+    padding: 60px 15%;
+    font-family: 'Jura', sans-serif;
+}
+
+.info-title {
+font-size: 36px;
+font-weight: bold;
+margin-bottom: 24px;
+font-family: 'Cairo';
+}
+
+.info-text {
+font-size: 18px;
+line-height: 1.6;
+letter-spacing: 0.6px;
+margin-bottom: 20px;
+color: #ffffff91;
+}
+/* --- Адаптивност за екрани под 1600px --- */
+@media (max-width: 1450px) {
+    .header {
+        width: 95%;
+        padding: 0 15px;
+    }
+
+    .hero {
+        height: 650px;
+    }
+
+    .hero-title {
+        font-size: 42px;
+    }
+
+    .hero-subtitle {
+        font-size: 28px;
+    }
+
+    .hero-button {
+        font-size: 20px;
+        padding: 8px 25px;
+        margin-bottom: 8px;
+    }
+
+    .cards-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .card {
+        width: 280px;
+        height: 300px;
+        padding: 25px;
+    }
+
+    .success-path {
+        height: 250px;
+        padding: 40px 15px;
+    }
+
+    .success-title {
+        font-size: 28px;
+    }
+
+    .step {
+        font-size: 20px;
+        padding: 12px 25px;
+    }
+
+    .info-section {
+        padding: 50px 10%;
+    }
+
+    .info-title {
+        font-size: 30px;
+    }
+
+    .info-text {
+        font-size: 16px;
+    }
+}
+
+/* --- За екрани под 1200px (типични лаптопи) --- */
+@media (max-width: 1200px) {
+    .hero {
+        height: 550px;
+    }
+
+    .hero-title {
+        font-size: 38px;
+    }
+
+    .hero-subtitle {
+        font-size: 24px;
+    }
+
+    .hero-button {
+        font-size: 18px;
+        padding: 8px 20px;
+    }
+
+    .cards-container {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .card {
+        width: 250px;
+        height: 280px;
+        padding: 20px;
+    }
+
+    .success-title {
+        font-size: 26px;
+    }
+
+    .step {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+
+    .info-section {
+        padding: 40px 8%;
+    }
+
+    .info-title {
+        font-size: 28px;
+    }
+
+    .info-text {
+        font-size: 15px;
+    }
+}
+
+/* --- За екрани под 900px (малки лаптопи, таблети) --- */
+@media (max-width: 900px) {
+    .header {
+        height: 65px;
+        border-radius: 40px;
+    }
+
+    .header-logo {
+        font-size: 24px;
+    }
+
+    .header-buttons .button {
+        width: 100px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .hero {
+        height: 500px;
+    }
+
+    .hero-title {
+        font-size: 34px;
+        margin-top: 82%;
+    }
+
+    .hero-subtitle {
+        font-size: 20px;
+    }
+
+    .hero-button {
+        font-size: 16px;
+        padding: 7px 18px;
+    }
+
+    .cards-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .success-path {
+        height: 220px;
+    }
+
+    .success-title {
+        font-size: 24px;
+        margin-bottom: 31%;
+    }
+
+    .step {
+        font-size: 16px;
+        padding: 8px 18px;
+    }
+
+    .info-section {
+        padding: 30px 5%;
+    }
+
+    .info-title {
+        font-size: 26px;
+    }
+
+    .info-text {
+        font-size: 14px;
+    }
+}
+/* --- За телефони под 600px (мобилна версия) --- */
+@media (max-width: 450px) {
+    .header {
+        height: 60px;
+        border-radius: 30px;
+        padding: 0 10px;
+    }
+
+    .header-logo {
+        font-size: 20px;
+    }
+
+    .header-logo img {
+        height: 34px;
+        margin-right: 5px;
+    }
+
+    .header-buttons .button {
+        width: 90px;
+        height: 30px;
+        font-size: 12px;
+        border-radius: 15px;
+    }
+
+    .hero {
+        height: 400px;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 28px;
+        margin-top: 62%;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+        margin-top: 7px;
+    }
+
+    .hero-button {
+        font-size: 14px;
+        padding: 7px 15px;
+        border-radius: 8px;
+    }
+
+    .cards-container {
+        display: flex;
+        flex-wrap: nowrap; /* Забранява прехвърлянето на нов ред */
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .card {
+        width: 49%;
+        max-width: 181px;
+        height: auto;
+        padding: 10px;
+    }
+    
+    .card-title {
+        font-size: 16px;
+    }
+    
+    .card-text {
+        font-size: 14px;
+    }
+    
+
+    .success-path {
+        height: auto;
+        min-height: 220px;
+        padding: 40px 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .success-path::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 42, 67, 0.4); /* По-силен тъмен ефект за четливост */
+        backdrop-filter: blur(8px);
+    }
+
+    .success-title {
+        font-size: 22px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        position: relative;
+        z-index: 2;
+        max-width: 90%;
+    }
+
+    .success-steps {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        position: relative;
+        z-index: 2;
+        width: 100%;
+    }
+
+    .step {
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #C4E538 0%, #A3D900 100%);
+        color: black;
+        font-weight: bold;
+        text-align: center;
+        width: 90%;
+        max-width: 260px;
+        transition: transform 0.3s ease;
+    }
+
+    .step:hover {
+        transform: scale(1.05);
+    }
+
+    .connector {
+        display: none; /* Премахваме стрелките за по-чист дизайн */
+    }
+
+    .connector {
+        display: none; /* Премахваме стрелките, за да не заемат място */
+    }
+
+    .info-section {
+        padding: 25px 5%;
+    }
+
+    .info-title {
+        font-size: 22px;
+        margin-bottom: 16px;
+    }
+
+    .info-text {
+        font-size: 14px;
+    }
+}
+
