@@ -3,6 +3,7 @@ body {
     font-family: 'Cairo', sans-serif;
     background-color: #0A2A43;
     color: white;
+    overflow-x: hidden;
 }
 /* Header */
 .header {
@@ -63,8 +64,8 @@ body {
 /* Hero Section */
 .hero {
     width: 100%;
-    height: 750px;
-    background: linear-gradient(to top, rgb(0 0 0) 0%, rgb(0 0 0 / 0%) 77%, rgb(0 0 0 / 0%) 100%), url(file:///C:/Users/User/Downloads/gentrit-sylejmani-JjUyjE-oEbM-unsplash.jpg) no-repeat center center / cover;
+    height: 714px;
+    background: linear-gradient(to top, rgb(0 0 0) 0%, rgb(0 0 0 / 0%) 77%, rgb(0 0 0 / 0%) 100%), url('Image/gentrit-sylejmani-JjUyjE-oEbM-unsplash.jpg') no-repeat center center / cover;
     margin: auto;
     display: flex;
     flex-direction: column;
@@ -160,7 +161,7 @@ color: rgba(0, 46, 67, 0.58);
 }
 .success-path {
 text-align: center;
-background: url('file:///C:/Users/User/Downloads/tim-marshall-dYO_5KOMEkA-unsplash.jpg') no-repeat center center / cover;
+background: url('Image/tim-marshall-dYO_5KOMEkA-unsplash.jpg') no-repeat center center / cover;
 padding: 50px 20px;
 color: white;
 position: relative;
@@ -210,6 +211,9 @@ bottom: 121px;
 .step-center {
 margin-top: 17%;
 }
+.step-left{
+    margin: 0px;
+}
 
 .connector {
 width: 50px;
@@ -257,7 +261,7 @@ color: #ffffff91;
     }
 
     .hero {
-        height: 650px;
+        height: 490px;
     }
 
     .hero-title {
@@ -315,7 +319,7 @@ color: #ffffff91;
 /* --- За екрани под 1200px (типични лаптопи) --- */
 @media (max-width: 1200px) {
     .hero {
-        height: 550px;
+        height: 490px;
     }
 
     .hero-title {
@@ -376,7 +380,7 @@ color: #ffffff91;
     }
 
     .header-buttons .button {
-        width: 100px;
+        width: 78px;
         height: 35px;
         font-size: 14px;
     }
@@ -385,9 +389,9 @@ color: #ffffff91;
         height: 500px;
     }
 
-    .hero-title {
-        font-size: 34px;
-        margin-top: 82%;
+   .hero-title {
+        font-size: 32px;
+        margin-top: 73%;
     }
 
     .hero-subtitle {
@@ -434,155 +438,195 @@ color: #ffffff91;
     .info-text {
         font-size: 14px;
     }
-}
-/* --- За телефони под 600px (мобилна версия) --- */
+}/* Mobile Styles for screens 450px and below */
 @media (max-width: 450px) {
+    
+    /* Header */
     .header {
+        width: 90%;
         height: 60px;
-        border-radius: 30px;
         padding: 0 10px;
+        border-radius: 30px;
     }
-
+    
     .header-logo {
-        font-size: 20px;
+        font-size: 18px;
     }
-
+    
     .header-logo img {
-        height: 34px;
-        margin-right: 5px;
+        height: 40px;
+        margin-right: 12px;
     }
-
-    .header-buttons .button {
+    
+    .button {
         width: 90px;
-        height: 30px;
-        font-size: 12px;
-        border-radius: 15px;
+        height: 35px;
+        font-size: 14px;
     }
 
+    /* Hero Section */
     .hero {
-        height: 400px;
+        height: 639px;
+        margin-top: -80px;
         text-align: center;
     }
 
     .hero-title {
-        font-size: 28px;
-        margin-top: 62%;
+        font-size: 32px;
+        margin-top: 105%;
     }
 
     .hero-subtitle {
         font-size: 18px;
-        margin-top: 7px;
     }
 
     .hero-button {
-        font-size: 14px;
-        padding: 7px 15px;
-        border-radius: 8px;
+        font-size: 18px;
+        padding: 8px 20px;
     }
 
+    /* Cards Section */
     .cards-container {
         display: flex;
-        flex-wrap: nowrap; /* Забранява прехвърлянето на нов ред */
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px;
+        overflow-x: auto;
+        gap: 24px;
+        padding: 28px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    
+    .cards-container::-webkit-scrollbar {
+        display: none; /* Скрива скролбара */
     }
     
     .card {
-        width: 49%;
-        max-width: 181px;
+        background: #CFD8DC;
+        width: 90%;
         height: auto;
-        padding: 10px;
+        padding: 15px;
+        border-radius: 20px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        flex: 0 0 auto;
+        scroll-snap-align: start;
+        margin-bottom: 15px;
+    }
+    
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    .card img {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 10px;
     }
     
     .card-title {
-        font-size: 16px;
+        font-family: 'Jura', sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+        color: #003C4D;
+        margin-bottom: 15px;
+        line-height: 1.4; /* Този ред ще направи разстоянието между редовете в заглавието по-голямо */
     }
     
     .card-text {
+        font-family: 'Jura', sans-serif;
         font-size: 14px;
+        line-height: 1.5; /* Този ред ще даде повече пространство между редовете на текстовете */
+        color: rgba(0, 46, 67, 0.58);
+        white-space: normal; /* Това ще позволи текста да се разтяга на нов ред, когато е нужно */
+        word-wrap: break-word; /* Текстът ще се пренася автоматично, когато не се побира в един ред */
+        margin-top: 10px; /* Добавяне на малко разстояние между текста и изображението */
     }
     
-
+    
+    
+    /* Success Path */
     .success-path {
         height: auto;
-        min-height: 220px;
-        padding: 40px 20px;
+        padding: 30px 10px;
         text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
     }
-
-    .success-path::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(10, 42, 67, 0.4); /* По-силен тъмен ефект за четливост */
-        backdrop-filter: blur(8px);
-    }
-
+    
     .success-title {
-        font-size: 22px;
-        margin-bottom: 20px;
-        font-weight: bold;
-        position: relative;
-        z-index: 2;
-        max-width: 90%;
+        font-size: 24px;
+    }
+    
+    .success-steps {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .step {
+        width: auto;
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+    
+    .connector {
+        display: none;
     }
 
-    .success-steps {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        position: relative;
-        z-index: 2;
-        width: 100%;
+    /* Info Section */
+    .info-section {
+        padding: 40px 10%;
+    }
+    
+    .info-title {
+        font-size: 28px;
+    }
+    
+    .info-text {
+        font-size: 16px;
+    }
+    .step-center {
+        margin-top: 0%;
+        margin-left: 35%;
+        margin-bottom: 14px;
+    }
+    .step-left{
+        margin-right: 35%;
+        margin-bottom: 14px;
+    }
+    .step-right{
+        margin-right: 35%;
     }
 
     .step {
-        font-size: 16px;
-        padding: 12px 20px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #C4E538 0%, #A3D900 100%);
-        color: black;
-        font-weight: bold;
-        text-align: center;
-        width: 90%;
-        max-width: 260px;
-        transition: transform 0.3s ease;
-    }
-
-    .step:hover {
-        transform: scale(1.05);
-    }
-
-    .connector {
-        display: none; /* Премахваме стрелките за по-чист дизайн */
-    }
-
-    .connector {
-        display: none; /* Премахваме стрелките, за да не заемат място */
-    }
-
-    .info-section {
-        padding: 25px 5%;
-    }
-
-    .info-title {
-        font-size: 22px;
-        margin-bottom: 16px;
-    }
-
-    .info-text {
-        font-size: 14px;
+        bottom: 90px;
     }
 }
+@media (max-width: 380px) {
+    
+    .header-logo {
+        font-size: 16px;
+    }
+    .header-logo img {
+        height: 36px;
+        margin-right: 12px;
+    }
+    .hero-title {
+        font-size: 32px;
+        margin-top: 120%;
+    }
+    .header-buttons .button {
+        width: 62px;
+        height: 25px;
+        font-size: 12px;
+    }
 
+}

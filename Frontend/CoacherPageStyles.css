@@ -38,9 +38,7 @@ select, input {
 
 button {
     padding: 6px 20px;
-    background-color: #1ccc48;
-    background-color: #1ccca6;
-    background-color: #1ccca6;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
@@ -52,13 +50,7 @@ button {
 
 button:hover {
     background-color: transparent; /* За да запазиш фона прозрачен */
-    color: #ffffff; /* Промени цвета на текста при hover */
-}
-
-button:focus {
-    outline: none; /* Премахва очертанието при фокусиране */
-    background-color: transparent; /* За да запазиш фона прозрачен */
-    color: #ffffff; /* Промени цвета на текста при фокус */
+    color: #1443c5; /* Промени цвета на текста при hover */
 }
 
 table {
@@ -323,7 +315,6 @@ tbody tr:hover {
         margin-bottom: 10%;
     }
     #detailed-info-link{
-        margin-left: 48% !important; 
         font-weight: bold;
         font-size: 16px;
     }
@@ -341,7 +332,7 @@ tbody tr:hover {
 
     button {
         padding: 3px 21px;
-        background-color: #1ccc48;
+        background-color: #007bff;
         font-size: 12px;
         display: list-item;
         padding-bottom: 2%;
@@ -354,7 +345,7 @@ tbody tr:hover {
 
     button {
         padding: 6px 21px 7px 19px;
-        background-color: #1ccca6;
+        background-color: #007bff;
         color: white;
         border: none;
         border-radius: 4px;
@@ -483,7 +474,6 @@ tbody tr:hover {
         margin-right: 0px;
     }
     #detailed-info-link {
-        margin-left: 48% !important;
         font-weight: bold;
         font-size: 12px;
     }

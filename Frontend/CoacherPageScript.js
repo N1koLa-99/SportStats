@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     function populateDropdown(elementId, items, textProperty, valueProperty) {
         const select = document.getElementById(elementId);
         if (select) {
-            select.innerHTML = '<option value="" disabled selected>Изберете опция</option>';
+            select.innerHTML = '<option value="" disabled selected></option>';
             items.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item[valueProperty];
