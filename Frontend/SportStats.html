@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sport Stats</title>
     <link rel="stylesheet" href="SportStatsCss.css">
+    <script src="SportStatsJs.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&display=swap" rel="stylesheet">
-
     <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&family=Domine:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -15,12 +15,16 @@
     <!-- Header -->
     <div class="header">
         <div class="header-logo">
-            <img src="Image/SportStats.jpg.png" alt="Sport Stats Logo">
+            <img src="SportStats.jpg.png" alt="Sport Stats Logo">
             Sport Stats
         </div>
         <div class="header-buttons">
-            <button class="button signup">SingUp</button>
-            <button class="button login">logIn</button>
+            <a href="Index.html">
+             <button class="button signup">SingUp</button>
+        </a>
+            <a href="Index.html">
+                <button class="button login">logIn</button>
+        </a>
         </div>
     </div>
 
@@ -28,7 +32,7 @@
     <div class="hero">
         <div class="hero-title">Sport Stats</div>
         <div class="hero-subtitle">Твоят личен спортен анализатор</div>
-        <a href="index.html">
+        <a href="javascript:void(0)" onclick="scrollToContact()">
             <button class="hero-button">Започни сега</button>
         </a>
     </div>
@@ -36,7 +40,7 @@
     <!-- Features Section -->
     <div class="cards-container">
         <div class="card">
-            <img src="Image/real-time.png" alt="Икона">
+            <img src="real-time.png" alt="Икона">
             <div class="card-title">Реално време</div>
             <div class="card-text">Следете резултатите мигновено и без усилия.</div>
         </div>
@@ -46,7 +50,7 @@
             <div class="card-text">Следете резултатите мигновено и без усилия.</div>
         </div>
         <div class="card">
-            <img src="Image/data-storage.png" alt="Икона">
+            <img src="data-storage.png" alt="Икона">
             <div class="card-title">Достъп навсякъде</div>
             <div class="card-text">Следете резултатите мигновено и без усилия.</div>
         </div>
@@ -75,5 +79,27 @@
             за участие в ДЛОП. Това прави процеса не само по-ефективен, но и много по-мотивиращ за всички.
         </p>
     </div>
+        <!-- Contact Us Section -->
+        <div class="contact-us" id="contact-us">
+    <div class="contact-title">Ако си Клуб, който иска да се развива - свържи се с нас  </div>
+    <p class="contact-text">Имейл за връзка: <a href="mailto:support@sportstats.com">support@sportstats.com</a></p>
+    <div class="app-screenshots">
+        <div class="screenshot">
+            <img src="PomePage.png" alt="Снимка на приложението 1">
+            <p>Всеки един потрбител може да следи своето развитие. Най-добрият резултат се сравнява с норматива на дадената дисциплина.</p>
+        </div>
+        <div class="screenshot">
+            <img src="Coacher.png" alt="Снимка на приложението 2">
+            <img src="Coacher2.png" alt="Снимка на приложението 2">
+            <p>Екран с табица за добаввян/изтриване на време.</p>
+        </div>
+        <div class="screenshot">
+            <img src="MoreInfoo.png" alt="Снимка на приложението 3">
+            <p>Екран който само треньора има достъп до него.Вижда по дати разултатите на потребителите от техния клуб.</p>
+        </div>
+    </div>
+</div>
+
+    
 </body>
 </html>

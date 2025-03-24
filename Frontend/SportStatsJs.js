@@ -1,14 +1,6 @@
-document.addEventListener("mousemove", (event) => {
-    const hero = document.querySelector(".hero");
-    const { clientX: x, clientY: y } = event;
-    
-    // Получаваме размерите на елемента
-    const { width, height, left, top } = hero.getBoundingClientRect();
-    
-    // Нормализираме координатите (стойности от 0 до 1)
-    const xPercent = (x - left) / width;
-    const yPercent = (y - top) / height;
+// Функция, която скролира към секцията с id "contact-us"
+function scrollToContact() {
+    // Намери елемента с id "contact-us" и скролирай към него
+    document.getElementById("contact-us").scrollIntoView({ behavior: "smooth" });
+}
 
-    // Генерираме нов градиент спрямо позицията на мишката
-    hero.style.background = `linear-gradient(${xPercent * 360}deg, var(--secondary-color) 40%, var(--highlight-color) 100%)`;
-});
