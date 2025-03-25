@@ -371,6 +371,29 @@ button:active {
 #status-button {
     margin-right: 20px; /* Можеш да добавиш отстояние от десния край */
 }
+.button-image {
+    width: 50px; /* Размер на изображенията */
+    height: 50px;
+    object-fit: contain;
+}
+
+/* Контейнер за бутоните */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Разстояние между бутоните */
+    position: absolute;
+    top: 10px; /* Отстояние от горната част */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 400px; /* За да не се разтягат бутоните на големи екрани */
+}
+
+/* Скриване на бутоните по подразбиране, ако са "hidden" */
+.hidden {
+    display: none;
+}
 
 @media (max-width: 1600px) {
     .results h2 {
@@ -542,10 +565,10 @@ button:active {
     }
 
     .profile-image {
-        width: 120px;
-        height: 120px;
-        margin-top: 37%;
-        margin-left: 60%;
+        width: 85px;
+        height: 85px;
+        margin-top: 76%;
+        margin-left: 72%;
         margin-bottom: 4%;
     }
 
@@ -601,7 +624,7 @@ button:active {
         color: white;
         font-size: 32px;
         font-family: cursive;
-        margin-top: 5%;
+        margin-top: 18%;
         font-family: 'Roboto';
     }
 
@@ -671,11 +694,14 @@ button:active {
     #last-name ~ .label {
         display: none;
     }
-
-    .settings-button, .coach-button {
-        font-size: 34px;
-        top: 20px;
-        right: 9px;
+    .button-container {
+        top: 5px;
+        gap: 15px;
+    }
+    
+    .button-image {
+        width: 50px;
+        height: 50px;
     }
     
     button {
@@ -700,12 +726,44 @@ button:active {
         transition: color 0.3s;
         margin-right: 4px;
     }
+    .header {
+        width: 100%;
+        height: 110px; /* Височина на хедъра */
+        background-color: #2c3e50; /* Тъмен фон */
+        position: fixed; /* Винаги остава най-отгоре */
+        top: 0;
+        left: 0;
+        z-index: 1000; /* За да е над всички елементи, освен Settings бутона */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .settings-button {
+        position: fixed;
+        top: 3.5%;
+        right: 11%;
+        z-index: 1100;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .settings-button img {
+        width: 50px; /* Размер на иконата */
+        height: 50px;
+    }
+    
 
     #status-button, .status-button {
-        top: 97px;
-        right: 0px;
+        top: 2.5%;
+        right: 69%;
         font-size: 17px;
         padding: 7px;
+    }
+    #coach-button {
+        position: fixed;
+        top: 3%;
+        right: 43%;
+        z-index: 1000;
     }
 }
 
