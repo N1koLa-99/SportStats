@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     function populateDropdown(elementId, items, textProperty, valueProperty) {
         const select = document.getElementById(elementId);
         if (select) {
-            select.innerHTML = '<option value="" disabled selected></option>';
             items.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item[valueProperty];
@@ -115,8 +114,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${user.firstName}</td>
-                <td>${user.lastName}</td>
+                <td>${user.firstName}<br>${user.lastName}</td> <!-- Фамилията на нов ред -->
                 <td>${user.yearOfBirth ? user.yearOfBirth : 'Няма данни'}</td>
                 <td>${bestResult}</td>
                 <td>
@@ -137,6 +135,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
         });
     }
+    
+    
+    
     
     async function handleCoach() {
         if (!user || user.roleID !== 2) {

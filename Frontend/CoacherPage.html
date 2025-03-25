@@ -7,7 +7,8 @@
     <title>Coacher Page</title>
     <link rel="stylesheet" href="CoacherPageStyles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&family=Domine:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -19,60 +20,51 @@
             </div>
         </div>
     </div>
-    
 
     <div class="container">
-
         <button id="go-home" class="home-button"><i class="fas fa-home"></i></button>
-
-        <h2>Добре дошли, <span id="coach-name"></span></h2>
-
-        <label for="discipline">Изберете дисциплина:</label>
+        <h2><br><span id="coach-name"></span></h2>
+        
         <select id="discipline">
             <option value="" disabled selected>Изберете дисциплина</option>
         </select>
         
         <form id="search-form">
-            <input type="text" id="search-input" placeholder="Търсене на потребители..." />
+            <input type="text" id="search-input" placeholder="Име Фамилия..." />
             <button type="submit">Търсене</button>
         </form>
-        
-        
-        <h3>Потребители на клуба</h3>
+
         <div class="scrollable-table">
             <table id="users-table">
                 <thead>
                     <tr>
-                        <th>Първо име</th>
-                        <th>Фамилия</th>
+                        <th>Име Фамилия</th>
                         <th>Година на раждане</th>
                         <th>Най-добър резултат</th>
                         <th>Старите резултати</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
 
         <div id="add-result-form">
             <h3>Добавяне на резултат</h3>
-            <label for="add-discipline">Дисциплина:</label>
-            <select id="add-discipline"></select>
-            
+            <select id="add-discipline">
+                <option value="" disabled selected>Изберете дисциплина</option>
+            </select>
+
             <div id="add-user-container">
-                <label for="add-user">Потребител:</label>
-                <select id="add-user"></select>
+                <select id="add-user">
+                    <option value="" disabled selected>Изберете състезател</option>
+                </select>
                 <img id="user-profile-picture" alt="Профилна снимка на потребителя" />
             </div>
             
             <div id="time-input" style="display: none;">
                 <select id="hours">${Array.from({length: 13}, (_, i) => `<option value="${i}"> час </option>`).join('')}</select>
-                
                 <select id="minutes">${Array.from({length: 60}, (_, i) => `<option value="${i}"> мин </option>`).join('')}</select>
-                
                 <select id="seconds">${Array.from({length: 60}, (_, i) => `<option value="${i}"> сек </option>`).join('')}</select>
-                
                 <select id="milliseconds">${Array.from({length: 100}, (_, i) => `<option value="${i}"> стот </option>`).join('')}</select>
             </div>
 
@@ -83,10 +75,11 @@
         
             <button id="submit-result">Добави резултат</button>
         </div>
+
         <a href="Information.html" id="detailed-info-link" style="margin-top:3%;margin-left: 0px; font-weight: bold; display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-align: center; text-decoration: none; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: background-color 0.3s;">
             Подробна информация
         </a>
-            </div>
+    </div>
 
     <script src="CoacherPageScript.js"></script>
 </body>
