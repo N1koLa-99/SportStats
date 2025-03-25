@@ -569,6 +569,17 @@ chart = new Chart(ctx, {
         document.getElementById('normative-value').innerHTML = normativeValueText + 
             (normativeStatusText ? normativeStatusText : '');
     }    
+    
+    const disciplineSelect = document.getElementById("discipline");
+    const chartContainer = document.getElementById("chart-container");
+
+    disciplineSelect.addEventListener("change", function () {
+        if (disciplineSelect.value) {
+            chartContainer.style.display = "block"; // Показва графиката
+        } else {
+            chartContainer.style.display = "none"; // Скрива графиката
+        }
+    });
 
     function formatTime(seconds) {
         if (seconds === undefined || seconds === null || isNaN(seconds)) {

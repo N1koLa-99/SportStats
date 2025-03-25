@@ -5,19 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HomePage</title>
     <link rel="stylesheet" href="HomePageStyles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&family=Domine:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="header"></div>
     <div class="container">
+       
         <a href="Settings.html" class="settings-button">
             <img src="settings.png" alt="Settings" class="button-image">
+            <span class="icon-label">Настройки</span>
         </a>
+        
         <button id="coach-button" class="icon-button hidden" onclick="redirectToCoacherPage()">
             <img src="result.png" alt="Coach" class="button-image">
+            <span class="icon-label">Резултати</span>
         </button>
         
         <button id="status-button" class="icon-button hidden">
             <img src="ask.png" alt="Status" class="button-image">
+            <span class="icon-label">Заявки</span>
         </button>
         
         <div class="info">

@@ -5,6 +5,7 @@ body {
     width: 100%;
 }
 
+
 .container {
     position: relative;
     display: flex;
@@ -44,7 +45,6 @@ body {
     object-fit: cover;
     border: 3px solid #ddd;
 }
-
 .info {
     max-width: 300px;
     background: transparent;
@@ -329,15 +329,15 @@ button:active {
 /* Позициониране на бутоните */
 #coach-button {
     position: fixed;
-    top: 36px;
-    right: 6%;
+    top: 20%;
+    right: -1%;
     z-index: 1000;
 }
 
 #status-button {
     position: fixed;
-    top: 36px;
-    right: 15%;
+    top: 38%;
+    right: 1%;
     z-index: 1000;
 }
 
@@ -371,9 +371,28 @@ button:active {
 #status-button {
     margin-right: 20px; /* Можеш да добавиш отстояние от десния край */
 }
+a.settings-button,
+button.icon-button {
+    display: flex;
+    flex-direction: column; /* Подрежда елементите вертикално */
+    align-items: center; /* Центрира ги хоризонтално */
+    text-decoration: none; /* Премахва подчертаването на <a> */
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.icon-label {
+    font-family: Jura;
+    font-size: 20px;
+    color: #f0f8ff6b;
+    margin-top: 5px;
+    text-align: center;
+}
+
 .button-image {
-    width: 50px; /* Размер на изображенията */
-    height: 50px;
+    width: 75px;
+    height: 75px;
     object-fit: contain;
 }
 
@@ -422,9 +441,9 @@ button:active {
         font-size: 17px;
         padding: 7px;
     }
-    #status-button, .status-button{
-        top: 150px;
-        right: 5px;
+    #status-button, .status-button {
+        top: 217px;
+        right: 12px;
         font-size: 17px;
         padding: 7px;
     }
@@ -501,6 +520,12 @@ button:active {
     {
         margin-right: -16px;
     }
+    #coach-button {
+        position: fixed;
+        top: 7%;
+        right: 5.5%;
+        z-index: 1000;
+    }
 }
 
 @media (max-width: 1550) {
@@ -550,10 +575,17 @@ button:active {
         padding: 0px;
         padding-bottom: 100%;
         width: 100vw;
-        background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)),
-         url(https://sportstats.blob.core.windows.net/$web/SnimkaTel.jpg)center center fixed;
-        animation: backgroundAnimation 0s infinite alternate;
+        
+        /* Задава мащабиране на изображението, така че да покрие целия контейнер */
+        background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)), 
+            url(taiki-ishikawa-9H5rLZLyw9c-unsplash.jpg);
+        
+        background-size: cover;  /* Кара снимката да покрива целия контейнер */
+        background-position: center; /* Центрира изображението */
+        background-attachment: fixed; /* Фиксира фона при скрол */
+        background-repeat: no-repeat; /* Забранява повторението */
     }
+    
 
     select {
         padding: 14px 11px;
@@ -567,9 +599,9 @@ button:active {
     .profile-image {
         width: 85px;
         height: 85px;
-        margin-top: 76%;
-        margin-left: 72%;
-        margin-bottom: 4%;
+        margin-top: 86%;
+        margin-left: 44%;
+        margin-bottom: 6%;
     }
 
     .info {
@@ -580,9 +612,7 @@ button:active {
         margin-right: 44%;
     }
 
-    .info-section{
-         display: table-cell;
-    }
+
 
     .info .info-row {
         grid-template-columns: 1fr;
@@ -592,13 +622,15 @@ button:active {
     .info .label, .info .value {
         font-size: 24px;
         margin-left: -24%;
+        color: #8a9493;
+        font-family: 'Jura';
         margin-top: -6%;
         padding-inline: 28px;
     }
 
     .info .info-col .label {
         font-weight: 700;
-        color: #888888b0;
+        color: #8a9493;
         font-size: 24px;
         margin-bottom: 15px;
         margin-left: 15%;
@@ -606,26 +638,29 @@ button:active {
 
     .info .info-col .value {
         font-weight: 700;
-        color: #ffffff;
-        font-size: 22px;
-        margin-left: 93px;
-        width: 90px;
+        font-family: 'Jura';
+        color: #8a9493;
+        font-size: 24px;
+        margin-left: -11px;
+        margin-bottom: 48%;
+        margin-top: -88px;
+        width: 113px;
     }
 
     .info .info-section {
-        margin-bottom: -4px;
-        padding-bottom: 21px;
+        margin-bottom: -113px;
+        margin-left: 83%;
     }
 
     .line{
-        display: none;    }
+       display: none;   
+     }
 
-    .results h2{
-        color: white;
+     .results h2 {
+        color: #ffffff;
         font-size: 32px;
-        font-family: cursive;
-        margin-top: 18%;
-        font-family: 'Roboto';
+        margin-top: 10%;
+        font-family: 'Jura';
     }
 
     .results {
@@ -728,12 +763,13 @@ button:active {
     }
     .header {
         width: 100%;
-        height: 110px; /* Височина на хедъра */
-        background-color: #2c3e50; /* Тъмен фон */
-        position: fixed; /* Винаги остава най-отгоре */
-        top: 0;
+        height: 96px;
+        background-color: #00000075;
+        position: fixed;
+        top: 20px;
+        border-radius: 78px;
         left: 0;
-        z-index: 1000; /* За да е над всички елементи, освен Settings бутона */
+        z-index: 1000;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
     
@@ -765,6 +801,37 @@ button:active {
         right: 43%;
         z-index: 1000;
     }
+    .icon-label {
+        font-family: Jura;
+        font-size: 12px;
+        color: #f0f8ff8c;
+        margin-top: 4px;
+        text-align: center;
+    }
+
+    #chart-container {
+        display: none; /* Скрити по подразбиране */
+    }
+    select {
+        padding: 10px 15px;
+        border-radius: 15px;
+        border: 2px solid #ffffff;
+        background-color: #f9f9f930;
+        color: #ffffff;
+        font-size: 16px;
+        font-family: 'Arial', sans-serif;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease, transform 0.2s ease;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    select:hover {
+        border-color: #ffffff18;
+        background-color: #003ba891;
+        cursor: pointer;
+    }
+    
 }
 
 @media (max-width: 414px) {
@@ -787,17 +854,6 @@ button:active {
     button {
         font-size: 15px;
     }
-
-    .results h2{
-        font-size: 25px;
-    }
-
-    #status-button, .status-button {
-        top: 97px;
-        right: 1px;
-        font-size: 17px;
-        padding: 7px;
-    }
 }
 
 @media(max-width: 412px){
@@ -805,14 +861,6 @@ button:active {
         margin-top: 59%;
         margin-right: -43px;
     }
-    .profile-image {
-        width: 120px;
-        height: 120px;
-        margin-top: 57%;
-        margin-left: 60%;
-        margin-bottom: 4%;
-    }
-
     button {
         border-radius: 18px;
         padding: 13px 30px;
@@ -826,15 +874,6 @@ button:active {
     .results {
         margin-top: 56%;
         margin-right: -44px;
-    }
-
-    .profile-image {
-        margin-top: 37%;
-        margin-left: 55%;
-        margin-bottom: 6%;
-    }
-    .info .info-col .value {
-        margin-left: 66px;
     }
 }
 
@@ -860,15 +899,16 @@ button:active {
         line-height: 20px;
     }
     .profile-image {
-        margin-top: 43%;
-        margin-left: 61%;
-        margin-bottom: 5%;
-        width: 100px;
-        height: 100px;
+        margin-top: 91%;
+        margin-left: 40%;
+        margin-bottom: 7%;
+        width: 70px;
+        height: 70px;
     }
     .results h2 {
-        font-size: 22px;
+        font-size: 31px;
         margin-top: 31px;
+        margin-left: 21px;
     }
     .container{
         padding: 0px;
@@ -876,19 +916,52 @@ button:active {
     }
 
     #status-button, .status-button {
-        top: 93px;
-        right: 1px;
+        top: 12px;
+        right: 68%;
         font-size: 17px;
         padding: 7px;
+    }
+    .header {
+        width: 100%;
+        height: 83px;
+        background-color: #00000075;
+        position: fixed;
+        top: 16px;
+        border-radius: 78px;
+        left: 0;
+        z-index: 1000;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .button-image {
+        width: 47px;
+        height: 47px;
+    }
+    .settings-button img {
+        width: 47px;
+        height: 47px;
+    }
+    .info .info-col .value {
+        font-weight: 700;
+        font-family: 'Jura';
+        color: #8a9493;
+        font-size: 24px;
+        margin-left: -25px;
+        margin-bottom: 48%;
+        margin-top: -85px;
+        width: 128px;
+    }
+    .info .label, .info .value {
+        font-size: 24px;
+        margin-left: -66%;
+        color: #8a9493;
+        font-family: 'Jura';
+        margin-top: 14%;
+        padding-inline: 27px;
     }
 }
 
 @media(max-width: 361px){
     
-    .info .info-col .value {
-        margin-left: 73px;
-    }
-
     .select {
         padding: 9px 0px;
         border-radius: 11px;
@@ -917,35 +990,8 @@ button:active {
         max-height: 209px;
         margin-left: 9px;
     }
-
-    .profile-image{
-        width: 100px;
-        height: 100px;
-        margin-left: 59%;
-    }
     .container {
         width: 101vw;
-    }
-
-    .icon-button {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        margin-top: 1px;
-        transition: color 0.3s;
-        margin-right: -37px;
-    }
-    #status-button, .status-button {
-        top: 97px;
-        right: -36px;
-        font-size: 17px;
-        padding: 5px;
-    }
-    .settings-button, .coach-button {
-        font-size: 34px;
-        top: 18px;
-        right: 10px;
     }
 }
 @media(max-width: 335px){
