@@ -409,9 +409,8 @@ button.icon-button {
     max-width: 400px; /* За да не се разтягат бутоните на големи екрани */
 }
 
-/* Скриване на бутоните по подразбиране, ако са "hidden" */
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 @media (max-width: 1600px) {

@@ -307,6 +307,19 @@ color: #ffffff91;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+.screenshot:last-of-type img {
+    width: 80%; /* Променяш процента според желаната големина */
+    max-width: 250px; /* Опционално, задава максимален размер */
+    border-radius: 10px; /* Заоблени ъгли */
+    margin-bottom: 8px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.screenshot:last-of-type img:hover {
+    transform: scale(1.05); /* Леко увеличение при ховър */
+}
+
+
 
 .screenshot:hover {
     transform: translateY(-10px);
