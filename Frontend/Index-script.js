@@ -29,124 +29,100 @@ document.addEventListener('DOMContentLoaded', function() {
     
     fetchClubs();
 
-    const registrationForm = document.getElementById('registration-form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
-    const genderInput = document.getElementById('gender');
-    const clubInput = document.getElementById('club');
+        const registrationForm = document.getElementById('registration-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const genderInput = document.getElementById('gender');
+        const clubInput = document.getElementById('club');
     
-    const emailError = createErrorElement('email-error');
-    const passwordError = createErrorElement('password-error');
-    const firstNameError = createErrorElement('first-name-error');
-    const lastNameError = createErrorElement('last-name-error');
-    const genderError = createErrorElement('gender-error');
-    const clubError = createErrorElement('club-error');
+        const emailError = createErrorElement('email-error');
+        const passwordError = createErrorElement('password-error');
+        const firstNameError = createErrorElement('first-name-error');
+        const lastNameError = createErrorElement('last-name-error');
+        const genderError = createErrorElement('gender-error');
+        const clubError = createErrorElement('club-error');
     
-    emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
-    passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
-    firstNameInput.parentNode.insertBefore(firstNameError, firstNameInput.nextSibling);
-    lastNameInput.parentNode.insertBefore(lastNameError, lastNameInput.nextSibling);
-    genderInput.parentNode.insertBefore(genderError, genderInput.nextSibling);
-    clubInput.parentNode.insertBefore(clubError, clubInput.nextSibling);
-
-    const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    const namePattern = /^[A-Za-zА-Яа-я]+$/; 
-
-    registrationForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        let formIsValid = true;
-
-        // Email validation
-        if (!emailPattern.test(emailInput.value)) {
-            emailError.textContent = 'Моля, въведете валиден имейл адрес.';
-            emailError.style.display = 'block';
-            emailInput.classList.add('error');
-            formIsValid = false;
-        } else {
-            try {
-                const emailExists = await checkEmailAvailability(emailInput.value);
-                if (emailExists) {
-                    emailError.textContent = 'Този имейл вече е регистриран.Влезте в профила си от "Вход"';
-                    emailError.style.display = 'block';
-                    emailInput.classList.add('error');
-                    formIsValid = false;
-                } else {
-                    emailError.textContent = '';
-                    emailError.style.display = 'none';
-                    emailInput.classList.remove('error');
+        emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
+        passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
+        firstNameInput.parentNode.insertBefore(firstNameError, firstNameInput.nextSibling);
+        lastNameInput.parentNode.insertBefore(lastNameError, lastNameInput.nextSibling);
+        genderInput.parentNode.insertBefore(genderError, genderInput.nextSibling);
+        clubInput.parentNode.insertBefore(clubError, clubInput.nextSibling);
+    
+        const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const namePattern = /^[A-Za-zА-Яа-я]+$/;
+    
+        let emailTimeout;
+    
+        emailInput.addEventListener('input', function () {
+            clearTimeout(emailTimeout);
+            emailTimeout = setTimeout(async () => {
+                if (!emailPattern.test(emailInput.value)) {
+                    showError(emailError, emailInput, 'Моля, въведете валиден имейл адрес.');
+                    return;
                 }
-            } catch (error) {
-                handleError('Грешка при проверка на имейла:', emailError, emailInput);
+    
+                try {
+                    const emailExists = await checkEmailAvailability(emailInput.value);
+                    if (emailExists) {
+                        showError(emailError, emailInput, 'Имейлът вече е зает. Опитайте с друг.');
+                    } else {
+                        hideError(emailError, emailInput);
+                    }
+                } catch (error) {
+                    console.error('Грешка при проверка на имейла:', error);
+                }
+            }, 500);
+        });
+    
+        registrationForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            let formIsValid = true;
+    
+            // Email validation
+            if (!emailPattern.test(emailInput.value)) {
+                showError(emailError, emailInput, 'Моля, въведете валиден имейл адрес.');
                 formIsValid = false;
+            } else {
+                try {
+                    const emailExists = await checkEmailAvailability(emailInput.value);
+                    if (emailExists) {
+                        showError(emailError, emailInput, 'Този имейл вече е регистриран.');
+                        formIsValid = false;
+                    } else {
+                        hideError(emailError, emailInput);
+                    }
+                } catch (error) {
+                    console.error('Грешка при проверка на имейла:', error);
+                    showError(emailError, emailInput, 'Грешка при проверка на имейла.');
+                    formIsValid = false;
+                }
             }
-        }
-
-        // Password validation
-        if (!passwordPattern.test(passwordInput.value)) {
-            passwordError.textContent = 'Поне 8 символа и да съдържа главна буква';
-            passwordError.style.display = 'block';
-            passwordInput.classList.add('error');
-            formIsValid = false;
-        } else {
-            passwordError.textContent = '';
-            passwordError.style.display = 'none';
-            passwordInput.classList.remove('error');
-        }
-
-        // Name validation
-        if (!namePattern.test(firstNameInput.value)) {
-            firstNameError.textContent = 'Трябва да съдържа само букви.';
-            firstNameError.style.display = 'block';
-            firstNameInput.classList.add('error');
-            formIsValid = false;
-        } else {
-            firstNameError.textContent = '';
-            firstNameError.style.display = 'none';
-            firstNameInput.classList.remove('error');
-        }
-
-        if (!namePattern.test(lastNameInput.value)) {
-            lastNameError.textContent = 'Трябва да съдържа само букви.';
-            lastNameError.style.display = 'block';
-            lastNameInput.classList.add('error');
-            formIsValid = false;
-        } else {
-            lastNameError.textContent = '';
-            lastNameError.style.display = 'none';
-            lastNameInput.classList.remove('error');
-        }
-
-        // Gender validation
-        if (!genderInput.value) {
-            genderError.textContent = 'Моля, изберете пол.';
-            genderError.style.display = 'block';
-            genderInput.classList.add('error');
-            formIsValid = false;
-        } else {
-            genderError.textContent = '';
-            genderError.style.display = 'none';
-            genderInput.classList.remove('error');
-        }
-
-        // Club validation
-        if (!clubInput.value) {
-            clubError.textContent = 'Моля, изберете отбор.';
-            clubError.style.display = 'block';
-            clubInput.classList.add('error');
-            formIsValid = false;
-        } else {
-            clubError.textContent = '';
-            clubError.style.display = 'none';
-            clubInput.classList.remove('error');
-        }
-
-        if (formIsValid) {
+    
+            validateField(passwordInput, passwordError, passwordPattern, 'Паролата трябва да съдържа поне 8 символа, една главна буква и цифра.', formIsValid);
+            validateField(firstNameInput, firstNameError, namePattern, 'Трябва да съдържа само букви.', formIsValid);
+            validateField(lastNameInput, lastNameError, namePattern, 'Трябва да съдържа само букви.', formIsValid);
+    
+            if (!genderInput.value) {
+                showError(genderError, genderInput, 'Моля, изберете пол.');
+                formIsValid = false;
+            } else {
+                hideError(genderError, genderInput);
+            }
+    
+            if (!clubInput.value) {
+                showError(clubError, clubInput, 'Моля, изберете отбор.');
+                formIsValid = false;
+            } else {
+                hideError(clubError, clubInput);
+            }
+    
+            if (!formIsValid) return;
+    
             const formData = new FormData(registrationForm);
-            const yearOfBirth = parseInt(formData.get('yearOfBirth'), 10);
-        
             const user = {
                 firstName: formData.get('firstName'),
                 lastName: formData.get('lastName'),
@@ -156,32 +132,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 roleID: 1,
                 clubID: parseInt(formData.get('club'), 10),
                 profileImage_url: "https://sportstatsapi.azurewebsites.net/ProfilePictures/ProfilePhoto2.jpg",
-                yearOfBirth: yearOfBirth,
-                statusID: 1 // "чакащ"
+                yearOfBirth: parseInt(formData.get('yearOfBirth'), 10),
+                statusID: 1
             };
-        
+    
             try {
                 const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user),
                 });
-        
+    
                 if (!response.ok) {
                     throw new Error('Грешка при изпращане на данните: ' + response.statusText);
                 }
-        
-                const responseBody = await response.text();
-                console.log('Отговор от сървъра:', responseBody);
-        
-                const newUser = JSON.parse(responseBody);
-        
+    
+                const newUser = await response.json();
                 localStorage.setItem('user', JSON.stringify(newUser.user));
                 localStorage.setItem('userHash', newUser.userTokenHash);
-        
-                // Изпращаме заявка за одобрение
+    
                 await sendApprovalRequest(newUser.user);
-        
+    
                 showMessageBox('Потребителят е регистриран успешно!', 'success');
                 registrationForm.reset();
                 window.location.href = "HomePage.html";
@@ -189,9 +160,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Грешка:', error);
                 showMessageBox('Възникна грешка при регистрацията.', 'error');
             }
+        });
+    
+        async function checkEmailAvailability(email) {
+            try {
+                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/check-email?email=${email}`);
+                if (!response.ok) throw new Error('Грешка при проверката');
+    
+                const data = await response.json();
+                return data.exists;
+            } catch (error) {
+                console.error('Грешка при проверка на имейла:', error);
+                return true;
+            }
         }
-        
-        // Функция за изпращане на заявка за одобрение
+    
+        function showError(errorElement, inputElement, message) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            inputElement.classList.add('error');
+        }
+    
+        function hideError(errorElement, inputElement) {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+            inputElement.classList.remove('error');
+        }
+    
+        function validateField(input, errorElement, pattern, message, formIsValid) {
+            if (!pattern.test(input.value)) {
+                showError(errorElement, input, message);
+                return false;
+            } else {
+                hideError(errorElement, input);
+                return formIsValid;
+            }
+        }
+    
+        function createErrorElement(id) {
+            const errorElement = document.createElement('div');
+            errorElement.id = id;
+            errorElement.classList.add('error-message');
+            errorElement.style.display = 'none';
+            return errorElement;
+        }    
+            // Функция за изпращане на заявка за одобрение
         async function sendApprovalRequest(user) {
             try {
                 const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/approvalRequests`, {
@@ -407,4 +420,3 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-});
