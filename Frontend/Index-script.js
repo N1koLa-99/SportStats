@@ -165,13 +165,16 @@ document.addEventListener('DOMContentLoaded', function() {
         async function checkEmailAvailability(email) {
             try {
                 const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/check-email?email=${email}`);
-                if (!response.ok) throw new Error('Грешка при проверката');
-    
+                if (!response.ok) {
+                    throw new Error('Грешка при проверка на имейла: ' + response.statusText);
+                }
                 const data = await response.json();
-                return data.exists;
+                
+                // Увери се, че API връща правилен ключ
+                return data.exists;  // Ако API връща `data.exists`
             } catch (error) {
-                console.error('Грешка при проверка на имейла:', error);
-                return true;
+                console.error('Грешка:', error);
+                return false;  // По-добре да върнем false, за да не блокира регистрацията
             }
         }
     

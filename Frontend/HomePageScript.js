@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function redirectToIndex(message) {
         alert(message);
         localStorage.clear();
-        window.location.href = "index.html";
+        window.location.href = "Index.html";
     }
 
     async function checkUserStatus() {
@@ -44,9 +44,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             const updatedUser = await response.json();
             if (user.statusID !== updatedUser.statusID) {
-                alert("Вашият статус е променен. Моля, влезте отново.");
+                alert("Вашият статус е променен. Моля, влезте отново.Чрез имейл и парола");
                 localStorage.clear();
-                window.location.href = "index.html";
+                window.location.href = "Index.html";
             }
         } catch (error) {
             console.error("Грешка при проверка на статуса:", error);
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.body.innerHTML = `
                 <div class="club-selection-container" style="text-align: center; padding: 30px; background-color: white; border-radius: 15px; width: 50%; margin: 50px auto; box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); font-family: Arial, sans-serif;">
                     <h2 style="color: #2c3e50; font-size: 22px;">Изберете нов клуб</h2>
-                    <select id="club-select" style="padding: 10px; width: 80%; margin: 10px 0;">
+                    <select id="club-select" style="padding: 10px;width: 80%;margin: 10px 0;color: black;border-color: orange;">
                         <option value="" disabled selected>Изберете клуб...</option>
                         ${clubs.map(club => `<option value="${club.id}">${club.name}</option>`).join('')}
                     </select>
