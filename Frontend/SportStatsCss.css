@@ -1,6 +1,3 @@
-html{
-    overflow-x: hidden;
-
 body {
     margin: 0;
     font-family: 'Cairo', sans-serif;
@@ -13,7 +10,7 @@ body {
     width: 90%;
     max-width: 1260px;
     height: 75px;
-    background: rgba(255, 255, 255, 100); /* Прозрачност, за да се вижда под него */
+    background: rgba(255, 255, 255, 100);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -21,11 +18,12 @@ body {
     margin: auto;
     border-radius: 50px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    position: relative; /* Оставяме го над hero секцията */
+    position: relative;
     z-index: 10;
-    top: 20px; /* Леко повдигнат над секцията */
+    top: 20px;
+    gap: 20px;
 }
-
+    
 .header-logo {
     display: flex;
     align-items: center;
@@ -62,6 +60,37 @@ body {
 .login {
     background: #57C0E8;
     color: black;
+}
+.sponsor-strip-wrapper {
+    width: 50%;
+    overflow: hidden;
+    position: relative;
+    height: 75px;
+    display: flex;
+    align-items: center;
+}
+
+.sponsor-strip {
+    display: flex;
+    width: max-content;
+    animation: scrollLeft 10s linear infinite;
+}
+
+.sponsor-logo {
+    width: 100px;
+    height: 85px;
+    object-fit: contain;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+@keyframes scrollLeft {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 /* Hero Section */
@@ -256,6 +285,64 @@ letter-spacing: 0.6px;
 margin-bottom: 20px;
 color: #ffffff91;
 }
+.main-sponsors-section {
+    margin-top: 60px;
+    padding: 40px 20px;
+    text-align: center;
+    background: linear-gradient(90deg, #ffffff, #ffffff);
+    border-radius: 25px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 0 30px #cae4575e;
+}
+
+.main-sponsors-title {
+    font-size: 35px;
+    font-family: 'Jura';
+    font-weight: bold;
+    color: #002a43;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.main-sponsor-strip-wrapper {
+    overflow: hidden;
+    height: 100px;
+    position: relative;
+}
+
+.main-sponsor-strip {
+    display: flex;
+    width: max-content;
+    animation: scrollMainSponsors 18s linear infinite;
+}
+
+.main-sponsor-logo {
+    width: 120px;
+    height: 120px;
+    margin-right: 40px;
+    object-fit: contain;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.main-sponsor-logo:hover {
+    filter: grayscale(0%);
+    transform: scale(1.05);
+}
+
+@keyframes scrollMainSponsors {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+
+
 /* Contact Us Section */
 .contact-us {
     padding: 50px 20px;
@@ -747,5 +834,4 @@ color: #ffffff91;
         height: 25px;
         font-size: 12px;
     }
-}
 }
