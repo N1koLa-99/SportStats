@@ -1,5 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
    
+    window.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const formType = params.get("form");
+
+        const loginTab = document.querySelector('[data-tab="login"]');
+        const regTab = document.querySelector('[data-tab="registration"]');
+        const loginForm = document.getElementById("login-form");
+        const regForm = document.getElementById("registration-form");
+
+        if (formType === "signup") {
+            regTab.classList.add("active");
+            loginTab.classList.remove("active");
+            regForm.classList.add("active");
+            loginForm.classList.remove("active");
+        } else {
+            loginTab.classList.add("active");
+            regTab.classList.remove("active");
+            loginForm.classList.add("active");
+            regForm.classList.remove("active");
+        }
+    });
+
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
         const user = JSON.parse(savedUser);
@@ -8,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Пренасочване след кратко време
         setTimeout(() => {
             window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
-        }, 1500);
+        }, 1000);
     
     }
     const yearOfBirthSelect = document.getElementById('yearOfBirth');
