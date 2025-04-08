@@ -59,6 +59,7 @@
                 <div class="line"></div>
                 <span class="value" id="club">Няма данни</span>
             </div>
+            <!-- Sponsor Footer Ad -->
         </div>
 
         <div class="results">
@@ -88,6 +89,117 @@
             <button id="change-club-button">Промени</button>
         </div>
     </div>
+
+    <footer class="sponsor-footer">
+        <h3 class="footer-title">Открий ТОП продукти от нашите спонсори ⤵</h3>
+      
+        <div class="sponsor-cards-container">
+      
+          <!-- Decathlon -->
+          <div class="sponsor-card">
+            <img src="DecatlonLogo.avif" alt="Decathlon" class="card-logo">
+            <h4>Decathlon</h4>
+            <div class="carousel">
+              <div class="carousel-slide active">
+                <img src="Decatlon-Banski.avif" class="card-product-img" alt="Продукт 1">
+                <p>🩱 Подобри плувната си форма с новата серия Nabaiji!</p>
+              </div>
+              <div class="carousel-slide">
+                <img src="Decatlon-Pedals.avif" class="card-product-img" alt="Продукт 2">
+                <p> 🏊 Педалси за тренировки – специално за плувци!</p>
+              </div>
+            </div>
+            <a href="https://www.decathlon.bg" target="_blank" class="cta-button">Разгледай</a>
+          </div>
+      
+          <!-- GymBeam -->
+          <div class="sponsor-card">
+            <img src="GymBeamNoName.webp" alt="GymBeam" class="card-logo">
+            <h4>GymBeam</h4>
+            <div class="carousel">
+              <div class="carousel-slide active">
+                <img src="GymBeam-Protein.webp" class="card-product-img" alt="Whey">
+                <p>💪 Зареди се с енергия – избери Whey Protein!</p>
+              </div>
+              <div class="carousel-slide">
+                <img src="GymBeam-BCAA.webp" class="card-product-img" alt="BCAA">
+                <p>🔋 BCAA за възстановяване след тежки тренировки!</p>
+              </div>
+            </div>
+            <a href="https://gymbeam.bg" target="_blank" class="cta-button">Купи сега</a>
+          </div>
+      
+          <!-- Iced Out -->
+          <div class="sponsor-card">
+            <img src="IcedOutNoName.png" alt="Iced Out" class="card-logo">
+            <h4>Iced Out</h4>
+            <div class="carousel">
+              <div class="carousel-slide active">
+                <img src="IcedOut-Grivna.webp" class="card-product-img" alt="Ring">
+                <p>💎 Стил за шампиони – избери премиум бижута!</p>
+              </div>
+              <div class="carousel-slide">
+                <img src="IcedOut-Gerdan.webp" class="card-product-img" alt="Chain">
+                <p>🔥 Постави акцент с блестяща верижка от Iced Out.</p>
+              </div>
+            </div>
+            <a href="https://icedout.bg" target="_blank" class="cta-button">Грабни го</a>
+          </div>
+      
+          <!-- Arena -->
+          <div class="sponsor-card">
+            <img src="ArenaNoBG.png" alt="Арена" class="card-logo">
+            <h4>Арена</h4>
+            <div class="carousel">
+              <div class="carousel-slide active">
+                <img src="Arena-Cobra.webp" class="card-product-img" alt="Cobra">
+                <p>🏊 Подобри резултата си с <strong>Cobra Ultra Swipe</strong>!</p>
+              </div>
+              <div class="carousel-slide">
+                <img src="arena-Shapka.jpg" class="card-product-img" alt="Swim Cap">
+                <p>🎽 Силиконова шапка за комфорт и скорост.</p>
+              </div>
+            </div>
+            <a href="https://www.arenawaterinstinct.com" target="_blank" class="cta-button">Виж продукта</a>
+          </div>
+      
+          <!-- Proof -->
+          <div class="sponsor-card">
+            <img src="Proof.png" alt="Proof" class="card-logo">
+            <h4>Proof</h4>
+            <div class="carousel">
+              <div class="carousel-slide active">
+                <img src="proof-digital.jpg" class="card-product-img" alt="Digital">
+                <p>🌐 Proof инвестира в бъдещето на спорта – бъди част от него.</p>
+              </div>
+              <div class="carousel-slide">
+                <img src="proof-tech.jpg" class="card-product-img" alt="Tech">
+                <p>📱 Следи своите плувни данни с Proof технологии.</p>
+              </div>
+            </div>
+            <a href="https://proof.bg" target="_blank" class="cta-button">Научи повече</a>
+          </div>
+      
+        </div>
+      </footer>
+      
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const carousels = document.querySelectorAll('.carousel');
+      
+          carousels.forEach(carousel => {
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            let current = 0;
+      
+            setInterval(() => {
+              slides[current].classList.remove('active');
+              current = (current + 1) % slides.length;
+              slides[current].classList.add('active');
+            }, 4000); // сменя се на всеки 4 секунди
+          });
+        });
+      </script>
+            
 
     <script src="HomePageScript.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
