@@ -360,32 +360,73 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
                 : normativeValue - bestResult.valueTime;
         
             console.log(`Норматив (${poolType}): ${normativeValue}, Разлика: ${difference.toFixed(2)}`);
-            return true; // Включваме всички нормативи
+            return true; 
         });
 
         if (relevantNormatives.length > 0) {
             relevantNormatives.forEach(normative => {
                 const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
+                const poolName = poolType === '25m' ? '25м басейн' : '50м басейн';
                 const normativeValue = normative.valueStandart;
                 const difference = isTimeDiscipline 
                     ? bestResult.valueTime - normativeValue 
                     : normativeValue - bestResult.valueTime;
             
-                normativeValueText += `Норматив (${poolType}): ${formatTime(normativeValue)}<br>`;
-                normativeDifferenceText += `Разлика с норматив (${poolType}): ${difference.toFixed(2)} сек<br>`;
+                const isSuccess = difference <= 0;
+                const diffColor = isSuccess ? '#5fae70' : '#d66c6c';       
+                const bgColor = isSuccess ? '#e9f6ec' : '#fce9e9';          
+                const badgeBg = isSuccess ? '#b6e1c1' : '#f2b3b3';  
+                const formattedDifference = difference > 0 
+                 ? `+${difference.toFixed(2)} сек` 
+                 : `${difference.toFixed(2)} сек`;
             
-                const statusColor = difference <= 0 ? '#93ed87' : '#fa8787'; 
-                normativeStatusText += `
-                    <div style="display: inline-block; width: 80px; height: 40px; background-color: ${statusColor}; 
-                    color: black; text-align: center; line-height: 40px; border-radius: 5px; margin-right: -3px; font-weight: bold; margin-left: 14px;">
-                        ${poolType}
-                    </div><br>`;
+                 normativeValueText += `
+                 <div style="
+                     background-color: ${bgColor};
+                     border-radius: 12px;
+                     padding: 20px;
+                     margin-bottom: 24px;
+                     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                     font-family: 'Segoe UI', sans-serif;
+                 ">
+             
+                     <!-- Име на басейна -->
+                     <div style="font-size: 16px; font-weight: 600; color: #444; margin-bottom: 10px;">
+                        <span style="color: #222;">${poolName}</span>
+                     </div>
+             
+                     <!-- Норматив -->
+                     <div style="font-size: 18px; font-weight: 700; color:rgb(29, 29, 29); margin-bottom: 8px;">
+                         Норматив: ${formatTime(normativeValue)}
+                     </div>
+             
+                     <!-- Разлика -->
+                     <div style="font-size: 16px; font-weight: 600; color: ${diffColor}; margin-bottom: 10px;">
+                         Разлика: ${formattedDifference}
+                     </div>
+             
+                     <!-- Статус (покрит/непокрит) -->
+                     <div style="
+                         background-color: ${badgeBg};
+                         color: #111;
+                         font-size: 15px;
+                         font-weight: 700;
+                         padding: 8px 16px;
+                         border-radius: 8px;
+                         display: inline-block;
+                     ">
+                         ${isSuccess ? '✅ Покрит норматив' : '❌ Непокрит норматив'}
+                     </div>
+                 </div>
+             `;
+             
             });
+            
         } else {
             normativeValueText = 'Няма норматив за тази възрастова група и дисциплина.';
         }
     } else {
-        normativeValueText = 'Няма налични нормативи.';
+        normativeValueText = 'Няма налични резултати.';
     }
        
         const chartLabels = results.map(result => new Date(result.resultDate).toLocaleDateString());
@@ -508,13 +549,28 @@ chart = new Chart(ctx, {
                 },
                 callbacks: {
                     label: function(context) {
-                        const value = context.parsed.y;
+                        const index = context.dataIndex;
+                        const result = results[index];
+                        const value = result.valueTime;
+                        const formattedValue = isTimeDiscipline ? formatTime(value) : value;
+                        const formattedDate = new Date(result.resultDate).toLocaleDateString('bg-BG');
+                        const location = result.location || "Няма информация";
+                        const poolLength = result.swimmingPoolStandart + " м";
+                    
                         if (context.dataset.label.includes("Норматив")) {
-                            return `Норматив: ${value}`;
+                            return ` Норматив (${poolLength}): ${formatTime(context.parsed.y)}`;
                         } else {
-                            return isTimeDiscipline ? `Резултат: ${formatTime(value)}` : `Резултат: ${value}`;
+                            return [
+                                ` Дата: ${formattedDate}`,
+                                "",
+                                ` Резултат: ${formattedValue}`,
+                                "",
+                                ` Локация: ${location}`,
+                                "",
+                                ` Басейн: ${poolLength}`
+                            ];
                         }
-                    }
+                    }  
                 }
             }
         },
@@ -594,7 +650,7 @@ chart = new Chart(ctx, {
     
         if (seconds < 1) {
             const millis = Math.round(seconds * 100).toString().padStart(2, '0'); // Форматиране с водеща нула
-            return `${millis} ст`;
+            return `${millis}`;
         }
     
         const hours = Math.floor(seconds / 3600);
@@ -603,10 +659,10 @@ chart = new Chart(ctx, {
         const millis = Math.round((seconds % 1) * 100).toString().padStart(2, '0'); // Форматиране с водеща нула
     
         let timeString = '';
-        if (hours > 0) timeString += `${hours} ч `;
-        if (minutes > 0 || hours > 0) timeString += `${minutes} мин `;
-        if (secs > 0 || minutes > 0 || hours > 0) timeString += `${secs} сек `;
-        if (millis > 0 || (seconds % 1 !== 0)) timeString += `${millis} ст`;
+        if (hours > 0) timeString += `${hours} : `;
+        if (minutes > 0 || hours > 0) timeString += `${minutes} : `;
+        if (secs > 0 || minutes > 0 || hours > 0) timeString += `${secs} : `;
+        if (millis > 0 || (seconds % 1 !== 0)) timeString += `${millis}`;
     
         return timeString.trim();
     }

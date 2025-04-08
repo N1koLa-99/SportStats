@@ -48,7 +48,7 @@
             </table>
         </div>
 
-        <div id="add-result-form">
+        <div id="add-result-form" class="separate-form">
             <h3>Добавяне на резултат</h3>
             <select id="add-discipline">
                 <option value="" disabled selected>Изберете дисциплина</option>
@@ -60,6 +60,20 @@
                 </select>
                 <img id="user-profile-picture" alt="Профилна снимка на потребителя" />
             </div>
+
+
+            <div class="additional-inputs">
+                <label for="pool-location">Място на провеждане:</label>
+                <input type="text" id="pool-location" placeholder="гр. София, плувен басейн Спартак">
+            
+                <label for="pool-size">Размер на басейна:</label>
+                <select id="pool-size">
+                    <option value="" disabled selected>Изберете размер</option>
+                    <option value="25">25 метра</option>
+                    <option value="50">50 метра</option>
+                </select>
+            </div>
+            
             
             <div id="time-input" style="display: none;">
                 <select id="hours">${Array.from({length: 13}, (_, i) => `<option value="${i}"> час </option>`).join('')}</select>

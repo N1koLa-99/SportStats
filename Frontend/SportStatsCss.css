@@ -130,18 +130,24 @@ z-index: 1;
 }
 
 .hero-button {
-font-family: 'Jura', sans-serif;
-font-size: 24px;
-font-weight: bold;
-background-color: #CAE457;
-color: black;
-border: none;
-padding: 10px 30px;
-border-radius: 10px;
-cursor: pointer;
-position: relative;
-z-index: 1;
-margin-bottom: 64px;
+  font-family: 'Jura', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  background-color: #CAE457;
+  color: black;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 64px;
+  box-shadow: 0 0 10px #f0f890, 0 0 20px #f0f890;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.hero-button:hover {
+  box-shadow: 0 0 15px #ffffa0, 0 0 30px #ffffa0;
 }
 
  /* Cards Section */

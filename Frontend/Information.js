@@ -254,20 +254,19 @@ function updateCharts(results) {
     document.getElementById('best-result').textContent = `Най-добрият резултат: ${bestResult} сек`;
 
     const lineCanvas = document.getElementById('lineChart');
-
     if (!lineCanvas) {
         console.error("Грешка: Не е намерено платно за диаграмата.");
         return;
     }
 
     const ctxLine = lineCanvas.getContext('2d');
-
     if (!ctxLine) {
         console.error("Грешка: Неуспешна инициализация на контекста на диаграмата.");
         return;
     }
 
     if (window.myChart) window.myChart.destroy();
+
     window.myChart = new Chart(ctxLine, {
         type: 'line',
         data: {
@@ -275,8 +274,12 @@ function updateCharts(results) {
             datasets: [{
                 label: 'Резултати',
                 data: chartData,
-                borderColor: 'blue',
-                fill: false
+                borderColor: '#007bff',
+                backgroundColor: '#007bff',
+                fill: false,
+                tension: 0.3,
+                pointRadius: 7,
+                pointHoverRadius: 10
             }]
         },
         options: {
@@ -284,17 +287,60 @@ function updateCharts(results) {
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    reverse: true,  
+                    reverse: true,
                     ticks: {
                         beginAtZero: false,
                         min: Math.min(...chartData) - 5,
-                        max: Math.max(...chartData) + 5
+                        max: Math.max(...chartData) + 5,
+                        font: {
+                            size: 18 // още по-големи числа по оста Y
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 18 // още по-големи дати по оста X
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    titleFont: { size: 20, weight: 'bold' },
+                    bodyFont: { size: 18 },
+                    padding: 14,
+                    callbacks: {
+                        title: function (context) {
+                            return `Дата: ${context[0].label}`;
+                        },
+                        label: function (context) {
+                            const index = context.dataIndex;
+                            const result = results[index];
+                            const value = context.formattedValue;
+                            const location = result.location || 'Няма данни';
+                            const pool = result.swimmingPoolStandart || 'Няма данни';
+                            return [
+                                `Резултат: ${value} сек`,
+                                `Локация: ${location}`,
+                                `Басейн: ${pool} м`
+                            ];
+                        }
+                    }
+                },
+                legend: {
+                    labels: {
+                        font: {
+                            size: 18
+                        }
                     }
                 }
             }
         }
     });
 }
+
 
 function displayUserInfo(user) {
     const userInfoContainer = document.getElementById('user-info');

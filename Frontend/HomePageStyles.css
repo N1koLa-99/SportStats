@@ -4,8 +4,6 @@ body {
     height: 100%;
     width: 100%;
 }
-
-
 .container {
     position: relative;
     display: flex;
@@ -188,11 +186,11 @@ body {
 }
 
 #chart-info p {
-    margin: 15px 0;
+    margin: 0px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 110px;
     padding: 10px 15px;
-    border-bottom: 1px solid #ddd;
 }
 
 #chart-info span {
@@ -425,7 +423,7 @@ button.icon-button {
     margin-bottom: 60px;
     color: #0A2A43;
     font-weight: 700;
-    margin-top: -5%;
+    margin-top: -4%;
 }
 
 .sponsor-cards-container {
@@ -563,14 +561,6 @@ button.icon-button {
     opacity: 1;
     position: relative;
 }
-
-
-
-
-
-
-
-
 
 @media (max-width: 1600px) {
     .results h2 {

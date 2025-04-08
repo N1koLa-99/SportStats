@@ -87,34 +87,45 @@ document.addEventListener('DOMContentLoaded', async function () {
         const tbody = usersTable.querySelector('tbody');
         tbody.innerHTML = '';
         console.log('Показване на таблицата с потребители с ID на дисциплината:', disciplineId);
-        
+    
         if (!disciplineId) return;
-        
+    
         users.forEach(user => {
             const userResults = results.filter(result => result.userId === user.id && result.disciplineId == disciplineId);
-            
-            console.log('Потребител:', user.firstName, user.lastName, 'Резултати:', userResults);
-            
+    
             const bestResult = userResults.length > 0
                 ? getBestResult(userResults, disciplineId)
                 : 'Няма резултат';
     
             const resultEntries = userResults
-                .map(result => `
-                    <tr>
-                        <td>${formatResult(result.valueTime, disciplineId)}</td>
-                        <td>${new Date(result.resultDate).toLocaleDateString()}</td>
-                        <td>
-                            <button class="delete-result" data-result-id="${result.id}" title="Изтрий">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>`)
+                .map(result => {
+                    const tooltipText = `Локация: ${result.location || 'Няма данни'}\nРазмер: ${result.swimmingPoolStandart || 'Няма'} м`;
+                    return `
+                        <tr>
+                            <td>
+                                <div class="tooltip-container">
+                                    ${formatResult(result.valueTime, disciplineId)}
+                                    <span class="tooltip-text">${tooltipText}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="tooltip-container">
+                                    ${new Date(result.resultDate).toLocaleDateString()}
+                                    <span class="tooltip-text">${tooltipText}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="delete-result" data-result-id="${result.id}" title="Изтрий">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                })
                 .join('');
     
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${user.firstName}<br>${user.lastName}</td> <!-- Фамилията на нов ред -->
+                <td>${user.firstName}<br>${user.lastName}</td>
                 <td>${user.yearOfBirth ? user.yearOfBirth : 'Няма данни'}</td>
                 <td>${bestResult}</td>
                 <td>
@@ -135,10 +146,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
         });
     }
-    
-    
-    
-    
+
     async function handleCoach() {
         if (!user || user.roleID !== 2) {
             showMessageBox('Няма достъп до тази страница.', true);
@@ -321,16 +329,24 @@ document.addEventListener('DOMContentLoaded', async function () {
             const disciplineId = Number(document.getElementById('add-discipline').value);
             const userId = Number(document.getElementById('add-user').value);
             const isTimeBased = document.getElementById('time-input').style.display === 'block';
-    
+        
+            const poolLocation = document.getElementById('pool-location').value.trim();
+            const poolSize = Number(document.getElementById('pool-size').value);
+        
             let valueTime = isTimeBased 
                 ? calculateTimeValue() 
                 : parseFloat(document.getElementById('decimal-result').value);
-    
+        
             if (isNaN(valueTime) || valueTime < 0 || valueTime > 86400) {
                 showMessageBox('Моля, въведете валиден резултат. Стойността трябва да бъде между 0 и 86400 секунди.');
                 return;
             }
-    
+        
+            if (!poolLocation || isNaN(poolSize)) {
+                showMessageBox('Моля, попълнете място на провеждане и размер на басейна.');
+                return;
+            }
+        
             try {
                 const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results`, {
                     method: 'POST',
@@ -344,16 +360,18 @@ document.addEventListener('DOMContentLoaded', async function () {
                         userId,
                         disciplineId,
                         valueTime,
-                        resultDate: new Date().toISOString()
+                        resultDate: new Date().toISOString(),
+                        swimmingPoolStandart: poolSize,
+                        location: poolLocation
                     })
                 });
-    
+        
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Failed to add result:', { status: response.status, errorText });
                     throw new Error('Неуспешно добавяне на резултата.');
                 }
-    
+        
                 showMessageBox('Резултатът е добавен успешно! Презареди страницата!');
                 await handleRankingUpdate(userId, disciplineId, valueTime);
             } catch (error) {
@@ -361,6 +379,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 showMessageBox('Грешка при добавяне на резултата.', true);
             }
         });
+               
     
         populateRollers();
     }
