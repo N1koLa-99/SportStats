@@ -21,14 +21,21 @@
         </div>
     </div>
 
+    <!-- Бутони за превключване -->
+    <div class="toggle-buttons">
+        <button id="show-results-btn">Покажи резултати</button>
+        <button id="show-add-form-btn">Добави резултат</button>
+    </div>
+
+    <!-- Секция: Резултати -->
     <div class="container">
         <button id="go-home" class="home-button"><i class="fas fa-home"></i></button>
         <h2><br><span id="coach-name"></span></h2>
-        
+
         <select id="discipline">
             <option value="" disabled selected>Изберете дисциплина</option>
         </select>
-        
+
         <form id="search-form">
             <input type="text" id="search-input" placeholder="Име Фамилия..." />
             <button type="submit">Търсене</button>
@@ -48,53 +55,47 @@
             </table>
         </div>
 
-        <div id="add-result-form" class="separate-form">
-            <h3>Добавяне на резултат</h3>
-            <select id="add-discipline">
-                <option value="" disabled selected>Изберете дисциплина</option>
-            </select>
-
-            <div id="add-user-container">
-                <select id="add-user">
-                    <option value="" disabled selected>Изберете състезател</option>
-                </select>
-                <img id="user-profile-picture" alt="Профилна снимка на потребителя" />
-            </div>
-
-
-            <div class="additional-inputs">
-                <label for="pool-location">Място на провеждане:</label>
-                <input type="text" id="pool-location" placeholder="гр. София, плувен басейн Спартак">
-            
-                <label for="pool-size">Размер на басейна:</label>
-                <select id="pool-size">
-                    <option value="" disabled selected>Изберете размер</option>
-                    <option value="25">25 метра</option>
-                    <option value="50">50 метра</option>
-                </select>
-            </div>
-            
-            
-            <div id="time-input" style="display: none;">
-                <select id="hours">${Array.from({length: 13}, (_, i) => `<option value="${i}"> час </option>`).join('')}</select>
-                <select id="minutes">${Array.from({length: 60}, (_, i) => `<option value="${i}"> мин </option>`).join('')}</select>
-                <select id="seconds">${Array.from({length: 60}, (_, i) => `<option value="${i}"> сек </option>`).join('')}</select>
-                <select id="milliseconds">${Array.from({length: 100}, (_, i) => `<option value="${i}"> стот </option>`).join('')}</select>
-            </div>
-
-            <div id="decimal-input" style="display: none;">
-                <label for="decimal-result">Резултат:</label>
-                <input type="number" id="decimal-result" step="0.01">
-            </div>
-        
-            <button id="submit-result">Добави резултат</button>
-        </div>
-
         <a href="Information.html" id="detailed-info-link" style="margin-top:3%;margin-left: 0px; font-weight: bold; display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-align: center; text-decoration: none; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: background-color 0.3s;">
             Подробна информация
         </a>
     </div>
 
+    <!-- Секция: Добавяне на резултат -->
+    <div id="add-result-form" class="separate-form">
+        <h3>Добавяне на резултат</h3>
+        <select id="add-discipline">
+            <option value="" disabled selected>Изберете дисциплина</option>
+        </select>
+
+        <div id="add-user-container">
+            <select id="add-user">
+                <option value="" disabled selected>Изберете състезател</option>
+            </select>
+            <img id="user-profile-picture" alt="Профилна снимка на потребителя" />
+        </div>
+
+        <div class="additional-inputs">
+            <label for="pool-location">Място на провеждане:</label>
+            <input type="text" id="pool-location" placeholder="гр. София, плувен басейн Спартак">
+
+            <label for="pool-size">Размер на басейна:</label>
+            <input type="number" id="pool-size" min="15" max="50" placeholder="15 - 50 метра">
+        </div>
+
+        <div id="time-input" style="display: none;">
+            <select id="hours">${Array.from({length: 13}, (_, i) => `<option value="${i}"> час </option>`).join('')}</select>
+            <select id="minutes">${Array.from({length: 60}, (_, i) => `<option value="${i}"> мин </option>`).join('')}</select>
+            <select id="seconds">${Array.from({length: 60}, (_, i) => `<option value="${i}"> сек </option>`).join('')}</select>
+            <select id="milliseconds">${Array.from({length: 100}, (_, i) => `<option value="${i}"> стот </option>`).join('')}</select>
+        </div>
+
+        <div id="decimal-input" style="display: none;">
+            <label for="decimal-result">Резултат:</label>
+            <input type="number" id="decimal-result" step="0.01">
+        </div>
+
+        <button id="submit-result">Добави</button>
+    </div>
     <script src="CoacherPageScript.js"></script>
 </body>
 </html>

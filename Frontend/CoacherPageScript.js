@@ -67,7 +67,33 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
     
-    
+    const container = document.querySelector('.container');
+    const addForm = document.getElementById('add-result-form');
+    const showResultsBtn = document.getElementById('show-results-btn');
+    const showAddFormBtn = document.getElementById('show-add-form-btn');
+
+    showResultsBtn.addEventListener('click', () => {
+        container.style.display = 'block';
+        addForm.style.display = 'none';
+        showResultsBtn.classList.add('active');
+        showAddFormBtn.classList.remove('active');
+    });
+
+    showAddFormBtn.addEventListener('click', () => {
+        container.style.display = 'none';
+        addForm.style.display = 'block';
+        showAddFormBtn.classList.add('active');
+        showResultsBtn.classList.remove('active');
+    });
+
+    // Начално състояние
+    container.style.display = 'block';
+    addForm.style.display = 'none';
+    showResultsBtn.classList.add('active');
+
+    // Глобално достъпен deleteResult
+    window.deleteResult = deleteResult;
+
 
     function populateDropdown(elementId, items, textProperty, valueProperty) {
         const select = document.getElementById(elementId);
@@ -99,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     
             const resultEntries = userResults
                 .map(result => {
-                    const tooltipText = `Локация: ${result.location || 'Няма данни'}\nРазмер: ${result.swimmingPoolStandart || 'Няма'} м`;
+                    const tooltipText = `Локация: ${result.location || 'Няма данни'}\nДължина на басейна: ${result.swimmingPoolStandart || 'Няма'} м`;
                     return `
                         <tr>
                             <td>
@@ -342,8 +368,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 return;
             }
         
-            if (!poolLocation || isNaN(poolSize)) {
-                showMessageBox('Моля, попълнете място на провеждане и размер на басейна.');
+            if (!poolLocation || isNaN(poolSize) || poolSize < 15 || poolSize > 50) {
+                showMessageBox('Моля, попълнете място на провеждане и размер на басейна между 15 и 50 метра.');
                 return;
             }
         
@@ -379,8 +405,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 showMessageBox('Грешка при добавяне на резултата.', true);
             }
         });
-               
-    
         populateRollers();
     }
     
@@ -455,3 +479,4 @@ document.addEventListener('DOMContentLoaded', async function () {
     await setupAddResultForm();
     await handleCoach();
 });
+

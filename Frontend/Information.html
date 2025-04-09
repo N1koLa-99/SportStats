@@ -50,6 +50,26 @@
         </div>
     </div>
 
+
+    <div class="filters-row">
+        <label for="pool-select">Басейн: </label>
+        <select id="pool-select">
+          <option value="all">Всички</option>
+          <option value="25">25 м</option>
+          <option value="50">50 м</option>
+        </select>
+      
+        <label for="sort-select" style="margin-left: 1rem;">Сортирай по: </label>
+        <select id="sort-select">
+          <option value="date-desc">Дата (по-нови първо)</option>
+          <option value="date-asc">Дата (по-стари първо)</option>
+          <option value="time-asc">Най-добро време</option>
+          <option value="time-desc">Най-лошо време</option>
+        </select>
+      </div>
+
+      
+      
     <div id="best-result" class="best-result"></div>
 
     <div id="results-container"></div>

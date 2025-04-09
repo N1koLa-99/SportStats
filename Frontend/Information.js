@@ -2,13 +2,11 @@ async function fetchJson(url) {
     const response = await fetch(url);
     return response.json();
 }
-
 async function hashUserData(user) {
     const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}${user.statusID}`;
     const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
     return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }
-
 async function loadUser() {
     try {
         let storedUser = localStorage.getItem('user');
@@ -42,7 +40,6 @@ async function loadUser() {
         console.error('Грешка при зареждане на потребителя:', error);
     }
 }
-
 function populateDropdown(elementId, items, textProperty, valueProperty) {
     const select = document.getElementById(elementId);
     if (select) {
@@ -55,11 +52,8 @@ function populateDropdown(elementId, items, textProperty, valueProperty) {
         });
     }
 }
-
-
 async function handleCoach(user) {
     try {
-
         const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
         populateDropdown('discipline', disciplines, 'disciplineName', 'id');
 
@@ -106,12 +100,76 @@ async function handleCoach(user) {
         document.getElementById('discipline').addEventListener('change', fetchAndDisplayResults);
         document.getElementById('athlete-select').addEventListener('change', fetchAndDisplayResults);
 
+        document.getElementById('sort-select').addEventListener('change', async () => {
+            const selectedUserId = Number(document.getElementById('athlete-select').value);
+            const disciplineId = Number(document.getElementById('discipline').value);
+
+            if (!selectedUserId || !disciplineId) return;
+
+            const selectedUser = clubUsers.find(u => u.id === selectedUserId);
+            if (!selectedUser) return;
+
+            const currentYear = new Date().getFullYear();
+            const yearOfBirth = currentYear - selectedUser.age;
+
+            try {
+                const res = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}`, {
+                    headers: { 'Requester-Id': user.id }
+                });
+                const results = await res.json();
+
+                fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, results, selectedUser);
+                updateCharts(results);
+            } catch (error) {
+                console.error("Грешка при сортиране:", error);
+                showMessageBox("Грешка при сортиране!", true);
+            }
+        });
+
+        // 🔽 Нов eventListener за филтър по басейн
+        document.getElementById('pool-select').addEventListener('change', async () => {
+            const selectedUserId = Number(document.getElementById('athlete-select').value);
+            const disciplineId = Number(document.getElementById('discipline').value);
+
+            if (!selectedUserId || !disciplineId) return;
+
+            const selectedUser = clubUsers.find(u => u.id === selectedUserId);
+            if (!selectedUser) return;
+
+            const currentYear = new Date().getFullYear();
+            const yearOfBirth = currentYear - selectedUser.age;
+
+            try {
+                const res = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}`, {
+                    headers: { 'Requester-Id': user.id }
+                });
+                const results = await res.json();
+
+                fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, results, selectedUser);
+                updateCharts(results);
+            } catch (error) {
+                console.error("Грешка при филтър по басейн:", error);
+                showMessageBox("Грешка при филтриране по басейн!", true);
+            }
+        });
+
+        // 🔍 Нов eventListener за търсене по име
+        document.getElementById('search-input').addEventListener('input', () => {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            const filteredUsers = clubUsers.filter(u => {
+                const fullName = `${u.firstName} ${u.lastName}`.toLowerCase();
+                return fullName.includes(searchTerm);
+            });
+
+            populateDropdown('athlete-select', filteredUsers, u => `${u.firstName} ${u.lastName}`, 'id');
+        });
+
     } catch (error) {
         console.error('Грешка при зареждане на данните:', error);
         showMessageBox("Грешка при зареждане на данните!", true);
     }
 }
-
 
 function resetResults() {
 
@@ -124,54 +182,121 @@ function resetResults() {
 function displayResults(disciplineId, yearOfBirth, gender, results, normatives) {
     const resultsContainer = document.getElementById('results-container');
     const normativesContainer = document.getElementById('normatives-container');
+    const sortSelect = document.getElementById('sort-select');
+    const poolSelect = document.getElementById('pool-select');
 
-    if (!resultsContainer) {
-        console.error('Грешка: Не може да се намери контейнера за резултати.');
-        return;
+    if (!resultsContainer || !normativesContainer) return;
+
+    // 📌 Филтрация по избран тип басейн
+    const selectedPool = poolSelect ? poolSelect.value : 'all';
+    let filteredResults = [...results];
+    if (selectedPool === '25' || selectedPool === '50') {
+        filteredResults = filteredResults.filter(r => r.swimmingPoolStandart === Number(selectedPool));
     }
 
-    if (!normativesContainer) {
-        console.error('Грешка: Не може да се намери контейнера за нормативи.');
-        return;
+    // 🔃 Сортиране според избора
+    const sortOption = sortSelect ? sortSelect.value : 'date-desc';
+    const sortedResults = [...filteredResults];
+
+    switch (sortOption) {
+        case 'date-asc':
+            sortedResults.sort((a, b) => new Date(a.resultDate) - new Date(b.resultDate));
+            break;
+        case 'date-desc':
+            sortedResults.sort((a, b) => new Date(b.resultDate) - new Date(a.resultDate));
+            break;
+        case 'time-asc':
+            sortedResults.sort((a, b) => a.valueTime - b.valueTime);
+            break;
+        case 'time-desc':
+            sortedResults.sort((a, b) => b.valueTime - a.valueTime);
+            break;
     }
 
+    // 🧹 Изчистване на предишното съдържание
     resultsContainer.innerHTML = '';
     normativesContainer.innerHTML = '';
 
-    let bestResult = null;
-    if (results.length > 0) {
-        bestResult = Math.min(...results.map(result => result.valueTime));
-        resultsContainer.innerHTML = `Най-добрият резултат: ${formatTime(bestResult)} сек`;
-    } else {
+    if (sortedResults.length === 0) {
         resultsContainer.innerHTML = 'Няма налични резултати за този атлет.';
+        normativesContainer.innerHTML = 'Няма нормативи за сравнение.';
+        return;
     }
 
-    if (normatives.length > 0) {
-        const list = document.createElement('ul');
-        normatives.forEach(normative => {
-            const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
-            const genderText = normative.gender === 'M' ? 'Мъже' : 'Жени'; 
-            const formattedTime = formatTime(normative.valueStandart);
+    const list = document.createElement('ul');
 
-            const timeDifference = bestResult - normative.valueStandart;
+    sortedResults.forEach(result => {
+        const poolType = result.swimmingPoolStandart;
+        const resultTime = result.valueTime;
+        const formattedResultTime = formatTime(resultTime);
+        const resultDate = new Date(result.resultDate).toLocaleDateString();
+        const location = result.location || 'Няма данни';
 
-            const isNormativeCovered = timeDifference <= 0;
-            const resultText = isNormativeCovered
-                ? `Нормативът е покрит! Разлика: ${formatTime(Math.abs(timeDifference))} сек.`
-                : `Нормативът не е покрит! Разлика: ${formatTime(Math.abs(timeDifference))} сек.`;
+        // 📌 Намиране на съответните нормативи
+        let matchingNormatives = [];
+        if (poolType === 25) {
+            matchingNormatives = normatives.filter(n => n.swimmingPoolStandartId === 1);
+        } else if (poolType === 50) {
+            matchingNormatives = normatives.filter(n => n.swimmingPoolStandartId === 1 || n.swimmingPoolStandartId === 2);
+        }
 
-            const resultTextColor = isNormativeCovered ? 'green' : 'red';
+        // 🖋️ Създаване на HTML за резултата
+        const resultItem = document.createElement('li');
+        resultItem.innerHTML = `
+            <strong>${poolType} м басейн - ${resultDate}</strong><br>
+            Резултат: ${formattedResultTime} сек<br>
+            Локация: ${location}
+        `;
 
-            const item = document.createElement('li');
-            item.innerHTML = `${genderText} - ${normative.minYearOfBorn} до ${normative.maxYearOfBorn} години, норматив: ${formattedTime} сек (${poolType}) <br> <span style="color: ${resultTextColor};">${resultText}</span>`;
-            list.appendChild(item);
-        });
-        normativesContainer.appendChild(list);
-    } else {
-        normativesContainer.innerHTML = 'Няма налични нормативи за тази възрастова група и дисциплина.';
-    }
+        if (matchingNormatives.length === 0) {
+            resultItem.innerHTML += `<br>ℹ️ Без съпоставяне с норматив`;
+        } else {
+            const normList = document.createElement('ul');
+
+            matchingNormatives.forEach(norm => {
+                const normativeTime = norm.valueStandart;
+                const timeDiff = resultTime - normativeTime;
+                const isCovered = timeDiff <= 0;
+
+                const formattedNorm = formatTime(normativeTime);
+                const poolLabel = norm.swimmingPoolStandartId === 1 ? '25 м' : '50 м';
+                const diffText = formatTime(Math.abs(timeDiff));
+                const statusText = isCovered
+                    ? `✅ Покрит норматив (${poolLabel}) - разлика: ${diffText} сек`
+                    : `❌ Не е покрит норматив (${poolLabel}) - разлика: ${diffText} сек`;
+                const color = isCovered ? 'green' : 'red';
+
+                const normItem = document.createElement('li');
+                normItem.innerHTML = `<span style="color:${color}">${statusText}</span>`;
+                normList.appendChild(normItem);
+            });
+
+            resultItem.appendChild(normList);
+        }
+
+        list.appendChild(resultItem);
+    });
+
+    normativesContainer.appendChild(list);
 }
 
+function filterNormativesByPool(result, normatives) {
+    if (!result.swimmingPoolStandart) return [];
+
+    const pool = parseInt(result.swimmingPoolStandart);
+
+    return normatives.filter(normative => {
+        const normativePool = parseInt(normative.swimmingPoolStandart);
+
+        if (pool === 50) {
+            return normativePool === 50 || normativePool === 25;
+        } else if (pool === 25) {
+            return normativePool === 25;
+        }
+
+        return false;
+    });
+}
 function fetchNormativesAndCompare(disciplineId, yearOfBirth, userGender, results, selectedUser) {
     fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`)
     .then(response => {
@@ -227,7 +352,6 @@ function displayNormativesInHTML(normatives) {
         container.innerHTML = 'Няма налични нормативи за тази възрастова група и дисциплина.';
     }
 }
-
 function formatTime(time) {
     const minutes = Math.floor(time / 60);
     const seconds = (time % 60).toFixed(2); 
@@ -239,8 +363,6 @@ function formatTime(time) {
 
     return `${formattedMinutes}:${formattedSeconds}`;
 }
-
-
 function updateCharts(results) {
     if (!results || results.length === 0) {
         console.warn("Няма данни за диаграмата.");
@@ -293,14 +415,14 @@ function updateCharts(results) {
                         min: Math.min(...chartData) - 5,
                         max: Math.max(...chartData) + 5,
                         font: {
-                            size: 18 // още по-големи числа по оста Y
+                            size: 14 // още по-големи числа по оста Y
                         }
                     }
                 },
                 x: {
                     ticks: {
                         font: {
-                            size: 18 // още по-големи дати по оста X
+                            size: 14 // още по-големи дати по оста X
                         }
                     }
                 }
@@ -308,8 +430,8 @@ function updateCharts(results) {
             plugins: {
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                    titleFont: { size: 20, weight: 'bold' },
-                    bodyFont: { size: 18 },
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 14 },
                     padding: 14,
                     callbacks: {
                         title: function (context) {
@@ -332,7 +454,7 @@ function updateCharts(results) {
                 legend: {
                     labels: {
                         font: {
-                            size: 18
+                            size: 14
                         }
                     }
                 }
@@ -340,8 +462,6 @@ function updateCharts(results) {
         }
     });
 }
-
-
 function displayUserInfo(user) {
     const userInfoContainer = document.getElementById('user-info');
     const profilePicture = document.getElementById('profile-picture');
@@ -356,7 +476,27 @@ function displayUserInfo(user) {
 
     userBirthDate.textContent = `Година на раждане: ${user.yearOfBirth}`;
 }
+document.getElementById('sort-select').addEventListener('change', () => {
+    const selectedUserId = Number(document.getElementById('athlete-select').value);
+    const disciplineId = Number(document.getElementById('discipline').value);
 
+    // ⛔ Ако не е избран състезател или дисциплина – не правим нищо
+    if (!selectedUserId || !disciplineId || !clubUsers || !user) return;
+
+    const selectedUser = clubUsers.find(u => u.id === selectedUserId);
+    if (!selectedUser) return;
+
+    const currentYear = new Date().getFullYear();
+    const yearOfBirth = currentYear - selectedUser.age;
+
+    fetch(`https://sportstatsapi.azurewebsites.net/api/Results/by-user/${selectedUserId}/by-discipline/${disciplineId}`, {
+        headers: { 'Requester-Id': user.id }
+    })
+    .then(res => res.json())
+    .then(results => {
+        fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, results, selectedUser);
+    });
+});
 document.addEventListener('DOMContentLoaded', function () {
     const lineCanvas = document.getElementById('lineChart');
     if (!lineCanvas) {
@@ -366,3 +506,4 @@ document.addEventListener('DOMContentLoaded', function () {
     
     loadUser(); 
 });
+document.getElementById('pool-select').addEventListener('change', fetchAndDisplayResults);

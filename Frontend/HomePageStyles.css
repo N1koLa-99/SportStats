@@ -10,7 +10,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0px;
-    min-height: 90vh; /* Вместо height: 100vh; */
+    min-height: 100vh; /* Вместо height: 100vh; */
     width: 100vw;
     background: 
         linear-gradient(
@@ -188,9 +188,8 @@ body {
 #chart-info p {
     margin: 0px;
     display: flex;
-    justify-content: center;
-    gap: 110px;
-    padding: 10px 15px;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 #chart-info span {
@@ -577,7 +576,7 @@ button.icon-button {
         width: 90%;
         max-width: 523px;
         position: absolute;
-        right: 61px;
+        right: 90px;
         margin-right: 104px;
         margin-top: 7px;
         overflow: hidden;
@@ -632,7 +631,7 @@ button.icon-button {
     }
     #chart-info p {
         margin: 4px 0;
-        line-height: 27px;
+        line-height: 22px;
     }
     .info {
         max-width: 234px;
@@ -721,7 +720,7 @@ button.icon-button {
         justify-content: flex-start;
         align-items: center;
         padding: 0px;
-        padding-bottom: 100%;
+        padding-bottom: 6%;
         width: 100vw;
         
         /* Задава мащабиране на изображението, така че да покрие целия контейнер */
@@ -810,13 +809,14 @@ button.icon-button {
         margin-top: 10%;
         font-family: 'Jura';
     }
-
+  
     .results {
         max-width: 100%;
         padding: 13px;
         max-width: 380px;
         margin-top: 50%;
         margin-right: -9%;
+        right: 60px;
         background: rgba(255, 255, 255, 0);
     }
 
@@ -830,15 +830,14 @@ button.icon-button {
         
     }
     #chart-info p {
-        margin: 20px 0;
         display: flex;
         justify-content: space-between;
-        padding: 18px 16px;
-        border-bottom: 1px solid #ddd;
+        padding: 9px 16px;
         margin-top: -10px;
         margin-right: -10px;
         font-size: 15px;
         line-height: 25px;
+        flex-direction: column-reverse;
     }
 
     #chart-info span {
@@ -979,6 +978,13 @@ button.icon-button {
         background-color: #003ba891;
         cursor: pointer;
     }
+    .footer-title {
+        font-size: 14px;
+        margin-bottom: 60px;
+        color: #0A2A43;
+        font-weight: 700;
+        margin-top: -20%;
+    }
     
 }
 
@@ -1022,6 +1028,13 @@ button.icon-button {
     .results {
         margin-top: 56%;
         margin-right: -44px;
+    }
+    .footer-title {
+        font-size: 14px;
+        margin-bottom: 60px;
+        color: #0A2A43;
+        font-weight: 700;
+        margin-top: -20%;
     }
 }
 

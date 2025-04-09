@@ -94,6 +94,7 @@ tbody tr:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     width: 90%;
     max-width: 1200px;
+    margin-top: 20px;
 }
 
 /* Скролираща таблица */
@@ -317,7 +318,7 @@ tbody tr:hover {
     }
 }
 .separate-form {
-    margin-top: 100px; /* по-надолу от другите секции */
+    margin-top: 20px; /* по-надолу от другите секции */
     padding: 35px 30px;
     background: linear-gradient(145deg, #f0f4ff, #ffffff);
     border-radius: 18px;
@@ -427,6 +428,46 @@ tbody tr:hover {
     visibility: visible;
     opacity: 1;
 }
+.toggle-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 0 10px;
+}
+
+.toggle-buttons button {
+    flex: 1;
+    min-width: 45%;
+    padding: 12px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    white-space: nowrap;
+}
+
+.toggle-buttons button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Активен бутон */
+.toggle-buttons button.active {
+    background-color: #f07a05;
+}
+
+/* Скриване на формата по подразбиране */
+#add-result-form {
+    display: none;
+}
+
 
 
 @media (max-width: 450px) {
@@ -583,6 +624,15 @@ tbody tr:hover {
         width: 0;
         border-radius: 3px;
         animation: progressBar 2s linear forwards;
+    }
+    .toggle-buttons {
+        gap: 8px;
+        margin-top: 14%;
+    }
+
+    .toggle-buttons button {
+        font-size: 13px;
+        padding: 10px 8px;
     }
     
     

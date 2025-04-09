@@ -88,19 +88,13 @@ h2 {
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    width: 100%;
+    width: 90%;
     max-width: 1200px;
-    height: 600px;
+    height: 500px;
     display: flex;
     flex-direction: column;
     align-items: center;
     transition: transform 0.3s ease;
-}
-
-/* Стил за канваса */
-canvas {
-    width: 100% !important;
-    height: 100% !important;
 }
 
 /* Стил за падащите менюта */
@@ -292,6 +286,27 @@ select:hover {
     transform: scale(1.05); /* Леко уголемяване при hover */
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* По-силни сенки */
 }
+.sort-controls {
+    margin: 20px 0;
+    font-size: 16px;
+}
+.filters-row {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.5rem;
+    align-items: center;
+    padding-bottom: 0.5rem;
+  }
+  
+  /* По желание: да не се чупят select-ите */
+  .filters-row select {
+    white-space: nowrap;
+    max-width: 140px;
+    font-size: 14px;
+  }
+  
+
 @media (max-width: 450px) {
     #main-container {
         flex-direction: column; /* Подреждаме елементите вертикално */
@@ -341,7 +356,7 @@ select:hover {
         background: #ffffff;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        padding: 75px;
+        padding: 0px;
         width: 100%;
         max-width: 1200px;
         height: 270px;
@@ -358,6 +373,42 @@ select:hover {
     }
 
     #normatives-container li {
+        font-size: 10px;
+    }
+    body {
+        overflow-x: hidden;
+    }
+    #normatives-container li {
+        background: #ffffff;
+        margin: 10px 0;
+        padding: 4px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        color: #495057;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: flex ;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    label {
+        font-weight: bold;
+        color: #03111f;
+        margin-bottom: 5px;
         font-size: 12px;
+    }
+    .filters-row select {
+        /* white-space: nowrap; */
+        max-width: 105px;
+        font-size: 12px;
+    }
+    .filters-row {
+        display: flex
+    ;
+        flex-wrap: nowrap;
+        /* overflow-x: auto; */
+        gap: 0PX;
+        align-items: center;
+        padding-bottom: 0.5rem;
     }
 }

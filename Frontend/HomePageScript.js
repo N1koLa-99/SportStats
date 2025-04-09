@@ -283,12 +283,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error('Грешка при извличане на резултатите:', error);
             displayNoResults();
         });
-    }
-    
-    
-    
-
-    
+    }  
     
 function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender, results) {
     fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`)
@@ -373,7 +368,7 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
                     : normativeValue - bestResult.valueTime;
             
                 const isSuccess = difference <= 0;
-                const diffColor = isSuccess ? '#5fae70' : '#d66c6c';       
+                const diffColor = isSuccess ? '#198330' : '#bd1818';       
                 const bgColor = isSuccess ? '#e9f6ec' : '#fce9e9';          
                 const badgeBg = isSuccess ? '#b6e1c1' : '#f2b3b3';  
                 const formattedDifference = difference > 0 
@@ -383,43 +378,55 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
                  normativeValueText += `
                  <div style="
                      background-color: ${bgColor};
-                     border-radius: 12px;
-                     padding: 20px;
-                     margin-bottom: 24px;
-                     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                     border-radius: 8px;
+                     padding: 12px;
+                     margin-bottom: 16px;
+                     margin-right: 20px;
                      font-family: 'Segoe UI', sans-serif;
+                     display: flex;
+                     flex-direction: column;
+                     gap: 8px;
+                     font-size: 13px;
+                     max-width: 100%;
+                     box-sizing: border-box;
+                     border: 1px solid #eee;
                  ">
              
-                     <!-- Име на басейна -->
-                     <div style="font-size: 16px; font-weight: 600; color: #444; margin-bottom: 10px;">
-                        <span style="color: #222;">${poolName}</span>
+                     <div style="
+                         font-weight: 600;
+                         color: #1f1f1f;
+                         font-size: 15px;
+                         overflow: hidden;
+                         text-overflow: ellipsis;
+                         white-space: nowrap;
+                     ">
+                         ${poolName}
                      </div>
              
-                     <!-- Норматив -->
-                     <div style="font-size: 18px; font-weight: 700; color:rgb(29, 29, 29); margin-bottom: 8px;">
-                         Норматив: ${formatTime(normativeValue)}
+                     <div style="
+                         color: #333;
+                     ">
+                         <strong>Норматив БФПС:</strong> <br> ${formatTime(normativeValue)}
                      </div>
              
-                     <!-- Разлика -->
-                     <div style="font-size: 16px; font-weight: 600; color: ${diffColor}; margin-bottom: 10px;">
-                         Разлика: ${formattedDifference}
+                     <div style="
+                         color: ${diffColor};
+                     ">
+                         <strong>Разлика:</strong> ${formattedDifference}
                      </div>
              
-                     <!-- Статус (покрит/непокрит) -->
                      <div style="
                          background-color: ${badgeBg};
-                         color: #111;
-                         font-size: 15px;
-                         font-weight: 700;
-                         padding: 8px 16px;
-                         border-radius: 8px;
+                         color: #000;
+                         font-weight: 600;
+                         padding: 4px 8px;
+                         border-radius: 4px;
                          display: inline-block;
                      ">
                          ${isSuccess ? '✅ Покрит норматив' : '❌ Непокрит норматив'}
                      </div>
                  </div>
-             `;
-             
+             `; 
             });
             
         } else {
@@ -660,9 +667,9 @@ chart = new Chart(ctx, {
     
         let timeString = '';
         if (hours > 0) timeString += `${hours} : `;
-        if (minutes > 0 || hours > 0) timeString += `${minutes} : `;
-        if (secs > 0 || minutes > 0 || hours > 0) timeString += `${secs} : `;
-        if (millis > 0 || (seconds % 1 !== 0)) timeString += `${millis}`;
+        if (minutes > 0 || hours > 0) timeString += `${minutes}мин `;
+        if (secs > 0 || minutes > 0 || hours > 0) timeString += `${secs}сек `;
+        if (millis > 0 || (seconds % 1 !== 0)) timeString += `${millis}ст `;
     
         return timeString.trim();
     }
