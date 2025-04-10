@@ -837,7 +837,7 @@ button.icon-button {
         margin-right: -10px;
         font-size: 15px;
         line-height: 25px;
-        flex-direction: column-reverse;
+        flex-direction: column;
     }
 
     #chart-info span {
