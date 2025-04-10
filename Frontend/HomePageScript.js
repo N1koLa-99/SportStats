@@ -315,329 +315,281 @@ function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender,
             displayResults(disciplineId, yearOfBirth, userGender, results, []); // Празен списък при грешка
         });
 } 
+
+function mapPoolLengthToId(length) {
+    if (length === 25) return 1;
+    if (length === 50) return 2;
+    return 0;
+}
     
 function displayResults(disciplineId, yearOfBirth, userGender, results, normatives) {
     console.log('Резултати:', results);
     console.log('Нормативи:', normatives);
 
-    const latestResult = results.reduce((latest, result) => 
+    results = results.map(result => ({
+        ...result,
+        swimmingPoolStandartId: mapPoolLengthToId(result.swimmingPoolStandart),
+    }));
+
+    const timeDisciplines = Array.from({ length: 18 }, (_, i) => i + 1);
+    const isTimeDiscipline = timeDisciplines.includes(disciplineId);
+
+    const latestResult = results.reduce((latest, result) =>
         new Date(result.resultDate) > new Date(latest.resultDate) ? result : latest, results[0]
     );
 
-    let bestResult;
-    let normativeDifferenceText = '';
-    let normativeValueText = '';
-    let normativeStatusText = '';
-    let relevantNormatives = []; // Declare relevantNormatives here
-
-    const timeDisciplines = Array.from({ length: 18 }, (_, i) => i + 1); // Нов списък на времеви дисциплини
-    const isTimeDiscipline = timeDisciplines.includes(disciplineId); // Проверка дали е времева дисциплина
-
     function findBestResult(results, isTimeDiscipline) {
         return results.reduce((best, result) => {
-            if (isTimeDiscipline) {
-                return result.valueTime < best.valueTime ? result : best;
-            } else {
-                return result.valueTime > best.valueTime ? result : best;
-            }
+            return isTimeDiscipline
+                ? result.valueTime < best.valueTime ? result : best
+                : result.valueTime > best.valueTime ? result : best;
         }, results[0]);
     }
 
-    bestResult = findBestResult(results, isTimeDiscipline);
+    const normative25 = normatives.find(n => n.swimmingPoolStandartId === 1);
+    const normative50 = normatives.find(n => n.swimmingPoolStandartId === 2);
 
-    if (normatives.length > 0) {
-        console.log('Търсене на нормативи за:', { yearOfBirth, userGender, disciplineId });
-        relevantNormatives = normatives.filter(normative => {
-            const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
-            const normativeValue = normative.valueStandart;
-            const difference = isTimeDiscipline 
-                ? bestResult.valueTime - normativeValue 
-                : normativeValue - bestResult.valueTime;
-        
-            console.log(`Норматив (${poolType}): ${normativeValue}, Разлика: ${difference.toFixed(2)}`);
-            return true; 
-        });
+    function compareToNormative(normative, poolLabel, resultOverride = null) {
+        const poolId = normative.swimmingPoolStandartId;
+        const resultToUse = resultOverride || findBestResult(
+            results.filter(r => r.swimmingPoolStandartId === poolId),
+            isTimeDiscipline
+        );
 
-        if (relevantNormatives.length > 0) {
-            relevantNormatives.forEach(normative => {
-                const poolType = normative.swimmingPoolStandartId === 1 ? '25m' : '50m';
-                const poolName = poolType === '25m' ? '25м басейн' : '50м басейн';
-                const normativeValue = normative.valueStandart;
-                const difference = isTimeDiscipline 
-                    ? bestResult.valueTime - normativeValue 
-                    : normativeValue - bestResult.valueTime;
-            
-                const isSuccess = difference <= 0;
-                const diffColor = isSuccess ? '#198330' : '#bd1818';       
-                const bgColor = isSuccess ? '#e9f6ec' : '#fce9e9';          
-                const badgeBg = isSuccess ? '#b6e1c1' : '#f2b3b3';  
-                const formattedDifference = difference > 0 
-                 ? `+${difference.toFixed(2)} сек` 
-                 : `${difference.toFixed(2)} сек`;
-            
-                 normativeValueText += `
-                 <div style="
-                     background-color: ${bgColor};
-                     border-radius: 8px;
-                     padding: 12px;
-                     margin-bottom: 16px;
-                     margin-right: 20px;
-                     font-family: 'Segoe UI', sans-serif;
-                     display: flex;
-                     flex-direction: column;
-                     gap: 8px;
-                     font-size: 13px;
-                     max-width: 100%;
-                     box-sizing: border-box;
-                     border: 1px solid #eee;
-                 ">
-             
-                     <div style="
-                         font-weight: 600;
-                         color: #1f1f1f;
-                         font-size: 15px;
-                         overflow: hidden;
-                         text-overflow: ellipsis;
-                         white-space: nowrap;
-                     ">
-                         ${poolName}
-                     </div>
-             
-                     <div style="
-                         color: #333;
-                     ">
-                         <strong>Норматив БФПС:</strong> <br> ${formatTime(normativeValue)}
-                     </div>
-             
-                     <div style="
-                         color: ${diffColor};
-                     ">
-                         <strong>Разлика:</strong> ${formattedDifference}
-                     </div>
-             
-                     <div style="
-                         background-color: ${badgeBg};
-                         color: #000;
-                         font-weight: 600;
-                         padding: 4px 8px;
-                         border-radius: 4px;
-                         display: inline-block;
-                     ">
-                         ${isSuccess ? '✅ Покрит норматив' : '❌ Непокрит норматив'}
-                     </div>
-                 </div>
-             `; 
-            });
-            
+        if (!resultToUse) {
+            return `
+            <div style="border: 1px solid #eee; padding: 12px; margin-bottom: 16px; border-radius: 8px; background-color: #f9f9f9;">
+                <div style="font-weight: 600;">${poolLabel}</div>
+                <div>Няма резултати за сравнение с този норматив.</div>
+            </div>`;
+        }
+
+        const diff = isTimeDiscipline
+            ? resultToUse.valueTime - normative.valueStandart
+            : normative.valueStandart - resultToUse.valueTime;
+
+        const isSuccess = diff <= 0;
+        const formattedDiff = diff > 0 ? `+${diff.toFixed(2)} сек` : `${diff.toFixed(2)} сек`;
+
+        return `
+        <div style="
+            background-color: ${isSuccess ? '#e9f6ec' : '#fce9e9'};
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            margin-right: 20px;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 13px;
+            max-width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #eee;
+        ">
+            <div style="font-weight: 600; color: #1f1f1f; font-size: 15px;">
+                ${poolLabel}
+            </div>
+            <div><strong>Норматив БФПС:</strong><br> ${formatTime(normative.valueStandart)}</div>
+            <div style="color: ${isSuccess ? '#198330' : '#bd1818'};">
+                <strong>Разлика:</strong> ${formattedDiff}
+            </div>
+            <div style="
+                background-color: ${isSuccess ? '#b6e1c1' : '#f2b3b3'};
+                color: #000;
+                font-weight: 600;
+                padding: 4px 8px;
+                border-radius: 4px;
+                display: inline-block;
+            ">
+                ${isSuccess ? '✅ Покрит норматив' : '❌ Непокрит норматив'}
+            </div>
+        </div>`;
+    }
+
+    const bestOverall = findBestResult(results, isTimeDiscipline);
+
+    let normativeValueText = '';
+
+    if (normative25) {
+        // 25м норматив може да бъде покрит и от 50м резултат
+        const candidate = findBestResult(results.filter(r =>
+            [1, 2].includes(r.swimmingPoolStandartId) &&
+            r.valueTime <= normative25.valueStandart
+        ), isTimeDiscipline);
+
+        if (candidate) {
+            normativeValueText += compareToNormative(normative25, '25м басейн', candidate);
         } else {
-            normativeValueText = 'Няма норматив за тази възрастова група и дисциплина.';
+            normativeValueText += compareToNormative(normative25, '25м басейн');
         }
-    } else {
-        normativeValueText = 'Няма налични резултати.';
     }
-       
-        const chartLabels = results.map(result => new Date(result.resultDate).toLocaleDateString());
-        const chartData = results.map(result => result.valueTime);
 
-        let normative25m = null, normative50m = null;
-        let chartNormative25m = [], chartNormative50m = [];
+    if (normative50) {
+        const best50 = results.find(r => r.swimmingPoolStandartId === 2);
+        if (best50) {
+            normativeValueText += compareToNormative(normative50, '50м басейн');
+        } else {
+            normativeValueText += `
+            <div style="border: 1px solid #eee; padding: 12px; margin-bottom: 16px; border-radius: 8px; background-color: #f9f9f9;">
+                <div style="font-weight: 600;">50м басейн</div>
+                <div>Няма резултати за сравнение с този норматив.</div>
+            </div>`;
+        }
+    }
 
-        relevantNormatives.forEach(normative => {
-            if (normative.swimmingPoolStandartId === 1) {
-                normative25m = normative.valueStandart;
-            } else if (normative.swimmingPoolStandartId === 2) {
-                normative50m = normative.valueStandart;
+    if (!normative25 && !normative50) {
+        normativeValueText = 'Няма норматив за тази възрастова група и дисциплина.';
+    }
+
+    const chartLabels = results.map(result => new Date(result.resultDate).toLocaleDateString());
+    const chartData = results.map(result => result.valueTime);
+    const chartNormative25m = chartLabels.map(() => normative25?.valueStandart ?? null);
+    const chartNormative50m = chartLabels.map(() => normative50?.valueStandart ?? null);
+
+    const ctx = document.getElementById('resultsChart')?.getContext('2d');
+    if (ctx) {
+        if (chart) chart.destroy();
+
+        const latestDataCount = 8;
+        const latestLabels = chartLabels.slice(-latestDataCount);
+        const latestChartData = chartData.slice(-latestDataCount);
+        const latestChartNormative25m = chartNormative25m.slice(-latestDataCount);
+        const latestChartNormative50m = chartNormative50m.slice(-latestDataCount);
+
+        const gradientLine1 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientLine1.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+        gradientLine1.addColorStop(1, 'rgba(75, 192, 192, 0.4)');
+
+        const gradientLine2 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientLine2.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
+        gradientLine2.addColorStop(1, 'rgba(255, 99, 132, 0.4)');
+
+        const gradientLine3 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientLine3.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+        gradientLine3.addColorStop(1, 'rgba(54, 162, 235, 0.4)');
+
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: latestLabels,
+                datasets: [
+                    {
+                        label: 'Резултати',
+                        data: latestChartData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: gradientLine1,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                        pointHoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        pointStyle: 'rectRounded',
+                    },
+                    {
+                        label: 'Норматив 25m',
+                        data: latestChartNormative25m,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: gradientLine2,
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                    },
+                    {
+                        label: 'Норматив 50m',
+                        data: latestChartNormative50m,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: gradientLine3,
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'nearest', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { family: 'Arial', size: 14 },
+                            padding: 20,
+                            boxWidth: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { weight: 'bold', size: 14 },
+                        bodyFont: { size: 12 },
+                        callbacks: {
+                            label: function(context) {
+                                const index = context.dataIndex;
+                                const result = results[index];
+                                const value = result.valueTime;
+                                const formattedValue = isTimeDiscipline ? formatTime(value) : value;
+                                const formattedDate = new Date(result.resultDate).toLocaleDateString('bg-BG');
+                                const location = result.location || "Няма информация";
+                                const poolLength = result.swimmingPoolStandart + " м";
+
+                                if (context.dataset.label.includes("Норматив")) {
+                                    return ` Норматив (${poolLength}): ${formatTime(context.parsed.y)}`;
+                                } else {
+                                    return [
+                                        ` Дата: ${formattedDate}`,
+                                        "",
+                                        ` Резултат: ${formattedValue}`,
+                                        "",
+                                        ` Локация: ${location}`,
+                                        "",
+                                        ` Басейн: ${poolLength}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false },
+                    y: {
+                        title: {
+                            display: true,
+                            text: getUnitForDiscipline(disciplineId),
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        beginAtZero: !isTimeDiscipline,
+                        reverse: isTimeDiscipline,
+                        ticks: { stepSize: 0.10 },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutElastic',
+                }
             }
         });
-
-        chartNormative25m = chartLabels.map(() => normative25m ? normative25m : null);
-        chartNormative50m = chartLabels.map(() => normative50m ? normative50m : null);        
-        
-        const ctx = document.getElementById('resultsChart')?.getContext('2d');
-          if (ctx) {
-         if (chart) {
-                 chart.destroy();
-        }
-
-    // Ограничаваме данните до последните 8 елемента
-const latestDataCount = 8;
-
-const latestLabels = chartLabels.slice(-latestDataCount);
-const latestChartData = chartData.slice(-latestDataCount);
-const latestChartNormative25m = chartNormative25m.slice(-latestDataCount);
-const latestChartNormative50m = chartNormative50m.slice(-latestDataCount);
-
-// Създаване на градиенти
-const gradientLine1 = ctx.createLinearGradient(0, 0, 0, 400);
-gradientLine1.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
-gradientLine1.addColorStop(1, 'rgba(75, 192, 192, 0.4)');
-
-const gradientLine2 = ctx.createLinearGradient(0, 0, 0, 400);
-gradientLine2.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
-gradientLine2.addColorStop(1, 'rgba(255, 99, 132, 0.4)');
-
-const gradientLine3 = ctx.createLinearGradient(0, 0, 0, 400);
-gradientLine3.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
-gradientLine3.addColorStop(1, 'rgba(54, 162, 235, 0.4)');
-
-// Създаване на графиката с последните 8 резултата
-chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: latestLabels, // Използваме само последните 8 етикета
-        datasets: [
-            {
-                label: 'Резултати',
-                data: latestChartData,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: gradientLine1,
-                borderWidth: 2,
-                tension: 0.4,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                pointHoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
-                pointStyle: 'rectRounded', // по-забавни точки
-            },
-            {
-                label: 'Норматив 25m',
-                data: latestChartNormative25m,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: gradientLine2,
-                borderWidth: 2,
-                borderDash: [5, 5],
-                pointRadius: 0,
-                pointHoverRadius: 8,
-                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                pointHoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
-            },
-            {
-                label: 'Норматив 50m',
-                data: latestChartNormative50m,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: gradientLine3,
-                borderWidth: 2,
-                borderDash: [5, 5],
-                pointRadius: 0,
-                pointHoverRadius: 8,
-                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                pointHoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            mode: 'nearest',
-            intersect: false,
-        },
-        plugins: {
-            legend: {
-                position: 'top',
-                labels: {
-                    font: {
-                        family: 'Arial',
-                        size: 14,
-                        weight: 'normal',
-                    },
-                    padding: 20,
-                    boxWidth: 20
-                }
-            },
-            tooltip: {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                titleFont: {
-                    weight: 'bold',
-                    size: 14
-                },
-                bodyFont: {
-                    size: 12
-                },
-                callbacks: {
-                    label: function(context) {
-                        const index = context.dataIndex;
-                        const result = results[index];
-                        const value = result.valueTime;
-                        const formattedValue = isTimeDiscipline ? formatTime(value) : value;
-                        const formattedDate = new Date(result.resultDate).toLocaleDateString('bg-BG');
-                        const location = result.location || "Няма информация";
-                        const poolLength = result.swimmingPoolStandart + " м";
-                    
-                        if (context.dataset.label.includes("Норматив")) {
-                            return ` Норматив (${poolLength}): ${formatTime(context.parsed.y)}`;
-                        } else {
-                            return [
-                                ` Дата: ${formattedDate}`,
-                                "",
-                                ` Резултат: ${formattedValue}`,
-                                "",
-                                ` Локация: ${location}`,
-                                "",
-                                ` Басейн: ${poolLength}`
-                            ];
-                        }
-                    }  
-                }
-            }
-        },
-        scales: {
-            x: {
-                display: false, // Скриване на етикетите по x-оста
-                title: {
-                    display: true,
-                    text: 'Дата',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                },
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.1)',
-                    lineWidth: 1
-                }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: getUnitForDiscipline(disciplineId),
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                },
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.1)',
-                    lineWidth: 1
-                },
-                beginAtZero: !isTimeDiscipline,
-                reverse: isTimeDiscipline,
-                ticks: {
-                    stepSize: 0.10,  // Увеличете стъпката за да разширите разстоянията
-                }
-            }
-        },
-        animation: {
-            duration: 1000,
-            easing: 'easeInOutElastic',
-        }
     }
-});   
-    }
-     
-        document.getElementById('best-result').textContent = bestResult 
-            ? `Най-добър резултат: ${formatTime(bestResult.valueTime)}` 
-            : 'Няма налични резултати.';
-        
-        document.getElementById('latest-result').textContent = latestResult 
-            ? `Последен резултат: ${formatTime(latestResult.valueTime)}` 
-            : 'Няма налични резултати.';
-        
-        document.getElementById('normative-difference').innerHTML = normativeDifferenceText;
-        
-        document.getElementById('normative-value').innerHTML = normativeValueText + 
-            (normativeStatusText ? normativeStatusText : '');
-    }    
+
+    document.getElementById('best-result').textContent = bestOverall 
+        ? `Най-добър резултат: ${formatTime(bestOverall.valueTime)}` 
+        : 'Няма налични резултати.';
+
+    document.getElementById('latest-result').textContent = latestResult 
+        ? `Последен резултат: ${formatTime(latestResult.valueTime)}` 
+        : 'Няма налични резултати.';
+
+    document.getElementById('normative-difference').innerHTML = '';
+    document.getElementById('normative-value').innerHTML = normativeValueText;
+}
+
+
+
     
     const disciplineSelect = document.getElementById("discipline");
     const chartContainer = document.getElementById("chart-container");
