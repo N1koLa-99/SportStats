@@ -662,6 +662,16 @@ tbody tr:hover {
     #milliseconds-label {
         margin-right: 93px;
     }
+    select, input {
+        margin-right: 5px;
+    }
+    #time-input select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 45px;
+        height: 45px;
+    }
 }
 @media (max-width: 375px) {
     #hours-label {

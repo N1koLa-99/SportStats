@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    let chart;
+    let chart = null;
     const userJson = localStorage.getItem('user');
     const savedHash = localStorage.getItem('userHash');
 
@@ -56,8 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     setInterval(checkUserStatus, 10000);
     checkUserStatus();
 
-    function renderUserInterface(user) {
-        if (user.statusID === 1 || user.statusID === 3) {
+function renderUserInterface(user) {
+ if (user.statusID === 1 || user.statusID === 3) {
             document.body.innerHTML = `
                 <div class="status-container" style="text-align: center; padding: 30px; background-color: white; border-radius: 15px; width: 50%; margin: 50px auto; box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); font-family: Arial, sans-serif;">
                     <img src="https://sportstats.blob.core.windows.net/$web/SportStats.png" alt="SportStats Logo" style="width: 150px; margin-bottom: 20px;">
@@ -71,8 +71,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     }
-    
-
     async function loadClubs() {
         try {
             const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Clubs');
@@ -106,8 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Неуспешно зареждане на клубовете.");
         }
     }
-
-    async function changeUserClub(userId, newClubId) {
+ async function changeUserClub(userId, newClubId) {
         try {
             const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/users/${userId}/requestJoin/${newClubId}`, {
                 method: 'POST',
@@ -129,9 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Възникна грешка при смяната на клуба.");
         }
     }
-
     renderUserInterface(user);
-
     if (user) {
         document.getElementById('first-name').textContent = user.firstName || 'Няма данни';
         document.getElementById('last-name').textContent = user.lastName || 'Няма данни';
@@ -204,8 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('profile-picture').alt = 'Профилната снимка не е налична';
         }
     }
-
-    function fetchDisciplinesByClubId(clubId) {
+function fetchDisciplinesByClubId(clubId) {
         fetch(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${clubId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
@@ -217,9 +211,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             .catch(error => {
                 console.error('Грешка при извличане на дисциплините на клуба:', error);
             });
-    }
+}
 
-    function populateDisciplineDropdown(disciplines) {
+function populateDisciplineDropdown(disciplines) {
         const disciplineSelect = document.getElementById('discipline');
         disciplineSelect.innerHTML = '<option value="" disabled selected>Дисциплина</option>';
         disciplines.forEach(discipline => {
@@ -228,10 +222,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             option.textContent = discipline.disciplineName || `Дисциплина ${discipline.id} (Без име)`;
             disciplineSelect.appendChild(option);
         });
-    }
+}
     console.log('Потребителски данни:', user);
 
-    function fetchResults(disciplineId, userId) {
+function fetchResults(disciplineId, userId) {
         const user = JSON.parse(localStorage.getItem('user'));
         
         if (!disciplineId || !userId) {
@@ -255,7 +249,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('best-result').textContent = NO_RESULTS_MESSAGE;
             document.getElementById('latest-result').textContent = NO_RESULTS_MESSAGE;
             document.getElementById('normative-difference').textContent = '';
+            document.getElementById('normative-value').innerHTML = '';
+        
+            const chartCanvas = document.getElementById('resultsChart');
+            if (chartCanvas && chart) {
+                chart.destroy();
+            }
         }
+        
     
         document.getElementById('best-result').textContent = 'Зареждане...';
         document.getElementById('latest-result').textContent = 'Зареждане...';
@@ -283,7 +284,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error('Грешка при извличане на резултатите:', error);
             displayNoResults();
         });
-    }  
+}  
     
 function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender, results) {
     fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`)
@@ -586,11 +587,7 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
 
     document.getElementById('normative-difference').innerHTML = '';
     document.getElementById('normative-value').innerHTML = normativeValueText;
-}
-
-
-
-    
+} 
     const disciplineSelect = document.getElementById("discipline");
     const chartContainer = document.getElementById("chart-container");
 
@@ -602,7 +599,7 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
         }
     });
 
-    function formatTime(seconds) {
+function formatTime(seconds) {
         if (seconds === undefined || seconds === null || isNaN(seconds)) {
             return 'Неизвестна стойност';
         }
@@ -624,10 +621,9 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
         if (millis > 0 || (seconds % 1 !== 0)) timeString += `${millis}ст `;
     
         return timeString.trim();
-    }
-    
+}
 
-    function getUnitForDiscipline(disciplineId) {
+function getUnitForDiscipline(disciplineId) {
         // Определяне на единицата за дисциплината
         if ([1, ...Array.from({ length: 20 }, (_, i) => i + 44)].includes(disciplineId)) {
             return 'време';
@@ -636,5 +632,5 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
         } else {
             return '';
         }
-    }
+}
 });
