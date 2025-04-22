@@ -9,6 +9,12 @@ body {
     flex-direction: column;
     min-height: 100vh;
     color: #333;
+    background: 
+    linear-gradient(
+        rgba(0, 0, 0, 0.651),
+        rgba(0, 0, 0, 0.658)
+    ),
+    url('markus-spiske-OAg9u5E1ju0-unsplash.jpg')round
 }
 h2 {
     color: #6499d6; /* Светло синьо */
@@ -343,7 +349,7 @@ tbody tr:hover {
 .separate-form select,
 .separate-form input[type="text"],
 .separate-form input[type="number"] {
-    width: 100%;
+    width: 94%;
     padding: 12px 14px;
     margin-bottom: 20px;
     border: 1px solid #ccd4e0;
@@ -470,7 +476,7 @@ tbody tr:hover {
 
 
 
-@media (max-width: 450px) {
+@media (max-width: 450px) {    
     .container {
         padding: 15px;
         margin-bottom: 10%;
@@ -552,6 +558,12 @@ tbody tr:hover {
         padding: 0;
         display: flex;
         justify-content: normal;
+        background: 
+        linear-gradient(
+            rgba(0, 0, 0, 0.651),
+            rgba(0, 0, 0, 0.658)
+        ),
+        url('mihaly-koles-lW_kamfcwCA-unsplash.jpg')round
     }
 
     #search-form{
