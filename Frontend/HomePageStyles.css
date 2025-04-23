@@ -932,7 +932,7 @@ button.icon-button {
     #coach-button {
         position: fixed;
         top: 3%;
-        right: 43%;
+        right: 41.5%;
         z-index: 1000;
     }
     .icon-label {
@@ -1060,7 +1060,7 @@ button.icon-button {
     }
     .container{
         padding: 0px;
-        padding-bottom: 110%;
+        padding-bottom: 200%;
     }
 
     #status-button, .status-button {
