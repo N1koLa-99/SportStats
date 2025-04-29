@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         genderInput.parentNode.insertBefore(genderError, genderInput.nextSibling);
         clubInput.parentNode.insertBefore(clubError, clubInput.nextSibling);
     
-        const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|bg|org|net|info|edu|gov|biz|co\.uk)$/i;
         const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
         const namePattern = /^[A-Za-zА-Яа-я]+$/;
     
