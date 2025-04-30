@@ -146,7 +146,7 @@ function setupProfileEditing(user) {
 }
 
 async function saveProfileChanges(user) {
-    const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|bg|org|net|info|edu|gov|biz|co\.uk)$/i;
     const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
     const namePattern = /^[A-Za-zА-Яа-я]+$/;
     const yearOfBirthPattern = /^(?:[1-9][0-9]{3})$/;

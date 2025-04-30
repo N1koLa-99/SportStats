@@ -13,7 +13,7 @@ body {
     width: 90%;
     max-width: 1260px;
     height: 75px;
-    background: rgba(255, 255, 255, 100);
+    background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -56,14 +56,28 @@ body {
 }
 
 .signup {
-    background: #D4EC5B;
+    background-color: #D4EC5B;
     color: black;
-}
+    transition: box-shadow 0.1s ease-in-out, transform 0.2s ease;
+  }
+  
+  .signup:hover {
+    box-shadow: 0 0 15px #e8f77a, 0 0 30px #e8f77a;
+    transform: scale(1.05);
+  }
+  
+  .login {
+    background-color: #57C0E8;
+    color: black;
+    transition: box-shadow 0.1s ease-in-out, transform 0.2s ease;
+  }
+  
+  .login:hover {
+    box-shadow: 0 0 15px #78d4f0, 0 0 30px #78d4f0;
+    transform: scale(1.05);
+  }
+  
 
-.login {
-    background: #57C0E8;
-    color: black;
-}
 .sponsor-strip-wrapper {
     width: 50%;
     overflow: hidden;
