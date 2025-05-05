@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
         registrationForm.addEventListener('submit', async function (event) {
             event.preventDefault();
             let formIsValid = true;
-    
+        
             // Email validation
             if (!emailPattern.test(emailInput.value)) {
                 showError(emailError, emailInput, 'Моля, въведете валиден имейл адрес.');
@@ -123,27 +123,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     formIsValid = false;
                 }
             }
-    
-            validateField(passwordInput, passwordError, passwordPattern, 'Паролата трябва да съдържа поне 8 символа, една главна буква и цифра.', formIsValid);
-            validateField(firstNameInput, firstNameError, namePattern, 'Трябва да съдържа само букви.', formIsValid);
-            validateField(lastNameInput, lastNameError, namePattern, 'Трябва да съдържа само букви.', formIsValid);
-    
+        
+            // Допълнителна валидация на полета
+            formIsValid = validateField(passwordInput, passwordError, passwordPattern, 'Паролата трябва да съдържа поне 8 символа, една главна буква и цифра.') && formIsValid;
+            formIsValid = validateField(firstNameInput, firstNameError, namePattern, 'Трябва да съдържа само букви.') && formIsValid;
+            formIsValid = validateField(lastNameInput, lastNameError, namePattern, 'Трябва да съдържа само букви.') && formIsValid;
+
+        
             if (!genderInput.value) {
                 showError(genderError, genderInput, 'Моля, изберете пол.');
                 formIsValid = false;
             } else {
                 hideError(genderError, genderInput);
             }
-    
+        
             if (!clubInput.value) {
                 showError(clubError, clubInput, 'Моля, изберете отбор.');
                 formIsValid = false;
             } else {
                 hideError(clubError, clubInput);
             }
-    
+        
             if (!formIsValid) return;
-    
+        
             const formData = new FormData(registrationForm);
             const user = {
                 firstName: formData.get('firstName'),
@@ -157,24 +159,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 yearOfBirth: parseInt(formData.get('yearOfBirth'), 10),
                 statusID: 1
             };
-    
+        
             try {
                 const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(user),
                 });
-    
+        
                 if (!response.ok) {
                     throw new Error('Грешка при изпращане на данните: ' + response.statusText);
                 }
-    
+        
                 const newUser = await response.json();
                 localStorage.setItem('user', JSON.stringify(newUser.user));
                 localStorage.setItem('userHash', newUser.userTokenHash);
-    
+        
                 await sendApprovalRequest(newUser.user);
-    
+        
                 showMessageBox('Потребителят е регистриран успешно!', 'success');
                 registrationForm.reset();
                 window.location.href = "HomePage.html";
@@ -182,8 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Грешка:', error);
                 showMessageBox('Възникна грешка при регистрацията.', 'error');
             }
-        });
-    
+        });   
         async function checkEmailAvailability(email) {
             try {
                 const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/check-email?email=${email}`);
@@ -212,15 +213,16 @@ document.addEventListener('DOMContentLoaded', function() {
             inputElement.classList.remove('error');
         }
     
-        function validateField(input, errorElement, pattern, message, formIsValid) {
+        function validateField(input, errorElement, pattern, message) {
             if (!pattern.test(input.value)) {
                 showError(errorElement, input, message);
                 return false;
             } else {
                 hideError(errorElement, input);
-                return formIsValid;
+                return true;
             }
         }
+        
     
         function createErrorElement(id) {
             const errorElement = document.createElement('div');
