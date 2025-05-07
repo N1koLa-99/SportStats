@@ -1,0 +1,72 @@
+/* Основен стил за страницата */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f6fa;
+    margin: 0;
+    padding: 2em;
+    color: #2c3e50;
+  }
+  
+  h1, h2 {
+    color: #34495e;
+  }
+  
+  /* Контейнер за съдържанието */
+  .invitation-container {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  /* Секция */
+  .section {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1.5em;
+    margin-bottom: 1.5em;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Скриване на елементи */
+  .hidden {
+    display: none;
+  }
+  
+  /* Списък със състезатели */
+  #swimmersList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  #swimmersList li {
+    padding: 0.5em 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  #swimmersList li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Грешки */
+  .error {
+    color: #e74c3c;
+    background: #ffe6e6;
+    border: 1px solid #e0b4b4;
+  }
+  
+  /* Файл бутон */
+  .upload-section label {
+    display: inline-block;
+    margin-right: 1em;
+    font-weight: bold;
+  }
+  
+  .upload-section input[type="file"] {
+    padding: 0.5em;
+  }
+  
+  /* Подчертаване на информация */
+  strong {
+    color: #2980b9;
+  }
+  

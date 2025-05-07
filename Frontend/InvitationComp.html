@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <title>LENEX Покана</title>
+  <link rel="stylesheet" href="InvitationComp.css">
+</head>
+<body>
+  <main class="invitation-container">
+    <h1>Зареждане на LENEX покана (.zip)</h1>
+
+    <section class="section upload-section">
+      <label for="fileInput">📁 Избери файл:</label>
+      <input type="file" id="fileInput" accept=".zip" />
+    </section>
+
+    <section id="meetInfo" class="section hidden">
+      <!-- Тук ще се покажат името на състезанието, град, басейн и сесии -->
+    </section>
+
+    <section id="eligibleSwimmers" class="section hidden">
+      <h2>Състезатели от клуба, отговарящи на изискванията:</h2>
+      <ul id="swimmersList">
+        <!-- Списък с подходящи състезатели -->
+      </ul>
+    </section>
+
+    <section id="errorSection" class="section error hidden">
+      <!-- Грешки при зареждане на файл или парсване -->
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="InvitationComp.js"></script>
+</body>
+</html>
