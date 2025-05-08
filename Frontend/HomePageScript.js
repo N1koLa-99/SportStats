@@ -694,6 +694,4 @@ function formatDifference(diff, unit) {
     const sign = diff > 0 ? '+' : '';
     return `${sign}${diff.toFixed(2)} ${unit}`;
 }
-
-
 });

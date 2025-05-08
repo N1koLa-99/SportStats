@@ -547,58 +547,51 @@ button.icon-button {
     opacity: 1;
     position: relative;
 }
+.UserTableSction {
+    background-size: cover;
+    background-position: center;
+    padding: 40px;
+    border-radius: 10px;
+    background-color: #172e39;
+    font-family: 'Segoe UI', sans-serif;
+}
+
 .user-results-section {
-    margin: 40px auto;
-    padding: 30px;
-    max-width: 900px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: rgba(0, 0, 0, 0.6); /* Полупрозрачен черен фон */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .user-results-section h3 {
     text-align: center;
-    color: #333;
-    font-size: 24px;
     margin-bottom: 20px;
+    font-size: 24px;
+    color: #f8f8f8;
 }
 
 .results-table {
     width: 100%;
     border-collapse: collapse;
-}
-
-.results-table thead {
-    background-color: #f9a825;
+    background-color: rgba(255, 255, 255, 0.1); /* Леко прозрачен бял фон */
     color: #fff;
 }
 
-.results-table th, 
-.results-table td {
-    padding: 12px 16px;
+.results-table th, .results-table td {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 12px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
 }
 
-.results-table tbody tr:hover {
-    background-color: #f1f1f1;
+.results-table th {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+    color: #e0e0e0;
 }
 
-.results-table button {
-    padding: 6px 12px;
-    background-color: #ff9800;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
+.results-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
 }
-
-.results-table button:hover {
-    background-color: #fb8c00;
-}
-
 
 @media (max-width: 1600px) {
     .results h2 {
