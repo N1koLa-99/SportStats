@@ -10,8 +10,7 @@
 </head>
 <body>
     <div class="header"></div>
-    <div class="container">
-       
+    <div class="container"> 
         <a href="Settings.html" class="settings-button">
             <img src="settings.png" alt="Settings" class="button-image">
             <span class="icon-label">Настройки</span>
@@ -80,7 +79,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div id="change-club-section" class="hidden">
             <label for="club-select">Смени клуба:</label>
             <select id="club-select">
@@ -89,6 +88,20 @@
             <button id="change-club-button">Промени</button>
         </div>
     </div>
+    
+    <div class="user-results-section">
+      <h3>Най-добри резултати по дисциплина</h3>
+      <table id="users-table" class="results-table">
+          <thead>
+              <tr>
+                  <th>Име</th>
+                  <th>Година на раждане</th>
+                  <th>Най-добър резултат</th>
+              </tr>
+          </thead>
+          <tbody></tbody>
+      </table>
+  </div>
  <!--
     <footer class="sponsor-footer">
         <h3 class="footer-title">Открий ТОП продукти от нашите спонсори ⤵</h3>

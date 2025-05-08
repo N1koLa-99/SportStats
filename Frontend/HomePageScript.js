@@ -7,9 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         redirectToIndex("Невалидни данни. Пренасочване към началната страница.");
         return;
     }
-
-    const user = JSON.parse(userJson);
-    
+    const user = JSON.parse(userJson);  
     async function hashUserData(user) {
         const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}${user.statusID}`;
         const encoder = new TextEncoder();
@@ -17,7 +15,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         return btoa(String.fromCharCode(...new Uint8Array(buffer)));
     }
-
     try {
         const currentHash = await hashUserData(user);
         if (currentHash !== savedHash) {
@@ -30,13 +27,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Грешка при хеширането:", error);
         redirectToIndex("Възникна грешка. Пренасочване...");
     }
-
     function redirectToIndex(message) {
         alert(message);
         localStorage.clear();
         window.location.href = "Index.html";
     }
-
     async function checkUserStatus() {
         try {
             const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${user.id}`);
@@ -52,8 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Грешка при проверка на статуса:", error);
         }
     }
-
-    setInterval(checkUserStatus, 10000);
+    setInterval(checkUserStatus, 8000);
     checkUserStatus();
 
 function renderUserInterface(user) {
@@ -199,7 +193,11 @@ function renderUserInterface(user) {
             document.getElementById('profile-picture').alt = 'Профилната снимка не е налична';
         }
     }
-function fetchDisciplinesByClubId(clubId) {
+    
+    let currentClubId = null;
+    function fetchDisciplinesByClubId(clubId) {
+        currentClubId = clubId; // <-- запазваме го глобално
+    
         fetch(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${clubId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
@@ -211,19 +209,36 @@ function fetchDisciplinesByClubId(clubId) {
             .catch(error => {
                 console.error('Грешка при извличане на дисциплините на клуба:', error);
             });
-}
+    }
+    
+    
+    let disciplineSelectInitialized = false;
 
 function populateDisciplineDropdown(disciplines) {
-        const disciplineSelect = document.getElementById('discipline');
-        disciplineSelect.innerHTML = '<option value="" disabled selected>Дисциплина</option>';
-        disciplines.forEach(discipline => {
-            const option = document.createElement('option');
-            option.value = discipline.id;
-            option.textContent = discipline.disciplineName || `Дисциплина ${discipline.id} (Без име)`;
-            disciplineSelect.appendChild(option);
+    const disciplineSelect = document.getElementById('discipline');
+    disciplineSelect.innerHTML = '<option value="" disabled selected>Дисциплина</option>';
+
+    disciplines.forEach(discipline => {
+        const option = document.createElement('option');
+        option.value = discipline.id;
+        option.textContent = discipline.disciplineName || `Дисциплина ${discipline.id} (Без име)`;
+        disciplineSelect.appendChild(option);
+    });
+
+    if (!disciplineSelectInitialized) {
+        disciplineSelect.addEventListener('change', function () {
+            const selectedDisciplineId = this.value;
+            if (currentClubId && selectedDisciplineId) {
+                fetchBestResultsByDisciplineInClub(currentClubId, selectedDisciplineId);
+            }
         });
+        disciplineSelectInitialized = true;
+    }
 }
-    console.log('Потребителски данни:', user);
+
+
+    
+    
 
 function fetchResults(disciplineId, userId) {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -316,13 +331,49 @@ function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender,
             displayResults(disciplineId, yearOfBirth, userGender, results, []); // Празен списък при грешка
         });
 } 
-
 function mapPoolLengthToId(length) {
     if (length === 25) return 1;
     if (length === 50) return 2;
     return 0;
 }
-    
+function fetchBestResultsByDisciplineInClub(clubId, disciplineId) {
+    fetch(`https://localhost:7198/api/results/by-club/${clubId}/by-discipline/${disciplineId}`)
+        .then(response => {
+            if (!response.ok) throw new Error("Грешка при извличане на резултатите");
+            return response.json();
+        })
+        .then(results => {
+            const tbody = document.querySelector("#users-table tbody");
+            tbody.innerHTML = ""; // Изчистваме таблицата
+
+            if (!results || results.length === 0) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td colspan="4" style="text-align:center;">Няма налични резултати за тази дисциплина.</td>`;
+                tbody.appendChild(row);
+                return;
+            }
+
+            const unit = getUnitForDiscipline(Number(disciplineId));
+
+            results.forEach(result => {
+                const displayValue = formatResultValue(result.valueTime, unit);
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${result.userFirstName} ${result.userLastName}</td>
+                    <td>${result.userYearOfBirth}</td>
+                    <td>${displayValue}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error("Грешка при зареждане на резултатите:", error);
+        });
+}
+
+
+
 function displayResults(disciplineId, yearOfBirth, userGender, results, normatives) {
     console.log('Резултати:', results);
     console.log('Нормативи:', normatives);
@@ -370,8 +421,7 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
             : normative.valueStandart - resultToUse.valueTime;
 
         const isSuccess = diff <= 0;
-        const formattedDiff = diff > 0 ? `+${diff.toFixed(2)} сек` : `${diff.toFixed(2)} сек`;
-
+        const formattedDiff = formatDifference(diff, getUnitForDiscipline(disciplineId));
         return `
         <div style="
             background-color: ${isSuccess ? '#e9f6ec' : '#fce9e9'};
@@ -530,7 +580,7 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
                                 const index = context.dataIndex;
                                 const result = results[index];
                                 const value = result.valueTime;
-                                const formattedValue = isTimeDiscipline ? formatTime(value) : value;
+                                const formattedValue = isTimeDiscipline ? formatTime(value) : `${value} ${getUnitForDiscipline(disciplineId)}`;
                                 const formattedDate = new Date(result.resultDate).toLocaleDateString('bg-BG');
                                 const location = result.location || "Няма информация";
                                 const poolLength = result.swimmingPoolStandart + " м";
@@ -578,12 +628,13 @@ function displayResults(disciplineId, yearOfBirth, userGender, results, normativ
     }
 
     document.getElementById('best-result').textContent = bestOverall 
-        ? `Най-добър резултат: ${formatTime(bestOverall.valueTime)}` 
-        : 'Няма налични резултати.';
+    ? `Най-добър резултат: ${formatResultValue(bestOverall.valueTime, getUnitForDiscipline(disciplineId))}` 
+    : 'Няма налични резултати.';
 
     document.getElementById('latest-result').textContent = latestResult 
-        ? `Последен резултат: ${formatTime(latestResult.valueTime)}` 
-        : 'Няма налични резултати.';
+    ? `Последен резултат: ${formatResultValue(latestResult.valueTime, getUnitForDiscipline(disciplineId))}` 
+    : 'Няма налични резултати.';
+
 
     document.getElementById('normative-difference').innerHTML = '';
     document.getElementById('normative-value').innerHTML = normativeValueText;
@@ -624,13 +675,25 @@ function formatTime(seconds) {
 }
 
 function getUnitForDiscipline(disciplineId) {
-        // Определяне на единицата за дисциплината
-        if ([1, ...Array.from({ length: 20 }, (_, i) => i + 44)].includes(disciplineId)) {
-            return 'време';
-        } else if ([2, ...Array.from({ length: 6 }, (_, i) => i + 33)].includes(disciplineId)) {
-            return 'метра';
-        } else {
-            return '';
-        }
+    if (disciplineId >= 1 && disciplineId <= 18) {
+        return 'време';
+    } else {
+        return 'метра';
+    }
 }
+function formatResultValue(value, unit) {
+    if (unit === 'време') {
+        return formatTime(value); // Предполага се, че имаш твоя `formatTime()`
+    } else if (unit === 'метра') {
+        return `${Number(value).toFixed(2)} м`; // Две цифри след десетичната запетая
+    } else {
+        return value;
+    }
+}
+function formatDifference(diff, unit) {
+    const sign = diff > 0 ? '+' : '';
+    return `${sign}${diff.toFixed(2)} ${unit}`;
+}
+
+
 });
