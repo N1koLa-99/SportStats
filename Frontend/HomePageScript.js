@@ -336,6 +336,7 @@ function mapPoolLengthToId(length) {
     if (length === 50) return 2;
     return 0;
 }
+
 function fetchBestResultsByDisciplineInClub(clubId, disciplineId) {
     fetch(`https://localhost:7198/api/results/by-club/${clubId}/by-discipline/${disciplineId}`)
         .then(response => {
@@ -355,12 +356,30 @@ function fetchBestResultsByDisciplineInClub(clubId, disciplineId) {
 
             const unit = getUnitForDiscipline(Number(disciplineId));
 
-            results.forEach(result => {
+            results.forEach((result, index) => {
                 const displayValue = formatResultValue(result.valueTime, unit);
+                let medalIcon = "";
+                let rowClass = "";
+
+                switch (index) {
+                    case 0:
+                        medalIcon = "🥇";
+                        rowClass = "first-place";
+                        break;
+                    case 1:
+                        medalIcon = "🥈";
+                        rowClass = "second-place";
+                        break;
+                    case 2:
+                        medalIcon = "🥉";
+                        rowClass = "third-place";
+                        break;
+                }
 
                 const row = document.createElement("tr");
+                row.className = rowClass;
                 row.innerHTML = `
-                    <td>${result.userFirstName} ${result.userLastName}</td>
+                    <td>${medalIcon} ${result.userFirstName} ${result.userLastName}</td>
                     <td>${result.userYearOfBirth}</td>
                     <td>${displayValue}</td>
                 `;
@@ -371,7 +390,6 @@ function fetchBestResultsByDisciplineInClub(clubId, disciplineId) {
             console.error("Грешка при зареждане на резултатите:", error);
         });
 }
-
 
 
 function displayResults(disciplineId, yearOfBirth, userGender, results, normatives) {
@@ -691,7 +709,12 @@ function formatResultValue(value, unit) {
     }
 }
 function formatDifference(diff, unit) {
-    const sign = diff > 0 ? '+' : '';
-    return `${sign}${diff.toFixed(2)} ${unit}`;
+    const sign = diff > 0 ? '+' : '-';
+    if (unit === 'време') {
+        return `${sign}${formatTime(Math.abs(diff))}`;
+    } else {
+        return `${sign}${diff.toFixed(2)} м`;
+    }
 }
+
 });

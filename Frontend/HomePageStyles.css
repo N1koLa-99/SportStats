@@ -547,17 +547,41 @@ button.icon-button {
     opacity: 1;
     position: relative;
 }
-.UserTableSction {
+.tables-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 40px;
+}
+
+.UserTableSection {
+    flex: 1;
+    max-width: 55%;
     background-size: cover;
     background-position: center;
-    padding: 40px;
     border-radius: 10px;
     background-color: #172e39;
     font-family: 'Segoe UI', sans-serif;
 }
 
+.right-section {
+    flex: 1;
+    max-width: 40%;
+    background-color: #1f3b4d;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.placeholder {
+    text-align: center;
+    font-style: italic;
+    opacity: 0.8;
+}
+
 .user-results-section {
-    background-color: rgba(0, 0, 0, 0.6); /* Полупрозрачен черен фон */
+    background-color: rgba(0, 0, 0, 0.6);
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -568,19 +592,23 @@ button.icon-button {
     margin-bottom: 20px;
     font-size: 24px;
     color: #f8f8f8;
+    text-shadow: 1px 1px 2px #000;
 }
 
 .results-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: rgba(255, 255, 255, 0.1); /* Леко прозрачен бял фон */
+    background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .results-table th, .results-table td {
     border: 1px solid rgba(255, 255, 255, 0.3);
     padding: 12px;
     text-align: center;
+    transition: background-color 0.3s;
 }
 
 .results-table th {
@@ -592,6 +620,40 @@ button.icon-button {
 .results-table tr:nth-child(even) {
     background-color: rgba(255, 255, 255, 0.05);
 }
+
+.results-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+.results-table tr.first-place {
+    background-color: rgba(255, 223, 0, 0.2);
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.results-table tr.second-place {
+    background-color: rgba(192, 192, 192, 0.2);
+    font-weight: bold;
+    color: #c0c0c0;
+}
+
+.results-table tr.third-place {
+    background-color: rgba(205, 127, 50, 0.2);
+    font-weight: bold;
+    color: #cd7f32;
+}
+
+.results-table td:first-child {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.results-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+
 
 @media (max-width: 1600px) {
     .results h2 {
