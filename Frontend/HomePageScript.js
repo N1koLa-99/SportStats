@@ -194,8 +194,8 @@ function renderUserInterface(user) {
         }
     }
     
-    let currentClubId = null;
-    function fetchDisciplinesByClubId(clubId) {
+let currentClubId = null;
+function fetchDisciplinesByClubId(clubId) {
         currentClubId = clubId; // <-- запазваме го глобално
     
         fetch(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${clubId}`)
@@ -209,12 +209,12 @@ function renderUserInterface(user) {
             .catch(error => {
                 console.error('Грешка при извличане на дисциплините на клуба:', error);
             });
-    }
+}
     
     
-    let disciplineSelectInitialized = false;
+let disciplineSelectInitialized = false;
 
-    function populateDisciplineDropdown(disciplines) {
+function populateDisciplineDropdown(disciplines) {
         const disciplineSelect = document.getElementById('discipline');
         disciplineSelect.innerHTML = '<option value="" disabled selected>Дисциплина</option>';
     
@@ -236,11 +236,8 @@ function renderUserInterface(user) {
             });        
             disciplineSelectInitialized = true;
         }
-    }
-    
-
-
-    
+}
+   
     
 
 function fetchResults(disciplineId, userId) {
@@ -408,7 +405,6 @@ function fetchBestClubByDiscipline(disciplineId, yearOfBirth) {
             console.error('Грешка при зареждане на най-добър клуб:', error);
         });
 }
-
 
 
 function populateBestClubTable(data, disciplineId) {

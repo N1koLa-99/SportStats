@@ -1180,7 +1180,129 @@ button.icon-button {
         font-weight: 700;
         margin-top: -20%;
     }
-    
+    .UserTableSection {
+    flex: 1;
+    max-width: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    background-color: #172e39;
+    font-family: 'Segoe UI', sans-serif;
+}
+.right-section {
+    flex: 1;
+    max-width: 90%;
+    background-color: #1f3b4d;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+.tables-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  padding: 0; /* Премахваме отстоянията */
+  margin: 0;
+}
+
+.user-results-section,
+.best-club-section {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0; /* Няма вътрешен падинг */
+  border-radius: 0;
+  box-shadow: none;
+  width: 100%;
+}
+
+.user-results-section h3,
+.best-club-section h3 {
+  font-size: 16px;
+  text-align: center;
+  margin: 10px 0;
+  font-family: 'Jura';
+  color: #f8f8f8;
+  text-shadow: 1px 1px 2px #000;
+}
+
+/* Таблицата */
+.user-results-section table,
+.best-club-section table {
+  width: 100%;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0;
+}
+
+/* Таблица с фиксирана ширина */
+.results-table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: 'Jura';
+  font-size: 12px;
+  table-layout: fixed;
+}
+
+.results-table th,
+.results-table td {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 6px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  white-space: normal;
+  vertical-align: middle;
+}
+
+.results-table th:nth-child(1),
+.results-table td:nth-child(1) {
+  width: 35%;
+}
+
+.results-table th:nth-child(2),
+.results-table td:nth-child(2) {
+  width: 30%;
+}
+
+.results-table th:nth-child(3),
+.results-table td:nth-child(3) {
+  width: 35%;
+}
+
+.results-table th {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #e0e0e0;
+}
+
+.results-table tr.first-place {
+  background-color: rgba(255, 223, 0, 0.2);
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.results-table tr.second-place {
+  background-color: rgba(192, 192, 192, 0.2);
+  font-weight: bold;
+  color: #c0c0c0;
+}
+
+.results-table tr.third-place {
+  background-color: rgba(205, 127, 50, 0.2);
+  font-weight: bold;
+  color: #cd7f32;
+}
+
+.results-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+   
 }
 
 @media (max-width: 414px) {
