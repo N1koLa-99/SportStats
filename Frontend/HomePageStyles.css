@@ -19,7 +19,6 @@ body {
     ),
     url('markus-spiske-OAg9u5E1ju0-unsplash.jpg')round;
     background-size: cover;
-
 }
 .profile-image {
     display: block;
@@ -121,6 +120,7 @@ body {
     margin-top: 10px;
     overflow: auto; /* Разрешаване на скролването в този контейнер */
     transition: transform 0.3s ease-in-out;
+    font-family: 'Jura';
 }
 
 
@@ -552,6 +552,7 @@ button.icon-button {
     justify-content: space-between;
     gap: 20px;
     padding: 40px;
+    background-color: #1b343e;
 }
 
 .UserTableSection {
@@ -591,7 +592,16 @@ button.icon-button {
     text-align: center;
     margin-bottom: 20px;
     font-size: 24px;
+    font-family: 'Jura';
     color: #f8f8f8;
+    text-shadow: 1px 1px 2px #000;
+}
+.best-club-section h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #f8f8f8;
+    font-family: 'Jura';
     text-shadow: 1px 1px 2px #000;
 }
 
@@ -601,6 +611,7 @@ button.icon-button {
     background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
     border-radius: 10px;
+    font-family: 'Jura';
     overflow: hidden;
 }
 
@@ -652,6 +663,96 @@ button.icon-button {
     background-color: rgba(255, 255, 255, 0.1);
     transition: background-color 0.3s ease;
 }
+.hover-info {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 0.9em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+#best-club-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Jura';
+    margin-top: 1rem;
+}
+
+#best-club-table thead {
+    background-color: #ffffff1d;
+    color: white;
+}
+
+#best-club-table th,
+#best-club-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.best-club-row:hover {
+    background-color: #f3f4f6;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Топ 3 класации */
+.gold-row {
+    background-color: rgba(255, 223, 0, 0.2);
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.silver-row {
+    background-color: rgba(192, 192, 192, 0.2);
+    font-weight: bold;
+    color: #c0c0c0;
+}
+
+.bronze-row {
+    background-color: rgba(205, 127, 50, 0.2);
+    font-weight: bold;
+    color: #cd7f32;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 28px;
+    margin-bottom: 10px;
+  }
+  
+  .switch input { display: none; }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 28px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px; width: 20px;
+    left: 4px; bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .slider {
+    background-color: #4caf50;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(32px);
+  }
+  
+
 
 
 

@@ -214,27 +214,30 @@ function renderUserInterface(user) {
     
     let disciplineSelectInitialized = false;
 
-function populateDisciplineDropdown(disciplines) {
-    const disciplineSelect = document.getElementById('discipline');
-    disciplineSelect.innerHTML = '<option value="" disabled selected>Дисциплина</option>';
-
-    disciplines.forEach(discipline => {
-        const option = document.createElement('option');
-        option.value = discipline.id;
-        option.textContent = discipline.disciplineName || `Дисциплина ${discipline.id} (Без име)`;
-        disciplineSelect.appendChild(option);
-    });
-
-    if (!disciplineSelectInitialized) {
-        disciplineSelect.addEventListener('change', function () {
-            const selectedDisciplineId = this.value;
-            if (currentClubId && selectedDisciplineId) {
-                fetchBestResultsByDisciplineInClub(currentClubId, selectedDisciplineId);
-            }
+    function populateDisciplineDropdown(disciplines) {
+        const disciplineSelect = document.getElementById('discipline');
+        disciplineSelect.innerHTML = '<option value="" disabled selected>Дисциплина</option>';
+    
+        disciplines.forEach(discipline => {
+            const option = document.createElement('option');
+            option.value = discipline.id; // Задаваме само ID като стойност
+            option.textContent = discipline.disciplineName || `Дисциплина ${discipline.id} (Без име)`;
+            disciplineSelect.appendChild(option);
         });
-        disciplineSelectInitialized = true;
+    
+        if (!disciplineSelectInitialized) {
+            disciplineSelect.addEventListener('change', function () {
+                const selectedDisciplineId = this.value;
+    
+                if (currentClubId && selectedDisciplineId) {
+                    fetchBestResultsByDisciplineInClub(currentClubId, selectedDisciplineId);
+                    fetchBestClubByDiscipline(selectedDisciplineId);
+                }
+            });        
+            disciplineSelectInitialized = true;
+        }
     }
-}
+    
 
 
     
@@ -391,6 +394,96 @@ function fetchBestResultsByDisciplineInClub(clubId, disciplineId) {
         });
 }
 
+
+function fetchBestClubByDiscipline(disciplineId, yearOfBirth) {
+    fetch(`https://localhost:7198/api/Results/best-club-by-discipline/${disciplineId}/year/${user.yearOfBirth}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Неуспешно извличане на резултати');
+            return response.json();
+        })
+        .then(data => {
+            populateBestClubTable([data], disciplineId); // подаваме като масив за съвместимост
+        })
+        .catch(error => {
+            console.error('Грешка при зареждане на най-добър клуб:', error);
+        });
+}
+
+
+
+function populateBestClubTable(data, disciplineId) {
+    const tbody = document.querySelector('#best-club-table tbody');
+    tbody.innerHTML = '';
+
+    if (!Array.isArray(data)) return;
+
+    const unit = getUnitForDiscipline(disciplineId);
+
+    // Сортиране по най-добро време (най-ниска стойност)
+    const sortedResults = [...data].sort((a, b) => a.bestResult.valueTime - b.bestResult.valueTime);
+
+    sortedResults.forEach((entry, index) => {
+        const { ageGroup, bestResult } = entry;
+        const formattedValue = formatResultValue(bestResult.valueTime, unit);
+
+        const row = document.createElement('tr');
+
+        // Стилове за топ 3
+        let rowClass = '';
+        let medalEmoji = '';
+        switch (index) {
+            case 0:
+                rowClass = 'gold-row';
+                medalEmoji = '🥇';
+                break;
+            case 1:
+                rowClass = 'silver-row';
+                medalEmoji = '🥈';
+                break;
+            case 2:
+                rowClass = 'bronze-row';
+                medalEmoji = '🥉';
+                break;
+        }
+
+        row.classList.add('best-club-row', rowClass);
+
+        row.innerHTML = `
+            <td>${ageGroup}</td>
+            <td>${medalEmoji} ${bestResult.clubName}</td>
+            <td>${formattedValue}</td>
+        `;
+
+        row.addEventListener('mouseenter', () => {
+            const hoverDiv = document.getElementById('hover-info');
+            hoverDiv.style.display = 'block';
+            hoverDiv.innerHTML = `
+                <strong>Състезател:</strong> ${bestResult.userFirstName} ${bestResult.userLastName}<br>
+                <strong>Роден:</strong> ${bestResult.yearOfBirth}<br>
+                <strong>Дата:</strong> ${new Date(bestResult.resultDate).toLocaleDateString()}<br>
+                <strong>Локация:</strong> ${bestResult.location}
+            `;
+            const rect = row.getBoundingClientRect();
+            hoverDiv.style.top = `${rect.bottom + window.scrollY}px`;
+            hoverDiv.style.left = `${rect.left}px`;
+            hoverDiv.style.position = 'absolute';
+            hoverDiv.style.backgroundColor = '#2d3748';
+            hoverDiv.style.border = '1px solid #ccc';
+            hoverDiv.style.color = '#fff';
+            hoverDiv.style.padding = '10px';
+            hoverDiv.style.borderRadius = '8px';
+            hoverDiv.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+            hoverDiv.style.zIndex = 1000;
+        });
+
+        row.addEventListener('mouseleave', () => {
+            const hoverDiv = document.getElementById('hover-info');
+            hoverDiv.style.display = 'none';
+        });
+
+        tbody.appendChild(row);
+    });
+}
 
 function displayResults(disciplineId, yearOfBirth, userGender, results, normatives) {
     console.log('Резултати:', results);
