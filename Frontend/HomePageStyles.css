@@ -1214,17 +1214,19 @@ button.icon-button {
   border-radius: 0;
   box-shadow: none;
   width: 100%;
+  margin-top: 5%;
 }
 
 .user-results-section h3,
 .best-club-section h3 {
-  font-size: 16px;
+  font-size: 20px;
   text-align: center;
-  margin: 10px 0;
+  margin: 12px 0;
   font-family: 'Jura';
   color: #f8f8f8;
   text-shadow: 1px 1px 2px #000;
 }
+
 
 /* Таблицата */
 .user-results-section table,
@@ -1390,7 +1392,7 @@ button.icon-button {
     }
     .container{
         padding: 0px;
-        padding-bottom: 200%;
+        padding-bottom: 145%;
     }
 
     #status-button, .status-button {

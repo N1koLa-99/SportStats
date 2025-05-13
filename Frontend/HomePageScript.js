@@ -338,7 +338,7 @@ function mapPoolLengthToId(length) {
 }
 
 function fetchBestResultsByDisciplineInClub(clubId, disciplineId) {
-    fetch(`https://localhost:7198/api/results/by-club/${clubId}/by-discipline/${disciplineId}`)
+    fetch(`https://sportstatsapi.azurewebsites.net/api/results/by-club/${clubId}/by-discipline/${disciplineId}`)
         .then(response => {
             if (!response.ok) throw new Error("Грешка при извличане на резултатите");
             return response.json();
@@ -393,7 +393,7 @@ function fetchBestResultsByDisciplineInClub(clubId, disciplineId) {
 
 
 function fetchBestClubByDiscipline(disciplineId, yearOfBirth) {
-    fetch(`https://localhost:7198/api/Results/best-club-by-discipline/${disciplineId}/year/${user.yearOfBirth}`)
+    fetch(`https://sportstatsapi.azurewebsites.net/api/Results/best-club-by-discipline/${disciplineId}/year/${user.yearOfBirth}`)
         .then(response => {
             if (!response.ok) throw new Error('Неуспешно извличане на резултати');
             return response.json();
