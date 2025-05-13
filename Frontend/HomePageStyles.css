@@ -561,97 +561,109 @@ button.icon-button {
     background-size: cover;
     background-position: center;
     border-radius: 10px;
-    background-color: #172e39;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    color: #cdeeff;
+    animation: fadeIn 1s ease-in-out;
 }
 
 .right-section {
     flex: 1;
     max-width: 40%;
-    background-color: #1f3b4d;
+    background: linear-gradient(135deg, #1f3b4d, #162c3a);
     padding: 20px;
     border-radius: 10px;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    color: #dff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.right-section:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 30px rgba(0, 255, 255, 0.4);
 }
 
 .placeholder {
     text-align: center;
     font-style: italic;
-    opacity: 0.8;
+    opacity: 0.85;
+    color: #aaa;
 }
 
 .user-results-section {
-    background-color: rgba(0, 0, 0, 0.6);
+    background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(23,46,57,0.95));
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 255, 255, 0.1);
+    animation: floatUp 1s ease-out;
 }
 
-.user-results-section h3 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-family: 'Jura';
-    color: #f8f8f8;
-    text-shadow: 1px 1px 2px #000;
-}
+.user-results-section h3,
 .best-club-section h3 {
     text-align: center;
     margin-bottom: 20px;
-    font-size: 24px;
-    color: #f8f8f8;
+    font-size: 26px;
     font-family: 'Jura';
-    text-shadow: 1px 1px 2px #000;
+    color: #ffffff;
+    letter-spacing: 1px;
 }
 
 .results-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #eaffff;
     font-family: 'Jura';
     overflow: hidden;
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
 }
 
-.results-table th, .results-table td {
-    border: 1px solid rgba(255, 255, 255, 0.3);
+.results-table th,
+.results-table td {
+    border: 1px solid rgba(255, 255, 255, 0.15);
     padding: 12px;
     text-align: center;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .results-table th {
-    background-color: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(to right, #2b5876, #2b4362);
     font-weight: bold;
-    color: #e0e0e0;
+    color: #c0f7ff;
+    text-shadow: 1px 1px 3px #000;
 }
 
 .results-table tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .results-table tr:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(0, 255, 255, 0.1);
+    transform: scale(1.01);
     cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
 }
+
 .results-table tr.first-place {
-    background-color: rgba(255, 223, 0, 0.2);
+    background-color: rgba(255, 223, 0, 0.25);
     font-weight: bold;
-    color: #ffd700;
+    color: #fff176;
+    animation: pulseGlow 1.5s infinite;
 }
 
 .results-table tr.second-place {
-    background-color: rgba(192, 192, 192, 0.2);
+    background-color: rgba(192, 192, 192, 0.25);
     font-weight: bold;
-    color: #c0c0c0;
+    color: #e0e0e0;
+    animation: pulseGlow 2s infinite;
 }
 
 .results-table tr.third-place {
-    background-color: rgba(205, 127, 50, 0.2);
+    background-color: rgba(205, 127, 50, 0.25);
     font-weight: bold;
-    color: #cd7f32;
+    color: #ffccbc;
+    animation: pulseGlow 2.5s infinite;
 }
 
 .results-table td:first-child {
@@ -659,19 +671,17 @@ button.icon-button {
     padding-left: 20px;
 }
 
-.results-table tr:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transition: background-color 0.3s ease;
-}
 .hover-info {
     display: none;
     position: absolute;
-    background-color: #fff;
+    background: #fff;
     border: 1px solid #ccc;
     padding: 10px;
     font-size: 0.9em;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border-radius: 6px;
 }
+
 #best-club-table {
     width: 100%;
     border-collapse: collapse;
@@ -680,61 +690,67 @@ button.icon-button {
 }
 
 #best-club-table thead {
-    background-color: #ffffff1d;
-    color: white;
+    background: linear-gradient(to right, #264653, #1d2e38);
+    color: #fff;
 }
 
 #best-club-table th,
 #best-club-table td {
     padding: 12px 15px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #444;
     text-align: left;
 }
 
 .best-club-row:hover {
-    background-color: #f3f4f6;
+    background-color: rgba(0, 255, 255, 0.08);
     cursor: pointer;
     transition: background-color 0.3s;
+    box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.2);
 }
 
 /* Топ 3 класации */
 .gold-row {
-    background-color: rgba(255, 223, 0, 0.2);
+    background-color: rgba(255, 223, 0, 0.3);
     font-weight: bold;
-    color: #ffd700;
+    color: #fff176;
+    animation: pulseGlow 1.5s infinite;
 }
 
 .silver-row {
-    background-color: rgba(192, 192, 192, 0.2);
+    background-color: rgba(192, 192, 192, 0.3);
     font-weight: bold;
-    color: #c0c0c0;
+    color: #eeeeee;
+    animation: pulseGlow 2s infinite;
 }
 
 .bronze-row {
-    background-color: rgba(205, 127, 50, 0.2);
+    background-color: rgba(205, 127, 50, 0.3);
     font-weight: bold;
-    color: #cd7f32;
+    color: #ffccbc;
+    animation: pulseGlow 2.5s infinite;
 }
+
+/* Switch */
 .switch {
     position: relative;
     display: inline-block;
     width: 60px;
     height: 28px;
     margin-bottom: 10px;
-  }
-  
-  .switch input { display: none; }
-  
-  .slider {
+}
+
+.switch input { display: none; }
+
+.slider {
     position: absolute;
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc;
+    background: linear-gradient(145deg, #888, #aaa);
     transition: 0.4s;
     border-radius: 28px;
-  }
-  
-  .slider:before {
+}
+
+.slider:before {
     position: absolute;
     content: "";
     height: 20px; width: 20px;
@@ -742,16 +758,35 @@ button.icon-button {
     background-color: white;
     transition: 0.4s;
     border-radius: 50%;
-  }
-  
-  input:checked + .slider {
-    background-color: #4caf50;
-  }
-  
-  input:checked + .slider:before {
+}
+
+input:checked + .slider {
+    background: linear-gradient(135deg, #00ffcc, #00c6ff);
+    box-shadow: 0 0 8px rgba(0, 255, 200, 0.6);
+}
+
+input:checked + .slider:before {
     transform: translateX(32px);
-  }
-  
+}
+
+/* Анимации */
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+    50% { box-shadow: 0 0 15px rgba(255,255,255,0.6); }
+    100% { box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
 
 
 
