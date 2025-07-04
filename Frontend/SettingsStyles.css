@@ -373,6 +373,24 @@ input[type="password"] {
 .confirm-button:hover {
     background-color: #e60000;
 }
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    flex: 1;
+    padding-right: 30px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #555;
+}
+
 
 
 

@@ -537,6 +537,90 @@ color: #ffffff91;
 
 
 
+.tutorial-section {
+    padding: 6px 20px;
+    background-color: #0A2A43;
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tutorial-title {
+    font-family: 'Jura', sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    color: #CAE457;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.tutorial-title::before {
+    content: "🎬";
+    font-size: 32px;
+}
+
+.tutorial-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.tutorial-card {
+    background-color: #001829;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: left;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tutorial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tutorial-card h4 {
+    font-family: 'Jura', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #CAE457;
+    margin-bottom: 8px;
+}
+
+.tutorial-card a {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Jura', sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #57C0E8;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.tutorial-card a:hover {
+    color: #CAE457;
+}
+
+.tutorial-card a::before {
+    content: "▶";
+    margin-right: 6px;
+    font-size: 16px;
+}
+
+
+
+
+
+
+
 
 @media (max-width: 1920px) {
 
@@ -1004,6 +1088,30 @@ color: #ffffff91;
     .screenshot img {
          margin-bottom: 15px;
     }
+    .tutorial-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* две по две */
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+    .tutorial-list {
+        grid-template-columns: 1fr;
+    }
+
+    .tutorial-card {
+        padding: 14px;
+    }
+
+    .tutorial-card h4 {
+        font-size: 16px;
+    }
+
+    .tutorial-card a {
+        font-size: 14px;
+    }
+
 }
 @media (max-width: 380px) {
     

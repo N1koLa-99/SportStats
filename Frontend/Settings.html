@@ -73,18 +73,21 @@
                 </div>
             </div>
             <div class="info-item">
-                <span class="label">Парола:</span>
-                <div class="info-content">
-                    <span id="password">********</span>
-                    <input type="password" id="edit-password" style="display: none;" placeholder="Нова парола">
-                </div>
-            </div>
-            <div class="info-item">
-                <span class="label confirm-password-label">Потвърдете паролата:</span>
-                <div class="info-content">
-                    <input type="password" id="edit-confirm-password" class="hidden" placeholder="Потвърдете новата парола">
-                </div>
-            </div>
+    <span class="label">Парола:</span>
+    <div class="info-content password-container">
+        <input type="password" id="edit-password" style="display: none;" placeholder="Нова парола">
+        <i class="fas fa-eye toggle-password" style="display: none;" onclick="togglePassword('edit-password', this)"></i>
+    </div>
+</div>
+
+<div class="info-item">
+    <span class="label confirm-password-label">Потвърдете паролата:</span>
+    <div class="info-content password-container">
+        <input type="password" id="edit-confirm-password" class="hidden" style="display: none;" placeholder="Потвърдете новата парола">
+        <i class="fas fa-eye toggle-password" style="display: none;" onclick="togglePassword('edit-confirm-password', this)"></i>
+    </div>
+</div>
+
             <div class="info-item">
                 <span class="label">Клуб:</span>
                 <div class="info-content">

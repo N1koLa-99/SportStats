@@ -55,9 +55,11 @@
             </table>
         </div>
 
-        <a href="Information.html" id="detailed-info-link" style="margin-top:3%;margin-left: 0px; font-weight: bold; display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-align: center; text-decoration: none; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: background-color 0.3s;">
-            Подробна информация
-        </a>
+        <a href="Information.html" id="detailed-info-link">
+    Подробна информация
+</a>
+
+
     </div>
 
     <!-- Секция: Добавяне на резултат -->
@@ -88,6 +90,13 @@
             <select id="seconds">${Array.from({length: 60}, (_, i) => `<option value="${i}"> сек </option>`).join('')}</select>
             <select id="milliseconds">${Array.from({length: 100}, (_, i) => `<option value="${i}"> стот </option>`).join('')}</select>
         </div>
+        
+        <div id="distance-input" style="display: none;">
+    <label for="distance-result">Изминати метри:</label>
+    <input type="number" id="distance-result" min="0" placeholder="например: 1234 м.">
+</div>
+
+
 
         <div id="decimal-input" style="display: none;">
             <label for="decimal-result">Резултат:</label>

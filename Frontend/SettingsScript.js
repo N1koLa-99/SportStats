@@ -147,7 +147,7 @@ function setupProfileEditing(user) {
 
 async function saveProfileChanges(user) {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|bg|org|net|info|edu|gov|biz|co\.uk)$/i;
-    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/;
     const namePattern = /^[A-Za-zА-Яа-я]+$/;
     const yearOfBirthPattern = /^(?:[1-9][0-9]{3})$/;
    
@@ -196,7 +196,6 @@ async function saveProfileChanges(user) {
     try {
         for (const [field, value] of Object.entries(updatedUser)) {
             if (value && value !== user[field]) {
-                console.log(`Updating ${field} to ${value}`);
                 await updateField(user.id, field, value, field);
             }
         }
@@ -246,19 +245,33 @@ async function updateField(userId, fieldName, value, fieldLabel) {
         throw error;
     }
 }
+function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+    const isPassword = input.type === "password";
+    input.type = isPassword ? "text" : "password";
+    icon.classList.toggle("fa-eye");
+    icon.classList.toggle("fa-eye-slash");
+}
+
 
 function toggleEditFields(editing) {
     ['first-name', 'last-name', 'year-of-birth', 'email'].forEach(field => {
         document.getElementById(field).style.display = editing ? 'none' : 'inline';
         document.getElementById(`edit-${field}`).style.display = editing ? 'block' : 'none';
     });
+
     document.getElementById('edit-password').style.display = editing ? 'block' : 'none';
     document.getElementById('edit-confirm-password').style.display = editing ? 'block' : 'none';
+
+    document.querySelectorAll('.toggle-password').forEach(el => {
+        el.style.display = editing ? 'inline' : 'none';
+    });
 
     document.getElementById('save-profile').style.display = editing ? 'block' : 'none';
     document.getElementById('cancel-profile').style.display = editing ? 'block' : 'none';
     document.getElementById('edit-profile').style.display = editing ? 'none' : 'block';
 }
+
 
 function showMessageBox(message) {
     const messageBox = document.getElementById('message-box');

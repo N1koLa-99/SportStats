@@ -6,6 +6,7 @@
     <title>LogInPage</title>
     <link rel="stylesheet" href="Index_Style.css">
     <link href="https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="button-53.css">
 </head>
 <body>
@@ -64,17 +65,19 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="password" 
-                               id="password" 
-                               name="password" 
-                               required 
-                               minlength="6">
-                        <label for="password" class="required-label">Парола</label>
-                        <span class="error-message" id="password-error"></span>
-                        <div class="hint-message" id="password-hint">
-                            Поне 8 символа, 1 главна буква и 1 цифра.
-                        </div>
-                    </div>
+    <input type="password" 
+           id="password" 
+           name="password" 
+           required 
+           minlength="6">
+    <label for="password" class="required-label">Парола</label>
+    <span class="error-message" id="password-error"></span>
+    <div class="hint-message" id="password-hint">
+        Поне 8 символа, 1 главна буква и 1 цифра.
+    </div>
+    <i class="fa-solid fa-eye toggle-password" data-target="password"></i>
+</div>
+
 
                     <div class="form-group">
                         <select id="yearOfBirth" name="yearOfBirth" required>
@@ -90,8 +93,8 @@
                                 name="gender" 
                                 required>
                             <option value="" disabled selected></option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
+                            <option value="male">Мъж</option>
+                            <option value="female">Жена</option>
                         </select>
                         <label for="gender" class="required-label">Пол</label>
                         <span class="error-message" id="gender-error"></span>
@@ -123,17 +126,19 @@
                             Изисква валиден имейл формат.
                         </div>
                     </div>
-                    <div class="form-group">
-                        <input type="password" 
-                               id="login-password" 
-                               name="login-password" 
-                               required>
-                        <label for="login-password" class="required-label">Password</label>
-                        <span class="error-message" id="login-password-error"></span>
-                        <div class="hint-message" id="login-password-hint">
-                            Паролата трябва да съдържа поне 6 символа.
-                        </div>
-                    </div>
+         <div class="form-group">
+    <input type="password" 
+           id="login-password" 
+           name="login-password" 
+           required>
+    <label for="login-password" class="required-label">Password</label>
+    <span class="error-message" id="login-password-error"></span>
+    <div class="hint-message" id="login-password-hint">
+        Поне 8 символа, 1 главна буква и 1 цифра.
+    </div>
+    <i class="fa-solid fa-eye toggle-password" data-target="login-password"></i>
+</div>
+
                     <button type="submit" 
                             class="button-53 button-53-orange">Login</button>
                 </form>

@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function () {
     const user = JSON.parse(localStorage.getItem('user'));
-    console.log('User:', user);
     
     async function fetchJson(url) {
         try {
@@ -29,13 +28,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             showMessageBox('Изтриването е отменено.');
             return;
         }
-    
-        console.log(`Изтриване на резултат с ID: ${resultId}`);
-        console.log('Изпращане на хедъри:', {
-            'Requester-Id': user.id,
-            'Role-Id': user.roleID,
-            'Club-Id': user.clubID
-        });
+
     
         try {
             const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results/${resultId}`, {
@@ -104,74 +97,80 @@ document.addEventListener('DOMContentLoaded', async function () {
                 option.textContent = typeof textProperty === 'function' ? textProperty(item) : item[textProperty] || `Опция ${item[valueProperty]}`;
                 select.appendChild(option);
             });
-            console.log('Populated dropdown with ID:', elementId);
         }
     }
     
     function displayUsersTable(users, results, disciplineId = null) {
-        const usersTable = document.getElementById('users-table');
-        const tbody = usersTable.querySelector('tbody');
-        tbody.innerHTML = '';
-        console.log('Показване на таблицата с потребители с ID на дисциплината:', disciplineId);
-    
-        if (!disciplineId) return;
-    
-        users.forEach(user => {
-            const userResults = results.filter(result => result.userId === user.id && result.disciplineId == disciplineId);
-    
-            const bestResult = userResults.length > 0
-                ? getBestResult(userResults, disciplineId)
-                : 'Няма резултат';
-    
-            const resultEntries = userResults
-                .map(result => {
-                    const tooltipText = `Локация: ${result.location || 'Няма данни'}\nДължина на басейна: ${result.swimmingPoolStandart || 'Няма'} м`;
-                    return `
-                        <tr>
-                            <td>
-                                <div class="tooltip-container">
-                                    ${formatResult(result.valueTime, disciplineId)}
-                                    <span class="tooltip-text">${tooltipText}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="tooltip-container">
-                                    ${new Date(result.resultDate).toLocaleDateString()}
-                                    <span class="tooltip-text">${tooltipText}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="delete-result" data-result-id="${result.id}" title="Изтрий">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>`;
-                })
-                .join('');
-    
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${user.firstName}<br>${user.lastName}</td>
-                <td>${user.yearOfBirth ? user.yearOfBirth : 'Няма данни'}</td>
-                <td>${bestResult}</td>
-                <td>
-                    <table>
-                        <tbody>
-                            ${resultEntries || '<tr><td colspan="3">Няма резултати</td></tr>'}
-                        </tbody>
-                    </table>
-                </td>
-            `;
-            tbody.appendChild(row);
+    const usersTable = document.getElementById('users-table');
+    const tbody = usersTable.querySelector('tbody');
+    tbody.innerHTML = '';
+
+    if (!disciplineId) return;
+
+    users.forEach(user => {
+        const userResults = results.filter(result => result.userId === user.id && result.disciplineId == disciplineId);
+
+        let bestResult = 'Няма резултат';
+
+        if (userResults.length > 0) {
+            const valueTimes = userResults.map(r => r.valueTime);
+            const bestValue = (disciplineId == 18)
+                ? Math.max(...valueTimes) // Повече метри => по-добро
+                : Math.min(...valueTimes); // По-малко време => по-добро
+
+            bestResult = formatResult(bestValue, disciplineId);
+        }
+
+        const resultEntries = userResults
+            .map(result => {
+                const tooltipText = `Локация: ${result.location || 'Няма данни'}\nДължина на басейна: ${result.swimmingPoolStandart || 'Няма'} м`;
+                return `
+                    <tr>
+                        <td>
+                            <div class="tooltip-container">
+                                ${formatResult(result.valueTime, disciplineId)}
+                                <span class="tooltip-text">${tooltipText}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tooltip-container">
+                                ${new Date(result.resultDate).toLocaleDateString()}
+                                <span class="tooltip-text">${tooltipText}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="delete-result" data-result-id="${result.id}" title="Изтрий">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            })
+            .join('');
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.firstName}<br>${user.lastName}</td>
+            <td>${user.yearOfBirth ? user.yearOfBirth : 'Няма данни'}</td>
+            <td>${bestResult}</td>
+            <td>
+                <table>
+                    <tbody>
+                        ${resultEntries || '<tr><td colspan="3">Няма резултати</td></tr>'}
+                    </tbody>
+                </table>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.querySelectorAll('.delete-result').forEach(button => {
+        button.addEventListener('click', async function () {
+            const resultId = this.getAttribute('data-result-id');
+            await deleteResult(resultId);
         });
-    
-        document.querySelectorAll('.delete-result').forEach(button => {
-            button.addEventListener('click', async function () {
-                const resultId = this.getAttribute('data-result-id');
-                await deleteResult(resultId);
-            });
-        });
-    }
+    });
+}
+
 
     async function handleCoach() {
         if (!user || user.roleID !== 2) {
@@ -188,12 +187,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     
             const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
             let results = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Results?requesterId=${user.id}`);
-            console.log('Резултати за потребителя:', results);
     
             let selectedDisciplineId = null;
             document.getElementById('discipline').addEventListener('change', function () {
                 selectedDisciplineId = parseInt(this.value, 10);
-                console.log('Discipline changed to:', selectedDisciplineId);
                 displayUsersTable(clubUsers, results, selectedDisciplineId);
             });
     
@@ -241,12 +238,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
         ];
         
-        console.log('Discipline ID:', disciplineId);
-        console.log('Time-based IDs:', timeBasedIds);
-        
         const isTimeBased = timeBasedIds.includes(Number(disciplineId));
         
-        console.log('Is time-based:', isTimeBased);
         
         let bestResult;
         if (isTimeBased) {
@@ -262,187 +255,210 @@ document.addEventListener('DOMContentLoaded', async function () {
         return formatResult(bestResult.valueTime, disciplineId);
     }
     
-    function formatResult(valueTime, disciplineId) {
-        const timeBasedIds = [
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
-        ];
-        
-        console.log('Formatting result for discipline ID:', disciplineId);
+ function formatResult(valueTime, disciplineId) {
+    const timeBasedIds = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+    ];
 
-        if (typeof valueTime !== 'number' || isNaN(valueTime)) {
-            return 'Неизвестна стойност';
-        }
-
-        if (timeBasedIds.includes(Number(disciplineId))) {
-            const formattedTime = formatTime(valueTime);
-            console.log('Formatted result (time-based):', formattedTime);
-            return formattedTime;
-        } else {
-            const formattedNumber = valueTime.toFixed(2);
-            console.log('Formatted result (number-based):', formattedNumber);
-            return formattedNumber;
-        }
+    if (typeof valueTime !== 'number' || isNaN(valueTime)) {
+        return 'Неизвестна стойност';
     }
+
+    if (Number(disciplineId) === 18) {
+        return `${valueTime.toFixed(0)} м`;
+    }
+
+    if (timeBasedIds.includes(Number(disciplineId))) {
+        return formatTime(valueTime);
+    } else {
+        return valueTime.toFixed(2);
+    }
+}
+
+
     
     function formatTime(seconds) {
-        if (seconds === undefined || seconds === null || isNaN(seconds)) {
-            return 'Неизвестна стойност';
-        }
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = Math.floor(seconds % 60);
-        let millis = Math.round((seconds % 1) * 100);
-    
-        millis = millis < 10 ? `0${millis}` : `${millis}`;
-    
-        let timeString = '';
-        if (hours > 0) timeString += `${hours} ч `;
-        if (minutes > 0 || hours > 0) timeString += `${minutes} мин `;
-        timeString += `${secs}.${millis} сек`;
-        return timeString;
+    if (seconds === undefined || seconds === null || isNaN(seconds)) {
+        return 'Неизвестна стойност';
     }
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    let millis = Math.round((seconds % 1) * 100);
+
+    millis = millis < 10 ? `0${millis}` : `${millis}`;
+
+    let timeString = '';
+    if (hours > 0) timeString += `${hours} ч `;
+    if (minutes > 0 || hours > 0) timeString += `${minutes} мин `;
+    timeString += `${secs}.${millis} сек`;
+    return timeString;
+}
+
     
     
     async function setupAddResultForm() {
-        const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
-        populateDropdown('add-discipline', disciplines, 'disciplineName', 'id');
-    
-        const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
-        populateDropdown('add-user', clubUsers, user => `${user.firstName} ${user.lastName} (${user.yearOfBirth})`, 'id');
-    
-        document.getElementById('add-discipline').addEventListener('change', function () {
-            const disciplineId = Number(this.value);
-            const timeBasedIds = Array.from({ length: 18 }, (_, i) => i + 1);
-            const isTimeBased = timeBasedIds.includes(disciplineId);
-            
-            document.getElementById('time-input').style.display = isTimeBased ? 'block' : 'none';
-            document.getElementById('decimal-input').style.display = isTimeBased ? 'none' : 'block';
-        });
-    
-        document.getElementById('add-user').addEventListener('change', async function () {
-            const userId = this.value;
-            const userProfilePicture = document.getElementById('user-profile-picture');
-        
-            if (!userId) {
-                userProfilePicture.style.display = 'none';
-                return;
-            }
-        
-            try {
-                const [userResponse, imageResponse] = await Promise.all([
-                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}`),
-                    fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`)
-                ]);
-        
-                if (!userResponse.ok) throw new Error('Грешка при зареждане на потребителските данни');
-        
-                if (imageResponse.ok) {
-                    const imageBlob = await imageResponse.blob();
-                    userProfilePicture.src = URL.createObjectURL(imageBlob);
-                } else {
-                    userProfilePicture.src = '../SportStatsImg/ProfilePhoto2.jpg';
-                }
-        
-                userProfilePicture.style.display = 'block';
-            } catch (error) {
-                console.error('Грешка:', error);
+    const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
+    populateDropdown('add-discipline', disciplines, 'disciplineName', 'id');
+
+    const clubUsers = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/Users/club/${user.clubID}`);
+    populateDropdown('add-user', clubUsers, user => `${user.firstName} ${user.lastName} (${user.yearOfBirth})`, 'id');
+
+    document.getElementById('add-discipline').addEventListener('change', function () {
+        const disciplineId = Number(this.value);
+        const timeInput = document.getElementById('time-input');
+        const decimalInput = document.getElementById('decimal-input');
+        const distanceInput = document.getElementById('distance-input');
+
+        if (disciplineId >= 1 && disciplineId <= 17) {
+            timeInput.style.display = 'block';
+            decimalInput.style.display = 'none';
+            distanceInput.style.display = 'none';
+        } else if (disciplineId === 18) {
+            timeInput.style.display = 'none';
+            decimalInput.style.display = 'none';
+            distanceInput.style.display = 'block';
+        } else {
+            timeInput.style.display = 'none';
+            decimalInput.style.display = 'block';
+            distanceInput.style.display = 'none';
+        }
+    });
+
+    document.getElementById('add-user').addEventListener('change', async function () {
+        const userId = this.value;
+        const userProfilePicture = document.getElementById('user-profile-picture');
+
+        if (!userId) {
+            userProfilePicture.style.display = 'none';
+            return;
+        }
+
+        try {
+            const [userResponse, imageResponse] = await Promise.all([
+                fetch(`https://sportstatsapi.azurewebsites.net/api/Users/${userId}`),
+                fetch(`https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`)
+            ]);
+
+            if (!userResponse.ok) throw new Error('Грешка при зареждане на потребителските данни');
+
+            if (imageResponse.ok) {
+                const imageBlob = await imageResponse.blob();
+                userProfilePicture.src = URL.createObjectURL(imageBlob);
+            } else {
                 userProfilePicture.src = '../SportStatsImg/ProfilePhoto2.jpg';
-                userProfilePicture.style.display = 'block';
             }
-        });
-    
-        document.getElementById('submit-result').addEventListener('click', async function () {
-            const disciplineId = Number(document.getElementById('add-discipline').value);
-            const userId = Number(document.getElementById('add-user').value);
-            const isTimeBased = document.getElementById('time-input').style.display === 'block';
-        
-            const poolLocation = document.getElementById('pool-location').value.trim();
-            const poolSize = Number(document.getElementById('pool-size').value);
-        
-            let valueTime = isTimeBased 
-                ? calculateTimeValue() 
-                : parseFloat(document.getElementById('decimal-result').value);
-        
-            if (isNaN(valueTime) || valueTime < 0 || valueTime > 86400) {
-                showMessageBox('Моля, въведете валиден резултат. Стойността трябва да бъде между 0 и 86400 секунди.');
-                return;
+
+            userProfilePicture.style.display = 'block';
+        } catch (error) {
+            console.error('Грешка:', error);
+            userProfilePicture.src = '../SportStatsImg/ProfilePhoto2.jpg';
+            userProfilePicture.style.display = 'block';
+        }
+    });
+
+    document.getElementById('submit-result').addEventListener('click', async function () {
+        const disciplineId = Number(document.getElementById('add-discipline').value);
+        const userId = Number(document.getElementById('add-user').value);
+        const isTimeBased = document.getElementById('time-input').style.display === 'block';
+        const isDistanceBased = document.getElementById('distance-input').style.display === 'block';
+
+        const poolLocation = document.getElementById('pool-location').value.trim();
+        const poolSize = Number(document.getElementById('pool-size').value);
+
+        let valueTime;
+        if (isTimeBased) {
+            valueTime = calculateTimeValue();
+        } else if (isDistanceBased) {
+            valueTime = parseFloat(document.getElementById('distance-result').value);
+        } else {
+            valueTime = parseFloat(document.getElementById('decimal-result').value);
+        }
+
+        if (isNaN(valueTime) || valueTime < 0 || valueTime > 86400) {
+            showMessageBox('Моля, въведете валиден резултат. Стойността трябва да бъде между 0 и 86400.');
+            return;
+        }
+
+        if (!poolLocation || isNaN(poolSize) || poolSize < 15 || poolSize > 50) {
+            showMessageBox('Моля, попълнете място на провеждане и размер на басейна между 15 и 50 метра.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Requester-Id': user.id,
+                    'Role-Id': user.roleID,
+                    'Club-Id': user.clubID
+                },
+                body: JSON.stringify({
+                    userId,
+                    disciplineId,
+                    valueTime,
+                    resultDate: new Date().toISOString(),
+                    swimmingPoolStandart: poolSize,
+                    location: poolLocation
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed to add result:', { status: response.status, errorText });
+                throw new Error('Неуспешно добавяне на резултата.');
             }
-        
-            if (!poolLocation || isNaN(poolSize) || poolSize < 15 || poolSize > 50) {
-                showMessageBox('Моля, попълнете място на провеждане и размер на басейна между 15 и 50 метра.');
-                return;
-            }
-        
-            try {
-                const response = await fetch(`https://sportstatsapi.azurewebsites.net/api/Results`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Requester-Id': user.id,
-                        'Role-Id': user.roleID,
-                        'Club-Id': user.clubID
-                    },
-                    body: JSON.stringify({
-                        userId,
-                        disciplineId,
-                        valueTime,
-                        resultDate: new Date().toISOString(),
-                        swimmingPoolStandart: poolSize,
-                        location: poolLocation
-                    })
-                });
-        
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Failed to add result:', { status: response.status, errorText });
-                    throw new Error('Неуспешно добавяне на резултата.');
-                }
-        
-                showMessageBox('Резултатът е добавен успешно! Презареди страницата!');
-                await handleRankingUpdate(userId, disciplineId, valueTime);
-            } catch (error) {
-                console.error('Грешка:', error);
-                showMessageBox('Грешка при добавяне на резултата.', true);
-            }
-        });
-        populateRollers();
-    }
+
+            showMessageBox('Резултатът е добавен успешно! Презареди страницата!');
+            await handleRankingUpdate(userId, disciplineId, valueTime);
+        } catch (error) {
+            console.error('Грешка:', error);
+            showMessageBox('Грешка при добавяне на резултата.', true);
+        }
+    });
+
+    populateRollers();
+}
+
     
     function calculateTimeValue() {
-        const hours = parseInt(document.getElementById('hours').value, 10) || 0;
-        const minutes = parseInt(document.getElementById('minutes').value, 10) || 0;
-        const seconds = parseInt(document.getElementById('seconds').value, 10) || 0;
-        const milliseconds = parseInt(document.getElementById('milliseconds').value, 10) || 0;
-        return hours * 3600 + minutes * 60 + seconds + milliseconds / 100;
-    }
+    const hours = parseInt(document.getElementById('hours').value, 10) || 0;
+    const minutes = parseInt(document.getElementById('minutes').value, 10) || 0;
+    const seconds = parseInt(document.getElementById('seconds').value, 10) || 0;
+    const milliseconds = parseInt(document.getElementById('milliseconds').value, 10) || 0;
+    return hours * 3600 + minutes * 60 + seconds + milliseconds / 100;
+}
     
     async function handleRankingUpdate(userId, disciplineId, valueTime) {
-        try {
-            const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
-            if (isQualified) {
-                await addPointsToRankings(userId, disciplineId, 50);
-            }
-        } catch (error) {
-            console.warn('Грешка при проверка на норматива или добавяне на точки:', error);
+    try {
+        const isQualified = await compareResultWithNorms(userId, disciplineId, valueTime);
+        if (isQualified) {
+            await addPointsToRankings(userId, disciplineId, 50);
         }
+    } catch (error) {
+        console.warn('Грешка при проверка на норматива или добавяне на точки:', error);
     }
+}
+
     
     function populateRollers() {
-        populateRoller('hours', 0, 23);
-        populateRoller('minutes', 0, 59);
-        populateRoller('seconds', 0, 59);
-        populateRoller('milliseconds', 0, 99);
+    populateRoller('hours', 0, 23);
+    populateRoller('minutes', 0, 59);
+    populateRoller('seconds', 0, 59);
+    populateRoller('milliseconds', 0, 99);
+}
+
+function populateRoller(id, start, end) {
+    const select = document.getElementById(id);
+    for (let i = start; i <= end; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i.toString().padStart(2, '0');
+        select.appendChild(option);
     }
-    
-    function populateRoller(id, start, end) {
-        const select = document.getElementById(id);
-        for (let i = start; i <= end; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i.toString().padStart(2, '0');
-            select.appendChild(option);
-        }
-    }
+}
+
     
 
     function showMessageBox(message, isNegative = false) {

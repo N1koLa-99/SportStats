@@ -22,7 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+
     const savedUser = localStorage.getItem('user');
+    //localStorage.clear();
+
     if (savedUser) {
         const user = JSON.parse(savedUser);
         showMessageBox(`Здравей, ${user.firstName}!`, 'success');
@@ -74,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clubInput.parentNode.insertBefore(clubError, clubInput.nextSibling);
     
         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|bg|org|net|info|edu|gov|biz|co\.uk)$/i;
-        const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/;
         const namePattern = /^[A-Za-zА-Яа-я]+$/;
     
         let emailTimeout;
@@ -427,6 +430,27 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById(hintId).style.display = 'none';
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+    // ... Целият ти друг код вътре тук ...
+
+    // Активиране на функционалността за показване/скриване на паролата
+    document.querySelectorAll('.toggle-password').forEach(function (icon) {
+    icon.addEventListener('click', function () {
+        const inputId = this.getAttribute('data-target');
+        const input = document.getElementById(inputId);
+        const isPassword = input.type === 'password';
+
+        input.type = isPassword ? 'text' : 'password';
+
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+});
+
+
+});
+
 
     setupInputHints(emailInput, 'email-hint');
     setupInputHints(passwordInput, 'password-hint');

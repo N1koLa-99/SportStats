@@ -40,18 +40,18 @@ async function loadUser() {
         console.error('Грешка при зареждане на потребителя:', error);
     }
 }
-function populateDropdown(elementId, items, textProperty, valueProperty) {
-    const select = document.getElementById(elementId);
-    if (select) {
-        select.innerHTML = '<option value="" disabled selected>Изберете опция</option>';
-        items.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item[valueProperty];
-            option.textContent = typeof textProperty === 'function' ? textProperty(item) : item[textProperty];
-            select.appendChild(option);
-        });
-    }
+function populateDropdown(selectId, items, getText, keyForValue) {
+    const dropdown = document.getElementById(selectId);
+    dropdown.innerHTML = '<option value="">Избери...</option>';
+
+    items.forEach(item => {
+        const option = document.createElement('option');
+        option.textContent = typeof getText === 'function' ? getText(item) : item[getText];
+        option.value = item[keyForValue];
+        dropdown.appendChild(option);
+    });
 }
+
 async function handleCoach(user) {
     try {
         const disciplines = await fetchJson(`https://sportstatsapi.azurewebsites.net/api/ClubDisciplines/disciplines-by-club/${user.clubID}`);
@@ -89,7 +89,7 @@ async function handleCoach(user) {
                     const yearOfBirth = currentYear - selectedUser.age;
 
                     fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, userResults, selectedUser);
-                    updateCharts(userResults);
+                    updateCharts(userResults, disciplineId);
                 } catch (error) {
                     console.error("Грешка при зареждане на резултатите:", error);
                     showMessageBox("Грешка при зареждане на резултатите!", true);
@@ -119,7 +119,7 @@ async function handleCoach(user) {
                 const results = await res.json();
 
                 fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, results, selectedUser);
-                updateCharts(results);
+                updateCharts(userResults, disciplineId);
             } catch (error) {
                 console.error("Грешка при сортиране:", error);
                 showMessageBox("Грешка при сортиране!", true);
@@ -146,7 +146,7 @@ async function handleCoach(user) {
                 const results = await res.json();
 
                 fetchNormativesAndCompare(disciplineId, yearOfBirth, selectedUser.gender, results, selectedUser);
-                updateCharts(results);
+                updateCharts(userResults, disciplineId);
             } catch (error) {
                 console.error("Грешка при филтър по басейн:", error);
                 showMessageBox("Грешка при филтриране по басейн!", true);
@@ -170,7 +170,6 @@ async function handleCoach(user) {
         showMessageBox("Грешка при зареждане на данните!", true);
     }
 }
-
 function resetResults() {
 
     document.getElementById('best-result').textContent = 'Най-добрият резултат: —';
@@ -187,33 +186,41 @@ function displayResults(disciplineId, yearOfBirth, gender, results, normatives) 
 
     if (!resultsContainer || !normativesContainer) return;
 
-    // 📌 Филтрация по избран тип басейн
+    const unit = getUnitForDiscipline(disciplineId);
+
     const selectedPool = poolSelect ? poolSelect.value : 'all';
     let filteredResults = [...results];
     if (selectedPool === '25' || selectedPool === '50') {
         filteredResults = filteredResults.filter(r => r.swimmingPoolStandart === Number(selectedPool));
     }
 
-    // 🔃 Сортиране според избора
     const sortOption = sortSelect ? sortSelect.value : 'date-desc';
     const sortedResults = [...filteredResults];
 
     switch (sortOption) {
-        case 'date-asc':
-            sortedResults.sort((a, b) => new Date(a.resultDate) - new Date(b.resultDate));
-            break;
-        case 'date-desc':
-            sortedResults.sort((a, b) => new Date(b.resultDate) - new Date(a.resultDate));
-            break;
-        case 'time-asc':
-            sortedResults.sort((a, b) => a.valueTime - b.valueTime);
-            break;
-        case 'time-desc':
-            sortedResults.sort((a, b) => b.valueTime - a.valueTime);
-            break;
-    }
+    case 'date-asc':
+        sortedResults.sort((a, b) => new Date(a.resultDate) - new Date(b.resultDate));
+        break;
+    case 'date-desc':
+        sortedResults.sort((a, b) => new Date(b.resultDate) - new Date(a.resultDate));
+        break;
+    case 'time-asc':
+        sortedResults.sort((a, b) => {
+            return unit === 'време'
+                ? a.valueTime - b.valueTime   // по-малкото е по-добро
+                : b.valueTime - a.valueTime;  // по-голямото е по-добро
+        });
+        break;
+    case 'time-desc':
+        sortedResults.sort((a, b) => {
+            return unit === 'време'
+                ? b.valueTime - a.valueTime
+                : a.valueTime - b.valueTime;
+        });
+        break;
+}
 
-    // 🧹 Изчистване на предишното съдържание
+
     resultsContainer.innerHTML = '';
     normativesContainer.innerHTML = '';
 
@@ -227,51 +234,54 @@ function displayResults(disciplineId, yearOfBirth, gender, results, normatives) 
 
     sortedResults.forEach(result => {
         const poolType = result.swimmingPoolStandart;
-        const resultTime = result.valueTime;
-        const formattedResultTime = formatTime(resultTime);
+        const resultValue = result.valueTime;
+        const formattedResult = formatResultValue(resultValue, unit);
         const resultDate = new Date(result.resultDate).toLocaleDateString();
         const location = result.location || 'Няма данни';
 
-        // 📌 Намиране на съответните нормативи
-        let matchingNormatives = [];
-        if (poolType === 25) {
-            matchingNormatives = normatives.filter(n => n.swimmingPoolStandartId === 1);
-        } else if (poolType === 50) {
-            matchingNormatives = normatives.filter(n => n.swimmingPoolStandartId === 1 || n.swimmingPoolStandartId === 2);
-        }
-
-        // 🖋️ Създаване на HTML за резултата
         const resultItem = document.createElement('li');
         resultItem.innerHTML = `
             <strong>${poolType} м басейн - ${resultDate}</strong><br>
-            Резултат: ${formattedResultTime} сек<br>
+            Резултат: ${formattedResult}<br>
             Локация: ${location}
         `;
 
-        if (matchingNormatives.length === 0) {
-            resultItem.innerHTML += `<br>ℹ️ Без съпоставяне с норматив`;
+        if (unit === 'време') {
+            let matchingNormatives = [];
+            if (poolType === 25) {
+                matchingNormatives = normatives.filter(n => n.swimmingPoolStandartId === 1);
+            } else if (poolType === 50) {
+                matchingNormatives = normatives.filter(n => n.swimmingPoolStandartId === 1 || n.swimmingPoolStandartId === 2);
+            }
+
+            if (matchingNormatives.length === 0) {
+                resultItem.innerHTML += `<br>ℹ️ Без съпоставяне с норматив`;
+            } else {
+                const normList = document.createElement('ul');
+
+                matchingNormatives.forEach(norm => {
+                    const normativeValue = norm.valueStandart;
+                    const diff = resultValue - normativeValue;
+                    const isCovered = diff <= 0;
+
+                    const formattedNorm = formatResultValue(normativeValue, unit);
+                    const poolLabel = norm.swimmingPoolStandartId === 1 ? '25 м' : '50 м';
+                    const diffText = formatDifference(diff, unit);
+                    const statusText = isCovered
+                        ? `✅ Покрит норматив (${poolLabel}) - разлика: ${diffText}`
+                        : `❌ Не е покрит норматив (${poolLabel}) - разлика: ${diffText}`;
+                    const color = isCovered ? 'green' : 'red';
+
+                    const normItem = document.createElement('li');
+                    normItem.innerHTML = `<span style="color:${color}">${statusText}</span>`;
+                    normList.appendChild(normItem);
+                });
+
+                resultItem.appendChild(normList);
+            }
         } else {
-            const normList = document.createElement('ul');
-
-            matchingNormatives.forEach(norm => {
-                const normativeTime = norm.valueStandart;
-                const timeDiff = resultTime - normativeTime;
-                const isCovered = timeDiff <= 0;
-
-                const formattedNorm = formatTime(normativeTime);
-                const poolLabel = norm.swimmingPoolStandartId === 1 ? '25 м' : '50 м';
-                const diffText = formatTime(Math.abs(timeDiff));
-                const statusText = isCovered
-                    ? `✅ Покрит норматив (${poolLabel}) - разлика: ${diffText} сек`
-                    : `❌ Не е покрит норматив (${poolLabel}) - разлика: ${diffText} сек`;
-                const color = isCovered ? 'green' : 'red';
-
-                const normItem = document.createElement('li');
-                normItem.innerHTML = `<span style="color:${color}">${statusText}</span>`;
-                normList.appendChild(normItem);
-            });
-
-            resultItem.appendChild(normList);
+            // Метри – не сравняваме с нормативи
+            resultItem.innerHTML += `<br>ℹ️ Няма нормативи за дисциплина в метри.`;
         }
 
         list.appendChild(resultItem);
@@ -279,7 +289,6 @@ function displayResults(disciplineId, yearOfBirth, gender, results, normatives) 
 
     normativesContainer.appendChild(list);
 }
-
 function filterNormativesByPool(result, normatives) {
     if (!result.swimmingPoolStandart) return [];
 
@@ -304,15 +313,10 @@ function fetchNormativesAndCompare(disciplineId, yearOfBirth, userGender, result
         return response.json();
     })
     .then(normatives => {
-        console.log('Получени нормативи:', normatives);
 
         const genderMapping = { 'male': 'M', 'female': 'F' };
         const mappedGender = genderMapping[userGender.toLowerCase()] || userGender.toUpperCase();
-        
-        console.log('Година на раждане:', selectedUser.yearOfBirth);
-        console.log('Избрания пол:', mappedGender);
-        console.log('Всички нормативи:', normatives);
-        
+               
         const relevantNormatives = normatives.filter(normative => {
             return (
                 selectedUser.yearOfBirth >= normative.minYearOfBorn && 
@@ -321,30 +325,29 @@ function fetchNormativesAndCompare(disciplineId, yearOfBirth, userGender, result
             );
         });
         
-        console.log('Филтрирани нормативи:', relevantNormatives);
 
-        if (relevantNormatives.length === 0) {
-            console.log('Няма подходящи нормативи за тази възрастова група и пол.');
-        } else {
-            console.log('Филтрирани нормативи:', relevantNormatives);
-        }
+displayNormativesInHTML(disciplineId, relevantNormatives);
+displayResults(disciplineId, yearOfBirth, mappedGender, results, relevantNormatives);
 
-        displayResults(disciplineId, yearOfBirth, mappedGender, results, relevantNormatives);
     })
     .catch(error => {
         console.error('Грешка при извличане на нормативите:', error);
         displayResults(disciplineId, yearOfBirth, userGender, results, []); 
     });
 }
-function displayNormativesInHTML(normatives) {
+function displayNormativesInHTML(disciplineId, normatives) {
     const container = document.getElementById('normatives-container');
-    container.innerHTML = ''; 
+    container.innerHTML = '';
+
+    const unit = getUnitForDiscipline(disciplineId);
 
     if (normatives.length > 0) {
         const list = document.createElement('ul');
         normatives.forEach(normative => {
+            const formattedValue = formatResultValue(normative.valueStandart, unit);
+            const label = unit === 'време' ? 'сек' : ''; // 'м' е вече добавено във formatResultValue
             const item = document.createElement('li');
-            item.innerHTML = `${normative.gender === 'M' ? 'Мъжки' : 'Женски'} - ${normative.minYearOfBorn} до ${normative.maxYearOfBorn} години, норматив: ${formatTime(normative.valueStandart)} сек`;
+            item.innerHTML = `${normative.gender === 'M' ? 'Мъжки' : 'Женски'} - ${normative.minYearOfBorn} до ${normative.maxYearOfBorn} г., норматив: ${formattedValue} ${label}`;
             list.appendChild(item);
         });
         container.appendChild(list);
@@ -352,28 +355,90 @@ function displayNormativesInHTML(normatives) {
         container.innerHTML = 'Няма налични нормативи за тази възрастова група и дисциплина.';
     }
 }
+function getUnitForDiscipline(disciplineId) {
+    return disciplineId === 18 ? 'метра' : 'време';
+}
 function formatTime(time) {
     const minutes = Math.floor(time / 60);
-    const seconds = (time % 60).toFixed(2); 
+    const seconds = Math.floor(time % 60);
+    const hundredths = Math.round((time - Math.floor(time)) * 100);
 
+    const formattedMinutes = minutes > 0 ? `${minutes} мин ` : '';
+    const formattedSeconds = seconds > 0 ? `${seconds < 10 ? '0' : ''}${seconds} сек ` : '00 сек ';
+    const formattedHundredths = `${hundredths < 10 ? '0' : ''}${hundredths} ст`;
 
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
-    const formattedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-
-
-    return `${formattedMinutes}:${formattedSeconds}`;
+    return `${formattedMinutes}${formattedSeconds}${formattedHundredths}`.trim();
 }
-function updateCharts(results) {
+function formatResultValue(value, unit) {
+    if (unit === 'време') {
+        return formatTime(value); // ще използва новия по-описателен формат
+    } else if (unit === 'метра') {
+        return `${Number(value).toFixed(2)} м`;
+    } else {
+        return value;
+    }
+}
+function formatDifference(diff, unit) {
+    const sign = diff > 0 ? '+' : '-';
+    if (unit === 'време') {
+        return `${sign}${formatTime(Math.abs(diff))}`;
+    } else {
+        return `${sign}${Math.abs(diff).toFixed(2)} м`;
+    }
+}
+function updateCharts(results, disciplineId) {
+
     if (!results || results.length === 0) {
         console.warn("Няма данни за диаграмата.");
         return;
     }
 
-    const chartLabels = results.map(result => new Date(result.resultDate).toLocaleDateString());
-    const chartData = results.map(result => result.valueTime);
 
-    const bestResult = Math.min(...chartData);
-    document.getElementById('best-result').textContent = `Най-добрият резултат: ${bestResult} сек`;
+    const unit = getUnitForDiscipline(disciplineId); // "време" или "метра"
+
+    if (!unit || (unit !== 'време' && unit !== 'метра')) {
+        console.error("Невалиден unit за дисциплина:", unit);
+        return;
+    }
+
+    const isDistance = unit === 'метра';
+
+    const chartLabels = results.map(result =>
+        new Date(result.resultDate).toLocaleDateString()
+    );
+
+   const chartData = results.map(result => {
+    let value = isDistance ? result.valueDistance : result.valueTime;
+
+    // ако стойността липсва, пробвай другата
+    if (value === undefined || value === null) {
+        value = isDistance ? result.valueTime : result.valueDistance;
+    }
+
+    const num = Number(value);
+    if (isNaN(num)) {
+        console.warn("Невалиден резултат:", result);
+    }
+
+    return num;
+});
+
+
+    // Проверка за невалидни стойности
+    if (chartData.length === 0 || chartData.some(val => isNaN(val))) {
+        console.warn("Невалидни или липсващи стойности в chartData:", chartData);
+        return;
+    }
+
+    const bestResult = isDistance
+        ? Math.max(...chartData)
+        : Math.min(...chartData);
+
+    const bestText = `Най-добрият резултат: ${formatResultValue(bestResult, unit)}`;
+    const bestResultElement = document.getElementById('best-result');
+    if (bestResultElement) {
+        bestResultElement.textContent = bestText;
+    }
 
     const lineCanvas = document.getElementById('lineChart');
     if (!lineCanvas) {
@@ -387,14 +452,20 @@ function updateCharts(results) {
         return;
     }
 
-    if (window.myChart) window.myChart.destroy();
+    if (window.myChart) {
+        window.myChart.destroy();
+    }
+
+    const minY = Math.min(...chartData);
+    const maxY = Math.max(...chartData);
+    const padding = (maxY - minY) * 0.05 || 1;
 
     window.myChart = new Chart(ctxLine, {
         type: 'line',
         data: {
             labels: chartLabels,
             datasets: [{
-                label: 'Резултати',
+                label: isDistance ? 'Резултати (метри)' : 'Резултати (секунди)',
                 data: chartData,
                 borderColor: '#007bff',
                 backgroundColor: '#007bff',
@@ -409,20 +480,22 @@ function updateCharts(results) {
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    reverse: true,
+                    reverse: !isDistance,
+                    min: minY - padding,
+                    max: maxY + padding,
                     ticks: {
-                        beginAtZero: false,
-                        min: Math.min(...chartData) - 5,
-                        max: Math.max(...chartData) + 5,
+                        callback: function(value) {
+                            return formatResultValue(value, unit);
+                        },
                         font: {
-                            size: 14 // още по-големи числа по оста Y
+                            size: 14
                         }
                     }
                 },
                 x: {
                     ticks: {
                         font: {
-                            size: 14 // още по-големи дати по оста X
+                            size: 14
                         }
                     }
                 }
@@ -438,17 +511,25 @@ function updateCharts(results) {
                             return `Дата: ${context[0].label}`;
                         },
                         label: function (context) {
-                            const index = context.dataIndex;
-                            const result = results[index];
-                            const value = context.formattedValue;
-                            const location = result.location || 'Няма данни';
-                            const pool = result.swimmingPoolStandart || 'Няма данни';
-                            return [
-                                `Резултат: ${value} сек`,
-                                `Локация: ${location}`,
-                                `Басейн: ${pool} м`
-                            ];
-                        }
+    const index = context.dataIndex;
+    const result = results[index];
+
+    let valueRaw = isDistance ? result.valueDistance : result.valueTime;
+    if (valueRaw === undefined || valueRaw === null) {
+        valueRaw = isDistance ? result.valueTime : result.valueDistance;
+    }
+
+    const value = formatResultValue(Number(valueRaw), unit);
+    const location = result.location || 'Няма данни';
+    const pool = result.swimmingPoolStandart || 'Няма данни';
+
+    return [
+        `Резултат: ${value}`,
+        `Локация: ${location}`,
+        `Басейн: ${pool} м`
+    ];
+}
+
                     }
                 },
                 legend: {
@@ -462,6 +543,8 @@ function updateCharts(results) {
         }
     });
 }
+
+
 function displayUserInfo(user) {
     const userInfoContainer = document.getElementById('user-info');
     const profilePicture = document.getElementById('profile-picture');

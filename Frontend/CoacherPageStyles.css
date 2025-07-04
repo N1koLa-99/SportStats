@@ -92,7 +92,6 @@ th {
 tbody tr:hover {
     background-color: #f5f5f5;
 }
-
 .container {
     padding: 30px;
     background-color: #fff;
@@ -472,6 +471,38 @@ tbody tr:hover {
 /* Скриване на формата по подразбиране */
 #add-result-form {
     display: none;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+    40% {
+        box-shadow: 0 0 0 13px rgba(0, 123, 255, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 25px rgba(0, 123, 255, 0);
+    }
+}
+
+#detailed-info-link {
+    margin-top: 3%;
+    margin-left: 0px;
+    font-weight: bold;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0056b3;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    animation: pulse 1.2s infinite;
+    transition: background-color 0.3s;
+}
+
+#detailed-info-link:hover {
+    background-color: #003f88;
 }
 
 
