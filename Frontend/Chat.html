@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Отборен чат</title>
+  <link rel="stylesheet" href="ChatCss.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Отборен чат</h1>
+      <div class="meta">
+        <span id="meta-team">Отбор: —</span>
+        <span id="meta-user">Потребител: —</span>
+        <a class="back" href="HomePage.html">← Начало</a>
+      </div>
+    </header>
+
+    <section id="chat">
+      <div id="messages" aria-live="polite"></div>
+    </section>
+
+    <section>
+      <div class="row">
+        <input id="text" type="text" placeholder="Пиши съобщение…" autocomplete="off" />
+        <button id="send">Изпрати</button>
+      </div>
+      <div id="err" class="error"></div>
+      <p class="note">Съобщенията се опресняват автоматично на всеки 3 секунди.</p>
+    </section>
+  </div>
+
+  <script src="ChatJs.js"></script>
+</body>
+</html>
