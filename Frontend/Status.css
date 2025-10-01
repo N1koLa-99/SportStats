@@ -1,106 +1,218 @@
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #3a8dff, #6ec6ff);
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-}
-.home-button {
-    position: absolute;
-    top: 42px;
-    right: 42px;
-    font-size: 50px;
-    color: white;
-}
+/* =========================
+   Базови токени
+   ========================= */
+:root{
+  --bg:#ffffff;
+  --surface:#ffffff;
+  --muted-surface:#f6f7f9;
+  --border:#e6e9ef;
 
-.container {
-    width: 100%;
-    max-width: 600px;
-    background: white;
-    padding: 5vw;
-    border-radius: 15px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.5s ease-in-out;
+  --ink:#0b0f19;
+  --ink-2:#1f2937;
+  --muted:#6a7280;
+
+  --accent:#4f7cf7;
+  --accent-2:#2f5de8;
+
+  --radius:14px;
+  --radius-sm:10px;
+  --shadow:0 8px 28px rgba(13,20,33,.08);
+
+  --wrap: min(1120px, 100% - 32px);
 }
 
-h1 {
-    font-size: 2rem;
-    color: #3a8dff;
-    margin-bottom: 2rem;
-    border-bottom: 3px solid #6ec6ff;
-    display: inline-block;
-    padding-bottom: 0.5rem;
+/* Reset/Основни */
+*{ box-sizing: border-box }
+html,body{ height:100% }
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  font-size: 16px;
+}
+.wrap{ width:var(--wrap); margin-inline:auto }
+.page{ min-height:100dvh; display:grid; grid-template-rows:auto 1fr auto }
+
+/* =========================
+   Header – стил като Home/Settings
+   ========================= */
+.header{
+  position: sticky; top:0; z-index:10;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:saturate(1.15) blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.header .wrap{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:12px 0;
+}
+.brand-title{ font-weight:800; color:var(--ink-2); letter-spacing:.2px }
+
+/* Плочки с икони */
+.quick-actions{ display:flex; gap:12px; align-items:center }
+.icon-tile{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:6px; text-decoration:none; cursor:pointer;
+  width:84px; min-height:78px; padding:8px 6px;
+  border-radius:14px; border:1px solid var(--border);
+  background:#fff; color:var(--ink);
+  box-shadow:var(--shadow);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.icon-tile i{ font-size:20px; line-height:1 }
+.icon-tile .nav-label{ font-size:12px; color:var(--muted); font-weight:600 }
+.icon-tile:hover{ transform:translateY(-2px); border-color:#dfe4ee; background:#fafbfe }
+
+/* Респонсив плочки */
+@media (max-width:520px){
+  .icon-tile{ width:72px; min-height:70px; gap:4px; padding:6px 4px }
+  .icon-tile i{ font-size:18px }
+  .icon-tile .nav-label{ font-size:11px }
+}
+@media (max-width:380px){
+  .header .wrap{ gap:10px; padding:10px 0 }
+  .brand-title{ font-size:18px }
+  .icon-tile{ width:64px; min-height:64px }
+  .icon-tile i{ font-size:17px }
+  .icon-tile .nav-label{ font-size:10.5px }
 }
 
-.request-item {
-    background: #f0f8ff;
-    margin-bottom: 1rem;
-    padding: 1.5rem;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 5px solid #3a8dff;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+/* =========================
+   Карта със заявки
+   ========================= */
+.main{ padding-block:20px }
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.card-requests{
+  background: linear-gradient(180deg, rgba(248,249,252,.8), rgba(255,255,255,.95));
+  border-color:#e9edf4;
+}
+.card-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:14px 16px; border-bottom:1px solid var(--border);
+}
+.card-head h2{ margin:0; font-size:20px; font-weight:800; color:#0c1222 }
+.card-body{ padding:14px 16px 10px }
+
+/* Списък със заявки */
+.requests-list{ display:grid; gap:12px }
+
+/* Елемент заявка */
+.request-item{
+  display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:center;
+  padding:14px 16px;
+  background:linear-gradient(180deg,#ffffff,#fafcff);
+  border:1px solid #e6eaf3; border-radius:14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 8px 18px rgba(15,23,42,.06);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.request-item:hover{ transform:translateY(-2px); box-shadow:0 14px 28px rgba(15,23,42,.10); border-color:#dfe4ee; }
+
+.req-main{ display:grid; gap:6px; min-width:0 }
+.req-name{ font-size:16px; color:#0e1425; overflow-wrap: anywhere; }
+.req-email{ font-size:13px; color:var(--muted); overflow-wrap: anywhere; }
+
+.req-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end }
+
+/* Бутони Одобри/Отхвърли */
+.btn{
+  padding:10px 12px; border-radius:12px; border:1px solid var(--border);
+  background:#fff; color:var(--ink); cursor:pointer; font-weight:600;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease, filter .15s ease;
+  min-height: 44px; /* удобен touch target */
+}
+.btn:hover{ transform: translateY(-1px); border-color:#cfd4de }
+
+.approve{
+  background:#10b981; border-color:#10b981; color:#fff;
+  box-shadow:0 8px 18px rgba(16,185,129,.25);
+}
+.approve:hover{ filter:brightness(1.05) }
+
+.reject{
+  background:#ef4444; border-color:#ef4444; color:#fff;
+  box-shadow:0 8px 18px rgba(239,68,68,.25);
+}
+.reject:hover{ filter:brightness(1.05) }
+
+/* Съобщения */
+.muted{ color:var(--muted) }
+.error{ color:#ef4444 }
+
+/* Toast mini */
+.toast{
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(16px);
+  padding:10px 14px; border-radius:12px; color:#fff; opacity:0;
+  transition: transform .2s ease, opacity .2s ease;
+  box-shadow:0 10px 24px rgba(0,0,0,.18); z-index:1000;
+}
+.toast.success{ background:#10b981 }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+
+/* Footer */
+.footer{
+  padding:20px 0; border-top:1px solid var(--border);
+  color:var(--muted); text-align:left;
 }
 
-.request-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+/* =========================
+   Отзивчивост
+   ========================= */
+
+/* Таблети и надолу */
+@media (max-width: 880px){
+  .card-head h2{ font-size:18px }
+  .request-item{ padding:12px 14px }
+  .req-name{ font-size:15px }
 }
 
-button {
-    padding: 0.7rem 1.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+/* Малки екрани: подреждаме на една колона, бутоните стават на цяла ширина */
+@media (max-width:680px){
+  body{ font-size: 15px }
+  .main{ padding-block:16px }
+  .card-body{ padding:12px 12px 8px }
+  .requests-list{ gap:10px }
+
+  .request-item{
+    grid-template-columns: 1fr;
+    gap:10px;
+  }
+
+  .req-actions{
+    justify-content:stretch;
+    gap:8px;
+  }
+  .req-actions .btn{
+    flex:1 1 48%;
+  }
 }
 
-button:hover {
-    transform: scale(1.1);
+/* Много малки телефони */
+@media (max-width:480px){
+  body{ font-size: 14px }
+  .header .wrap{ padding:10px 0 }
+  .card-head{ padding:12px 12px }
+  .card-head h2{ font-size:17px }
+
+  .request-item{ padding:12px 12px }
+  .req-name{ font-size:14.5px }
+  .req-email{ font-size:12.5px }
+
+  /* бутоните всеки на цял ред за максимална четимост */
+  .req-actions{ flex-direction:column }
+  .req-actions .btn{ width:100%; flex:none }
 }
 
-.approve {
-    background: #3a8dff;
-    color: white;
-}
-
-.reject {
-    background: #6ec6ff;
-    color: white;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    .request-item {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    button {
-        width: 100%;
-        margin-top: 0.5rem;
-    }
+/* Ултра компактни устройства */
+@media (max-width:360px){
+  body{ font-size: 13.5px }
+  .icon-tile{ width:60px; min-height:60px }
+  .icon-tile i{ font-size:16px }
+  .icon-tile .nav-label{ font-size:10px }
+  .card-head h2{ font-size:16px }
+  .req-name{ font-size:14px }
 }

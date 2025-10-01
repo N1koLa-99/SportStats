@@ -324,38 +324,65 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function showLogoutConfirmation() {
-    // Премахваме старото потвърждение, ако има
-    const existingBox = document.querySelector('.confirmation-overlay');
-    if (existingBox) existingBox.remove();
+  // Премахни стар модал (ако има)
+  const existing = document.querySelector('.confirmation-overlay');
+  if (existing) existing.remove();
 
-    // Създаваме оверлей и прозорец
-    const overlay = document.createElement('div');
-    overlay.classList.add('confirmation-overlay');
-    overlay.innerHTML = `
-        <div class="confirmation-box">
-            <p>Сигурни ли сте, че искате да излезете от профила си?</p>
-            <button id="confirm-logout" class="confirm-button">Да</button>
-        </div>
-    `;
-    document.body.appendChild(overlay);
+  // Създай оверлей + модал
+  const overlay = document.createElement('div');
+  overlay.className = 'confirmation-overlay';
+  overlay.innerHTML = `
+    <div class="confirmation-box" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h3 id="confirm-title" class="confirm-title">Сигурни ли сте, че искате да излезете от профила си?</h3>
+      <button id="confirm-logout" class="confirm-button">Да</button>
+    </div>
+  `;
 
-    // Изход при клик извън прозореца
-    overlay.addEventListener('click', function (e) {
-        if (!e.target.closest('.confirmation-box')) {
-            overlay.remove();
-        }
-    });
+  // Запази текущия overflow и спри скрола на фона
+  const prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
 
-    // Логика за потвърждение
-    document.getElementById('confirm-logout').addEventListener('click', function () {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userHash');
-        sessionStorage.removeItem('user');
+  // Функция за затваряне с малка анимация и възстановяване на скрол
+  function closeModal() {
+    overlay.classList.add('closing');
+    setTimeout(() => {
+      overlay.remove();
+      document.body.style.overflow = prevOverflow || '';
+      document.removeEventListener('keydown', onKeydown);
+    }, 150);
+  }
 
-        showMessageBox("Успешно излязохте!", "success");
+  // Затваряне при клик извън кутията
+  overlay.addEventListener('click', (e) => {
+    if (!e.target.closest('.confirmation-box')) closeModal();
+  });
 
-        setTimeout(() => {
-            window.location.href = "Index.html";
-        }, 1000);
-    });
+  // Спри пропагиране вътре в кутията
+  overlay.querySelector('.confirmation-box').addEventListener('click', (e) => e.stopPropagation());
+
+  // Затваряне с Esc
+  function onKeydown(e) {
+    if (e.key === 'Escape') closeModal();
+  }
+  document.addEventListener('keydown', onKeydown);
+
+  // Потвърждение „Да“
+  overlay.querySelector('#confirm-logout').addEventListener('click', () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('userHash');
+    sessionStorage.removeItem('user');
+
+    if (typeof showMessageBox === 'function') {
+      showMessageBox("Успешно излязохте!", "success");
+    }
+
+    setTimeout(() => {
+      window.location.href = "Index.html";
+    }, 800);
+  });
+
+  // Добави към DOM и прехвърли фокуса към бутона
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirm-logout').focus();
 }
+

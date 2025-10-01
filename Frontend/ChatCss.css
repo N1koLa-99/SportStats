@@ -1,9 +1,11 @@
 :root {
-  /* Светла палитра с лек синкав тон */
+  /* Светла палитра с лек синкав тон (съвместима с останалите ти страници) */
   --bg: #f7f7fb;
   --panel: #ffffff;
   --panel-2: #f2f4f7;
+
   --text: #111827;
+  --ink: var(--text);                 /* за съвместимост с другите файлове */
   --muted: #667085;
 
   --accent: #3b82f6;
@@ -48,6 +50,9 @@ body {
   padding: 12px;
 }
 
+/* =========================
+   HEADER
+   ========================= */
 .app-header {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -63,6 +68,7 @@ body {
   gap: 12px;
 }
 
+/* Заглавие и мета */
 .app-title {
   margin: 0;
   font-size: 18px;
@@ -79,10 +85,48 @@ body {
   flex-wrap: wrap;
 }
 
-a.back { color: var(--muted); text-decoration: none; }
-a.back:hover { text-decoration: underline; }
+/* Старият линк „← Начало“ – скриваме го (ползваме плочката по-долу) */
+a.back { display: none; }
 
-/* Main */
+/* Плочка „Начало“ – иконка + текст (в стил останалите страници) */
+.quick-actions{ display:flex; gap:12px; align-items:center; }
+.icon-tile{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:6px; text-decoration:none; cursor:pointer;
+  width:84px; min-height:78px; padding:8px 6px;
+  border-radius:14px; border:1px solid var(--border);
+  background:#fff; color:var(--ink);
+  box-shadow:var(--shadow);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.icon-tile:hover{ transform:translateY(-2px); border-color:#dfe4ee; background:#fafbfe; }
+.icon-tile .nav-label{ font-size:12px; color:var(--muted); font-weight:600 }
+
+/* Векторна иконка на къща (без външни библиотеки) */
+.icon-tile .icon{
+  width:22px; height:22px;
+  background: currentColor;
+
+  /* фиксиран, едноредов data: URL */
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3L12 3z"/></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3L12 3z"/></svg>');
+
+  -webkit-mask-repeat: no-repeat;       mask-repeat: no-repeat;
+  -webkit-mask-position: center;        mask-position: center;
+  -webkit-mask-size: contain;           mask-size: contain;
+}
+
+
+/* Респонсив плочка */
+@media (max-width: 520px){
+  .icon-tile{ width:72px; min-height:70px; gap:4px }
+  .icon-tile .icon{ width:20px; height:20px }
+  .icon-tile .nav-label{ font-size:11px }
+}
+
+/* =========================
+   MAIN
+   ========================= */
 .app-main {
   display: flex;
   flex-direction: column;
@@ -147,12 +191,13 @@ a.back:hover { text-decoration: underline; }
   flex: 0 0 32px;
 }
 
-/* Bubble */
+/* Bubble – по-закръглено, с чиста опашка */
 .msg .bubble {
+  position: relative;
   display: grid;
   gap: 4px;
   padding: 10px 12px;
-  border-radius: 18px;
+  border-radius: 20px;
   background: var(--panel-2);
   border: 1px solid var(--border);
   word-wrap: break-word;
@@ -160,7 +205,8 @@ a.back:hover { text-decoration: underline; }
   box-shadow: 0 1px 2px rgba(16,24,40,.04);
 }
 
-/* Моето балонче – тъмно синьо с бял текст, малко удебелен */
+
+/* Моето балонче – тъмно синьо с бял текст */
 .msg.mine .bubble {
   background: var(--bubble-mine-bg);
   border-color: var(--bubble-mine-border);
@@ -168,7 +214,8 @@ a.back:hover { text-decoration: underline; }
 }
 .msg.mine .bubble .body { font-weight: 500; color: var(--bubble-mine-text); }
 
-/* Скриваме head от стария дизайн (вече не го ползваме) */
+
+/* Скриваме head от стария дизайн (вече не се ползва) */
 .head { display: none; }
 
 .body { font-size: 15px; line-height: 1.4; }

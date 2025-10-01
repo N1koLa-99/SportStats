@@ -1,108 +1,137 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
-    <link rel="stylesheet" href="SettingsStyles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="SettingsScript.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings</title>
+  <link rel="stylesheet" href="SettingsStyles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="SettingsScript.js" defer></script>
 </head>
-<body>
-    <a href="HomePage.html" class="settings-button">
+<body class="page">
+
+  <!-- Глобална нотификация (запазени ID-та) -->
+  <div id="message-box" class="message-box" role="status" aria-live="polite">
+    <div class="message-box-content">
+      <div id="message-box-text">This is a notification message</div>
+      <div class="message-box-progress">
+        <div id="message-box-progress-bar" class="message-box-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Хедър -->
+  <header class="header">
+  <div class="wrap">
+    <div class="brand">
+      <h1 class="brand-title"></h1>
+    </div>
+
+    <nav class="quick-actions">
+      <a href="HomePage.html" class="home-btn icon-tile" aria-label="Начало">
         <i class="fas fa-home"></i>
-    </a>
+        <span class="nav-label">Начало</span>
+      </a>
 
-    <div id="message-box" class="message-box">
-        <div class="message-box-content">
-            <div id="message-box-text">This is a notification message</div>
-            <div class="message-box-progress">
-                <div id="message-box-progress-bar" class="message-box-progress-bar"></div>
-            </div>
+      <button id="logout-button" class="btn danger icon-tile" title="Изход">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="nav-label">Изход</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+
+  <!-- Основно съдържание -->
+  <main class="main wrap">
+    <section class="card card-profile" aria-labelledby="profile-title">
+      <div class="card-head">
+        <h2 id="profile-title">Профил</h2>
+
+        <!-- Действия за профила (запазени ID-та) -->
+        <div class="actions">
+          <button class="btn icon" id="edit-profile" title="Редактирай">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button class="btn primary" id="save-profile" style="display:none;">Запази</button>
+          <button class="btn ghost" id="cancel-profile" style="display:none;">Назад</button>
         </div>
-    </div>
-    
-    <div class="container">
-        <div class="info">
-            <h2>Профил</h2>
+      </div>
 
-            <div class="profile-image-container">
-                <img id="profile-image" src="default-profile.png" alt="Профилна снимка" />
-                <input type="file" id="edit-profile-image" style="display: none;">
-                <button class="edit-image-button" id="edit-image-button">Смени снимката</button>
-            </div>
-
-      
-            <button class="edit-button" id="edit-profile">
-                <i class="fas fa-pencil-alt"></i>
-            </button>
-            <button class="save-button" id="save-profile" style="display: none;">Запази</button>
-            <button class="cancel-button" id="cancel-profile" style="display: none;">Назад</button>
-
-            <div id="changes-notification" style="display: none;"></div>
-
-            <div class="info-item">
-                <span class="label">Име:</span>
-                <div class="info-content">
-                    <span id="first-name">Зарежда се...</span>
-                    <input type="text" id="edit-first-name" style="display: none;" placeholder="Ново име">
-                </div>
-            </div>
-            <div class="info-item">
-                <span class="label">Фамилия:</span>
-                <div class="info-content">
-                    <span id="last-name">Зарежда се...</span>
-                    <input type="text" id="edit-last-name" style="display: none;" placeholder="Нова фамилия">
-                </div>
-            </div>
-            <div class="info-item">
-                <span class="label">Година на раждане:</span>
-                <div class="info-content">
-                    <span id="year-of-birth">Зарежда се...</span>
-                    <select id="edit-year-of-birth" style="display: none;">
-                        <!-- Примерни години, ще ги попълним динамично с JavaScript -->
-                    </select>
-                </div>
-            </div>
-            
-            <div class="info-item">
-                <span class="label">Email:</span>
-                <div class="info-content">
-                    <span id="email">Зарежда се...</span>
-                    <input type="email" id="edit-email" style="display: none;" placeholder="Нов email">
-                </div>
-            </div>
-            <div class="info-item">
-    <span class="label">Парола:</span>
-    <div class="info-content password-container">
-        <input type="password" id="edit-password" style="display: none;" placeholder="Нова парола">
-        <i class="fas fa-eye toggle-password" style="display: none;" onclick="togglePassword('edit-password', this)"></i>
-    </div>
-</div>
-
-<div class="info-item">
-    <span class="label confirm-password-label">Потвърдете паролата:</span>
-    <div class="info-content password-container">
-        <input type="password" id="edit-confirm-password" class="hidden" style="display: none;" placeholder="Потвърдете новата парола">
-        <i class="fas fa-eye toggle-password" style="display: none;" onclick="togglePassword('edit-confirm-password', this)"></i>
-    </div>
-</div>
-
-            <div class="info-item">
-                <span class="label">Клуб:</span>
-                <div class="info-content">
-                    <span id="club">Зарежда се...</span>
-                </div>
-            </div>
+      <!-- Аватар + бутон снимка (запазени ID-та) -->
+      <div class="profile">
+        <div class="avatar">
+          <img id="profile-image" src="default-profile.png" alt="Профилна снимка">
+          <input type="file" id="edit-profile-image" hidden>
+          <button class="btn soft" id="edit-image-button">Смени снимката</button>
         </div>
 
-        <button id="logout-button" class="button-53">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
-        
+        <!-- Информация (запазени ID-та и полета) -->
+        <div class="form-grid">
 
+          <div class="form-row">
+            <label class="label" for="edit-first-name">Име</label>
+            <div class="value">
+              <span id="first-name">Зарежда се...</span>
+              <input type="text" id="edit-first-name" placeholder="Ново име" style="display:none;">
+            </div>
+          </div>
 
-    </div>
+          <div class="form-row">
+            <label class="label" for="edit-last-name">Фамилия</label>
+            <div class="value">
+              <span id="last-name">Зарежда се...</span>
+              <input type="text" id="edit-last-name" placeholder="Нова фамилия" style="display:none;">
+            </div>
+          </div>
 
+          <div class="form-row">
+            <label class="label" for="edit-year-of-birth">Година на раждане</label>
+            <div class="value">
+              <span id="year-of-birth">Зарежда се...</span>
+              <select id="edit-year-of-birth" style="display:none;"></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="edit-email">Email</label>
+            <div class="value">
+              <span id="email">Зарежда се...</span>
+              <input type="email" id="edit-email" placeholder="Нов email" style="display:none;">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="edit-password">Парола</label>
+            <div class="value password-container">
+              <input type="password" id="edit-password" placeholder="Нова парола" style="display:none;">
+              <i class="fas fa-eye toggle-password" style="display:none;" onclick="togglePassword('edit-password', this)"></i>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="label confirm-password-label" for="edit-confirm-password" style="display:none;">Потвърдете паролата</label>
+            <div class="value password-container">
+              <input type="password" id="edit-confirm-password" class="hidden" placeholder="Потвърдете новата парола" style="display:none;">
+              <i class="fas fa-eye toggle-password" style="display:none;" onclick="togglePassword('edit-confirm-password', this)"></i>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <span class="label">Клуб</span>
+            <div class="value">
+              <span id="club">Зарежда се...</span>
+            </div>
+          </div>
+
+          <div id="changes-notification" class="note" style="display:none;"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    <small>© SportStats</small>
+  </footer>
 </body>
 </html>
