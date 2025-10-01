@@ -1,5 +1,5 @@
 // === НАСТРОЙКИ ===
-const API_BASE = 'https://localhost:7198';
+const API_BASE = 'https://localhost:7198'; // смени при нужда
 const POLL_MS = 3000;
 const AVATAR_FALLBACK = 'https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg';
 
@@ -8,22 +8,20 @@ const userJson = localStorage.getItem('user');
 const savedHash = localStorage.getItem('userHash');
 
 if (!userJson || !savedHash) {
-  redirectToIndex("Невалидни данни. Пренасочване към началната страница.");
+  alert("Невалидни данни. Върни се към началната страница.");
+  window.location.href = 'index.html';
   throw new Error("Missing user or hash in localStorage");
 }
-
 const user = JSON.parse(userJson);
 
 // userId и teamId
-const userId = user.id;
-const teamId = user.clubID;
-
+const userId = Number(user.id);
+const teamId = Number(user.clubID);
 localStorage.setItem('teamId', String(teamId));
 localStorage.setItem('userId', String(userId));
 
 // UI refs
 document.getElementById('meta-user').textContent = `Потребител: ${user.firstName} ${user.lastName}`;
-
 fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
   .then(r => { if (!r.ok) throw new Error('Network response was not ok'); return r.json(); })
   .then(club => { document.getElementById('meta-team').textContent = `Отбор: ${club.name || 'Няма данни'}`; })
@@ -32,17 +30,26 @@ fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
     document.getElementById('meta-team').textContent = 'Грешка при зареждане на клуба';
   });
 
-const $messages = document.getElementById('messages');
-const $text = document.getElementById('text');
-const $send = document.getElementById('send');
-const $err = document.getElementById('err');
-const $jumpNew = document.getElementById('jump-new');
-const $menu = document.getElementById('msg-menu');
+const $messages   = document.getElementById('messages');
+const $text       = document.getElementById('text');
+const $send       = document.getElementById('send');
+const $err        = document.getElementById('err');
+const $jumpNew    = document.getElementById('jump-new');
+const $menu       = document.getElementById('msg-menu');
 const $menuSender = document.getElementById('menu-sender');
-const $menuTime = document.getElementById('menu-time');
+const $menuTime   = document.getElementById('menu-time');
 const $menuDelete = document.getElementById('menu-delete');
-const $menuClose = document.getElementById('menu-close');
+const $menuClose  = document.getElementById('menu-close');
 
+const $btnAttach  = document.getElementById('btn-attach');
+const $fileInput  = document.getElementById('files');
+const $attBar     = document.getElementById('att-bar');
+const $drop       = document.getElementById('drop');
+
+// Държим селектираните файлове тук
+let selectedFiles = [];
+
+// helpers
 function api(path) { return API_BASE + path; }
 function fmtDate(d) {
   const date = new Date(d);
@@ -64,8 +71,21 @@ function showError(msg) {
   clearTimeout(showError._t);
   showError._t = setTimeout(() => ($err.style.display = 'none'), 5000);
 }
+function bytesToSize(b) {
+  if (b === 0) return '0 B';
+  if (!b && b !== 0) return '';
+  const u = ['B','KB','MB','GB','TB'];
+  const i = Math.floor(Math.log(b) / Math.log(1024));
+  return (b / Math.pow(1024, i)).toFixed(i ? 1 : 0) + ' ' + u[i];
+}
+function fileBadge(file) {
+  if (file.type?.startsWith('image/')) return 'IMG';
+  const ext = (file.name.split('.').pop() || '').toUpperCase();
+  if (ext) return ext.length > 5 ? 'FILE' : ext;
+  return 'FILE';
+}
 
-/* --- Аватари с кеш --- */
+// Аватари с кеш
 const avatarCache = new Map(); // id -> objectURL
 async function getAvatarUrl(uid) {
   if (avatarCache.has(uid)) return avatarCache.get(uid);
@@ -82,7 +102,7 @@ async function getAvatarUrl(uid) {
   }
 }
 
-/* --- Управление на скрол/пауза --- */
+// Скрол/пауза
 let isNearBottom = true;
 let userActiveUntil = 0;
 
@@ -90,18 +110,14 @@ function calcIsNearBottom() {
   const delta = $messages.scrollHeight - $messages.scrollTop - $messages.clientHeight;
   return delta < 48;
 }
-
 function preserveScrollDuring(updateFn) {
   const fromBottom = $messages.scrollHeight - $messages.scrollTop;
   updateFn();
-  if (isNearBottom) {
-    $messages.scrollTop = $messages.scrollHeight;
-  } else {
-    $messages.scrollTop = $messages.scrollHeight - fromBottom;
-  }
+  if (isNearBottom) $messages.scrollTop = $messages.scrollHeight;
+  else $messages.scrollTop = $messages.scrollHeight - fromBottom;
 }
 
-/* --- Времеви разделители (на всеки ≥10 мин или нов ден) --- */
+// Времеви разделители
 function shouldInsertTimeSep(prevISO, curISO) {
   if (!prevISO) return true;
   const a = new Date(prevISO);
@@ -111,9 +127,162 @@ function shouldInsertTimeSep(prevISO, curISO) {
   return diffMin >= 10 || a.toDateString() !== b.toDateString();
 }
 
-/* --- Рендериране на съобщения (нов markup с avatar + bubble) --- */
+// ===== Прикачване – поддръжка =====
+const ALLOWED = new Set(["image/jpeg","image/png","image/webp","image/gif","application/pdf"]);
+const MAX_FILE = 10 * 1024 * 1024; // 10MB
+
+function syncFileInputFromSelected() {
+  // синхронизираме реалния input за да е коректен при изпращане
+  const dt = new DataTransfer();
+  selectedFiles.forEach(f => dt.items.add(f));
+  $fileInput.files = dt.files;
+}
+
+function toggleSendDisabled() {
+  $send.disabled = !$text.value.trim() && selectedFiles.length === 0;
+}
+
+function renderSelectedFiles() {
+  $attBar.innerHTML = '';
+  if (selectedFiles.length === 0) {
+    $attBar.classList.remove('show');
+  } else {
+    $attBar.classList.add('show');
+  }
+
+  selectedFiles.forEach((f, idx) => {
+    const chip = document.createElement('div');
+    chip.className = 'att-chip';
+
+    // thumb или бейдж
+    if (f.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.alt = f.name;
+      img.src = URL.createObjectURL(f);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      chip.appendChild(img);
+    } else {
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = fileBadge(f);
+      chip.appendChild(badge);
+    }
+
+    // име + размер
+    const name = document.createElement('span');
+    name.className = 'name';
+    name.title = f.name;
+    name.textContent = f.name;
+    chip.appendChild(name);
+
+    const size = document.createElement('span');
+    size.className = 'size';
+    size.textContent = ' · ' + bytesToSize(f.size);
+    chip.appendChild(size);
+
+    // бутон премахване
+    const rm = document.createElement('button');
+    rm.className = 'rm';
+    rm.type = 'button';
+    rm.title = 'Премахни';
+    rm.textContent = '×';
+    rm.addEventListener('click', () => {
+      selectedFiles.splice(idx, 1);
+      syncFileInputFromSelected();
+      renderSelectedFiles();
+      toggleSendDisabled();
+    });
+    chip.appendChild(rm);
+
+    $attBar.appendChild(chip);
+  });
+}
+
+function addFiles(files) {
+  let added = 0;
+  for (const f of files) {
+    if (!ALLOWED.has(f.type || '')) { showError(`Неподдържан тип: ${f.name}`); continue; }
+    if (f.size > MAX_FILE) { showError(`Твърде голям файл (>10MB): ${f.name}`); continue; }
+    selectedFiles.push(f);
+    added++;
+  }
+  if (added > 0) {
+    syncFileInputFromSelected();
+    renderSelectedFiles();
+    toggleSendDisabled();
+  }
+}
+
+// UI: „Прикачи“
+$btnAttach.addEventListener('click', () => $fileInput.click());
+$fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+
+// Drag & Drop
+// правим drop зоната да се показва при drag върху документа
+['dragenter','dragover'].forEach(ev =>
+  document.addEventListener(ev, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    $drop.classList.add('active');
+  })
+);
+['dragleave','drop'].forEach(ev =>
+  document.addEventListener(ev, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (ev === 'dragleave') $drop.classList.remove('active');
+  })
+);
+$drop.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  $drop.classList.add('drag');
+});
+$drop.addEventListener('dragleave', () => $drop.classList.remove('drag'));
+$drop.addEventListener('drop', (e) => {
+  $drop.classList.remove('drag');
+  $drop.classList.remove('active');
+  const dt = e.dataTransfer;
+  if (dt && dt.files) addFiles(dt.files);
+});
+
+// ===== Рендериране на съобщения с прикачени =====
+function renderAttachments(list, container) {
+  if (!Array.isArray(list) || list.length === 0) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'att-list';
+
+  for (const a of list) {
+    const url = a.fileUrl ?? a.FileUrl;
+    const type = (a.fileType ?? a.FileType ?? '').toString();
+
+    if (!url) continue;
+
+    if (type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'прикачено изображение';
+      img.loading = 'lazy';
+      img.addEventListener('click', () => window.open(url, '_blank', 'noopener'));
+      wrap.appendChild(img);
+    } else if (type === 'application/pdf') {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'PDF файл';
+      wrap.appendChild(link);
+    } else {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Прикачен файл';
+      wrap.appendChild(link);
+    }
+  }
+
+  container.appendChild(wrap);
+}
+
 async function renderMessages(list) {
-  // Ще пълним фрагмент асинхронно заради аватарите
   const frag = document.createDocumentFragment();
   let prevTime = null;
 
@@ -124,7 +293,6 @@ async function renderMessages(list) {
     const created = m.createdAt ?? m.CreatedAt;
     const content = (m.content ?? m.Content) || '';
 
-    // Времеви чип
     if (shouldInsertTimeSep(prevTime, created)) {
       const sep = document.createElement('div');
       sep.className = 'time-sep';
@@ -133,34 +301,36 @@ async function renderMessages(list) {
     }
     prevTime = created;
 
-    // Ред на съобщението
     const row = document.createElement('div');
     row.className = 'msg' + (mine ? ' mine' : '');
-    row.dataset.msgId = id ?? '';                 // за менюто/изтриването
+    row.dataset.msgId = id ?? '';
     row.dataset.senderId = String(sender);
     row.dataset.createdAt = created;
 
-    // Аватар
     const img = document.createElement('img');
     img.className = 'avatar';
     img.alt = 'Аватар';
-    // await avatar
     // eslint-disable-next-line no-await-in-loop
     img.src = await getAvatarUrl(sender);
 
-    // Балонче (само текст)
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
 
-    const body = document.createElement('div');
-    body.className = 'body';
-    body.innerHTML = escapeHTML(content);
+    // текст
+    if (content) {
+      const body = document.createElement('div');
+      body.className = 'body';
+      body.innerHTML = escapeHTML(content);
+      bubble.appendChild(body);
+    }
 
-    bubble.appendChild(body);
+    // прикачени
+    const atts = m.attachments ?? m.Attachments ?? [];
+    if (atts.length) renderAttachments(atts, bubble);
+
     row.appendChild(img);
     row.appendChild(bubble);
 
-    // Клик за меню
     bubble.addEventListener('click', (ev) => openMsgMenu(ev, row));
 
     frag.appendChild(row);
@@ -173,7 +343,7 @@ async function renderMessages(list) {
   if ($jumpNew) $jumpNew.hidden = isNearBottom;
 }
 
-/* --- Зареждане на съобщения --- */
+// ===== Зареждане =====
 async function loadMessages() {
   if (Date.now() < userActiveUntil && !isNearBottom) return;
   try {
@@ -187,25 +357,35 @@ async function loadMessages() {
   }
 }
 
-/* --- Изпращане на съобщение --- */
+// ===== Изпращане (текст + файлове, multipart/form-data) =====
 async function sendMessage() {
   const content = $text.value.trim();
-  if (!content) { $text.focus(); return; }
+  if (!content && selectedFiles.length === 0) { $text.focus(); return; }
 
   $send.disabled = true;
   try {
-    const body = { TeamId: teamId, SenderId: userId, Content: content };
-    const res = await fetch(api('/api/messages'), {
+    const fd = new FormData();
+    fd.append('TeamId', String(teamId));
+    fd.append('SenderId', String(userId)); // в прод – бекенд да взема от JWT
+    if (content) fd.append('Content', content);
+    for (const f of selectedFiles) fd.append('Files', f);
+
+    const res = await fetch(api('/api/messages/send'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: fd
     });
+
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
 
-    // след изпращане – скрол долу и презареждане
+    // успех – чистим
     isNearBottom = true;
     $text.value = '';
+    selectedFiles = [];
+    syncFileInputFromSelected();
+    renderSelectedFiles();
     $text.focus();
+    toggleSendDisabled();
+
     await loadMessages();
   } catch (err) {
     console.error("Грешка при изпращане:", err);
@@ -215,13 +395,11 @@ async function sendMessage() {
   }
 }
 
-/* --- Контекстно меню --- */
-let menuForMsg = null; // реф към елемента .msg, за който е менюто
+// ===== Контекстно меню / изтриване =====
+let menuForMsg = null;
 
 function openMsgMenu(ev, msgRow) {
   menuForMsg = msgRow;
-
-  // Попълваме текстовете
   const sid = Number(msgRow.dataset.senderId);
   const createdAt = msgRow.dataset.createdAt;
   const mine = sid === userId;
@@ -229,16 +407,9 @@ function openMsgMenu(ev, msgRow) {
   $menuSender.textContent = mine ? 'Аз' : `Потребител #${sid}`;
   $menuTime.textContent = fmtDate(createdAt);
 
-  // Показваме/скриваме бутона Изтрий (само за мои)
-  if (mine) {
-    $menuDelete.removeAttribute('disabled');
-    $menuDelete.style.display = '';
-  } else {
-    $menuDelete.setAttribute('disabled', 'true');
-    $menuDelete.style.display = 'none';
-  }
+  if (mine) { $menuDelete.removeAttribute('disabled'); $menuDelete.style.display = ''; }
+  else { $menuDelete.setAttribute('disabled', 'true'); $menuDelete.style.display = 'none'; }
 
-  // Позициониране около клика (в границите на #chat)
   const chatRect = document.getElementById('chat').getBoundingClientRect();
   const x = Math.min(ev.clientX - chatRect.left + 8, chatRect.width - 240);
   const y = Math.min(ev.clientY - chatRect.top + 8, chatRect.height - 140);
@@ -247,40 +418,20 @@ function openMsgMenu(ev, msgRow) {
   $menu.style.top = y + 'px';
   $menu.hidden = false;
 }
-
-function closeMsgMenu() {
-  $menu.hidden = true;
-  menuForMsg = null;
-}
+function closeMsgMenu() { $menu.hidden = true; menuForMsg = null; }
 
 async function deleteCurrentMessage() {
   if (!menuForMsg) return;
-
-  const id = menuForMsg.dataset.msgId;        // идва от row.dataset.msgId в renderMessages
+  const id = menuForMsg.dataset.msgId;
   if (!id) { showError('Липсва идентификатор на съобщението.'); return; }
 
   try {
-    const headers = {};
-    // ако бекендът очаква токен/хеш — отключи реда по-долу
-    // const token = localStorage.getItem('userHash'); if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    // ТВОЯТ РУТ
     const url = api(`/api/messages/${id}/user/${userId}`);
-    const res = await fetch(url, { method: 'DELETE', headers });
-
+    const res = await fetch(url, { method: 'DELETE' });
     const text = await res.text().catch(() => '');
 
-    if (res.ok) {
-      closeMsgMenu();
-      await loadMessages();
-      return;
-    }
-
-    if (res.status === 403) {
-      showError(text || 'Нямате право да изтриете това съобщение.');
-      return;
-    }
-
+    if (res.ok) { closeMsgMenu(); await loadMessages(); return; }
+    if (res.status === 403) { showError(text || 'Нямате право да изтриете това съобщение.'); return; }
     showError(`Неуспешно изтриване (HTTP ${res.status}) ${text ? '— ' + text : ''}`);
   } catch (err) {
     console.error('Грешка при изтриване:', err);
@@ -288,17 +439,12 @@ async function deleteCurrentMessage() {
   }
 }
 
-
-/* --- Слушатели --- */
+// Слушатели
 $send.addEventListener('click', sendMessage);
-
 $text.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
-$text.addEventListener('input', () => { $send.disabled = !$text.value.trim(); });
+$text.addEventListener('input', () => { toggleSendDisabled(); });
 
 $messages.addEventListener('scroll', () => {
   isNearBottom = calcIsNearBottom();
@@ -313,7 +459,6 @@ if ($jumpNew) {
   });
 }
 
-// Меню бутони / извънкликове
 $menuDelete.addEventListener('click', deleteCurrentMessage);
 $menuClose.addEventListener('click', closeMsgMenu);
 document.addEventListener('click', (e) => {
@@ -322,16 +467,15 @@ document.addEventListener('click', (e) => {
   const clickedBubble = e.target.closest?.('.bubble');
   if (!clickedInsideMenu && !clickedBubble) closeMsgMenu();
 });
-
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) userActiveUntil = Date.now() + 10000;
 });
 
-/* --- Старт --- */
+// Старт
 (async function init() {
   try {
     $text.focus();
-    $send.disabled = true;
+    toggleSendDisabled();
     isNearBottom = true;
     await loadMessages();
     setInterval(loadMessages, POLL_MS);

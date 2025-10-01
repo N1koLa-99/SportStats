@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <link rel="stylesheet" href="ChatCss.css">
   <title>Отборен чат</title>
-  <link rel="stylesheet" href="ChatCss.css" />
 </head>
 <body class="chat-app">
   <div class="wrap chat-layout">
@@ -12,12 +12,11 @@
       <div class="header-row">
         <h1 class="app-title">Отборен чат</h1>
         <nav class="quick-actions">
-  <a href="HomePage.html" class="icon-tile home-btn" aria-label="Начало">
-    <span class="icon home-icon" aria-hidden="true"></span>
-    <span class="nav-label">Начало</span>
-  </a>
-</nav>
-
+          <a href="HomePage.html" class="icon-tile home-btn" aria-label="Начало">
+            <span class="icon home-icon" aria-hidden="true"></span>
+            <span class="nav-label">Начало</span>
+          </a>
+        </nav>
       </div>
       <div class="meta">
         <span id="meta-team">Отбор: —</span>
@@ -27,19 +26,9 @@
 
     <main class="app-main">
       <section id="chat" class="chat-window" aria-label="История на съобщенията">
-        <div
-          id="messages"
-          class="messages"
-          role="log"
-          aria-live="polite"
-          aria-relevant="additions"
-          tabindex="0">
-        </div>
-
-        <!-- Плаващ бутон за нови съобщения -->
+        <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions" tabindex="0"></div>
         <button id="jump-new" class="jump-new" type="button" hidden>Нови съобщения ↓</button>
 
-        <!-- Контекстно меню за съобщение -->
         <div id="msg-menu" class="msg-menu" hidden>
           <div class="msg-menu__meta">
             <div id="menu-sender" class="msg-menu__sender"></div>
@@ -54,15 +43,15 @@
 
       <section class="composer">
         <div class="row composer-row" role="form">
-          <input
-            id="text"
-            type="text"
-            placeholder="Пиши съобщение…"
-            autocomplete="off"
-            inputmode="text"
-            aria-label="Текст на съобщението" />
+          <button id="btn-attach" class="btn-attach" type="button">📎 Прикачи</button>
+          <input id="text" type="text" placeholder="Пиши съобщение…" autocomplete="off" inputmode="text" aria-label="Текст на съобщението" />
           <button id="send" class="btn-send" type="button">Изпрати</button>
+          <input id="files" type="file" accept="image/*,application/pdf" multiple hidden />
         </div>
+
+        <div id="drop" class="dropzone">Провлачете файлове тук или натиснете „Прикачи“</div>
+        <div id="att-bar" class="attachments-bar" aria-live="polite"></div>
+
         <div id="err" class="error" role="alert" aria-live="assertive"></div>
         <p class="note">Съобщенията се опресняват автоматично на всеки 3 секунди.</p>
       </section>

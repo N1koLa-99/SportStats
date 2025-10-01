@@ -178,7 +178,13 @@ body{
    Профил – по-стегната подредба
    ========================= */
 .card-profile{padding:12px 16px 16px}
-.profile-compact{ display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center; }
+.profile-compact {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    margin-top: 14px;
+    align-items: center;
+}
 .profile-image{
   width:84px;height:84px;border-radius:12px;object-fit:cover;border:1px solid var(--border)
 }
