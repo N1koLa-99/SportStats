@@ -1,1523 +1,557 @@
-body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-}
-.container {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0px;
-    min-height: 100vh; /* Вместо height: 100vh; */
-    width: 100vw;
-    background: 
-    linear-gradient(
-        rgba(0, 0, 0, 0.651),
-        rgba(0, 0, 0, 0.658)
-    ),
-    url('markus-spiske-OAg9u5E1ju0-unsplash.jpg')round;
-    background-size: cover;
-}
-.profile-image {
-    display: block;
-    margin: 0 auto 20px;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ddd;
-}
-.info {
-    max-width: 300px;
-    background: transparent;
-    color: #333;
-    padding: 20px;
-    border-radius: 10px;
-    font-family: 'Roboto', sans-serif;
-    margin-left: 80px;
-    padding-left: 55px;
-    padding-right: 55px;
-    margin-top: -100px;
-}
-
-.info .info-section {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    position: relative;
-}
-
-.info .info-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 100px;
-    margin-bottom: 10px;
-}
-
-.info .info-col {
-    display: flex;
-    flex-direction: column;
-}
-
-.info .info-col .label {
-    font-weight: 700;
-    color: #888888b0;
-    font-size: 22px;
-    margin-bottom: 5px;
-}
-
-.info .info-col .value {
-    font-weight: 700;
-    color: #ffffff;
-    font-size: 28px;
-}
-
-/* Стилове за линиите под етикетите */
-.info .info-col .line {
-    height: 2px;
-    background: #ddd;
-    margin-bottom: 10px;
-    width: 120%;
-    transform: translateX(-10%);
-}
-
-/* Стилове за линиите под другите етикети */
-.info .info-section .line {
-    height: 2px;
-    background: #ddd;
-    margin-bottom: 10px;
-    width: 120%;
-    transform: translateX(-10%);
-}
-
-.info .label {
-    font-weight: 700;
-    color: #888888b0;
-    font-size: 22px; 
-    margin-bottom: 5px; 
-}
-
-.info .value {
-    font-weight: 700; 
-    color: #ffffff; 
-    font-size: 28px; 
-}
-.results {
-    flex: 1;
-    max-width: 50%;
-    background: rgba(255, 255, 255, 0.22);
-    background: rgba(255 255 255 / 22%);
-    color: #333;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    width: 90%;
-    max-width: 800px;
-    position: absolute;
-    right: 20px; 
-    margin-right: 200px;
-    margin-top: 10px;
-    overflow: auto; /* Разрешаване на скролването в този контейнер */
-    transition: transform 0.3s ease-in-out;
-    font-family: 'Jura';
-}
-
-
-#resultsChart {
-    background-color: #f0f8ff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    transform: scale(0.8);
-    animation: scaleUp 1s ease-out forwards;
-}
-
-@keyframes scaleUp {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-#chart-container {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-#resultsChart {
-    max-width: 800px;
-    max-height: 250px;
-}
-
-#chart-info {
-    margin-left: 20px;
-    margin-top: 20px;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    font-weight: bold;
-    color: #333;
-    background-color: rgba(255, 255, 255, 0.7);
-    padding: 20px;
-    border-radius: 10px;
-    font-size: 1.2em;
-    line-height: 1.6em;
-    animation: fadeIn 2s ease-in;
-}
-
-#chart-info p {
-    margin: 0px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-#chart-info span {
-    font-weight: bold;
-    color: #1e90ff;
-}
-
-#chart-info p:last-child {
-    border-bottom: none;
-}
-
-select {
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: 2px solid #1e90ff;
-    background-color: #f9f9f9;
-    color: #333;
-    font-size: 16px;
-    font-family: 'Arial', sans-serif;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease, transform 0.2s ease;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-select:focus {
-    border-color: #1c7ed6;
-    outline: none;
-    background-color: #e6f0ff;
-    transform: scale(1.02);
-}
-
-select::-ms-expand {
-    display: none;
-}
-
-select::after {
-    content: '▼';
-    font-size: 18px;
-    color: #1e90ff;
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-
-.form-group {
-    position: relative;
-    display: inline-block;
-}
-
-select:hover {
-    border-color: #1c7ed6;
-    background-color: #f0f8ff;
-    cursor: pointer;
-}
-
-button {
-    color: #fff;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-}
-
-button:hover {
-color: #1c7ed6;
-    transform: scale(1.05);
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-.settings-button {
-    position: fixed;
-    top: 30px;
-    right: 30px;
-    font-size: 50px;
-    color: #ffffff;
-    text-decoration: none;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.settings-button:hover {
-    transform: scale(1.05);
-}
-
-.results h2 {
-    color: white;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-
-
-@keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-#total-points, #rank-name {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.hidden {
-    display: none; /* Задържане на стил, ако е необходимо да се скрие */
-}
-
-/* Стилове за бутоните само с икони */
-.icon-button {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    margin-top: -5px;
-    transition: color 0.3s;
-    margin-right: 48px;
-}
-
-.icon-button i {
-    font-size: 50px; /* Размер на иконата */
-    color: #ffffff; /* Цвят на иконата */
-}
-
-/* Позициониране на бутоните */
-#coach-button {
-    position: fixed;
-    top: 20%;
-    right: -1%;
-    z-index: 1000;
-}
-
-#status-button {
-    position: fixed;
-    top: 38%;
-    right: 1%;
-    z-index: 1000;
-}
-
-/* Останалите стилове */
-.waiting-container, .rejected-container {
-    text-align: center;
-    margin-top: 50px;
-    font-family: 'Roboto', sans-serif;
-}
-
-.waiting-container h2, .rejected-container h2 {
-    font-size: 24px;
-    color: #333;
-}
-
-.rejected-container button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.rejected-container button:hover {
-    background-color: #e60000;
-}
-
-#status-button {
-    margin-right: 20px; /* Можеш да добавиш отстояние от десния край */
-}
-a.settings-button,
-button.icon-button {
-    display: flex;
-    flex-direction: column; /* Подрежда елементите вертикално */
-    align-items: center; /* Центрира ги хоризонтално */
-    text-decoration: none; /* Премахва подчертаването на <a> */
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.icon-label {
-    font-family: Jura;
-    font-size: 20px;
-    color: #f0f8ff6b;
-    margin-top: 5px;
-    text-align: center;
-}
-
-.button-image {
-    width: 75px;
-    height: 75px;
-    object-fit: contain;
-}
-
-/* Контейнер за бутоните */
-.button-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px; /* Разстояние между бутоните */
-    position: absolute;
-    top: 10px; /* Отстояние от горната част */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 400px; /* За да не се разтягат бутоните на големи екрани */
-}
-
-.hidden {
-    display: none !important;
-}
-.sponsor-footer {
-    background: linear-gradient(135deg, #e0f7fa, #ffffff);
-    padding: 80px 20px;
-    border-top: 4px solid #0A2A43;
-    text-align: center;
-    font-family: 'Jura', sans-serif;
-}
-
-.footer-title {
-    font-size: 36px;
-    margin-bottom: 60px;
-    color: #0A2A43;
-    font-weight: 700;
-    margin-top: -4%;
-}
-
-.sponsor-cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.sponsor-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
-    width: 280px;
-    padding: 25px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    min-height: 520px;
-}
-
-.sponsor-card:hover {
-    transform: translateY(-10px) scale(1.03);
-    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.15);
-}
-
-.card-logo {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    margin: 0 auto 15px;
-}
-
-.card-product-img {
-    width: 100%;
-    height: auto;
-    margin: 15px 0;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.sponsor-card h4 {
-    font-size: 22px;
-    margin: 10px 0;
-    color: #0A2A43;
-}
-
-.sponsor-card p {
-    font-size: 15px;
-    color: #444;
-    margin-bottom: 20px;
-    flex-grow: 1;
-}
-
-.cta-button {
-    display: inline-block;
-    margin-top: auto;
-    padding: 10px 24px;
-    background: linear-gradient(135deg, #0A2A43, #1976d2);
-    color: #fff;
-    text-decoration: none;
-    border-radius: 30px;
-    font-size: 14px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.cta-button:hover {
-    background: linear-gradient(135deg, #1976d2, #0A2A43);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-}
-
-/* Optional animation on scroll */
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.sponsor-card {
-    animation: fadeUp 0.6s ease-in-out both;
-}
-
-.carousel {
-    position: relative;
-    height: auto;
-    min-height: 260px;
-  }
-  
-  .carousel-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    transition: opacity 0.8s ease-in-out;
-    width: 100%;
-  }
-  
-  .carousel-slide.active {
-    opacity: 1;
-    position: relative;
-  }
-  
-.product-slider {
-    position: relative;
-    width: 100%;
-    height: auto;
-    overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.product-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-}
-
-.product-slide.active {
-    opacity: 1;
-    position: relative;
-}
-.tables-wrapper {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 40px;
-    background-color: #1b343e;
-}
-
-.UserTableSection {
-    flex: 1;
-    max-width: 55%;
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    font-family: 'Segoe UI', sans-serif;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-    color: #cdeeff;
-    animation: fadeIn 1s ease-in-out;
-}
-
-.right-section {
-    flex: 1;
-    max-width: 40%;
-    background: linear-gradient(135deg, #1f3b4d, #162c3a);
-    padding: 20px;
-    border-radius: 10px;
-    color: #dff;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-.right-section:hover {
-    transform: scale(1.03);
-    box-shadow: 0 8px 30px rgba(0, 255, 255, 0.4);
-}
-
-.placeholder {
-    text-align: center;
-    font-style: italic;
-    opacity: 0.85;
-    color: #aaa;
-}
-
-.user-results-section {
-    background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(23,46,57,0.95));
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 255, 255, 0.1);
-    animation: floatUp 1s ease-out;
-}
-
-.user-results-section h3,
-.best-club-section h3 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 26px;
-    font-family: 'Jura';
-    color: #ffffff;
-    letter-spacing: 1px;
-}
-
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: rgba(255, 255, 255, 0.03);
-    color: #eaffff;
-    font-family: 'Jura';
-    overflow: hidden;
-    border-radius: 10px;
-    backdrop-filter: blur(6px);
-}
-
-.results-table th,
-.results-table td {
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 12px;
-    text-align: center;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.results-table th {
-    background: linear-gradient(to right, #2b5876, #2b4362);
-    font-weight: bold;
-    color: #c0f7ff;
-    text-shadow: 1px 1px 3px #000;
-}
-
-.results-table tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.02);
-}
-
-.results-table tr:hover {
-    background-color: rgba(0, 255, 255, 0.1);
-    transform: scale(1.01);
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-}
-
-.results-table tr.first-place {
-    background-color: rgba(255, 223, 0, 0.25);
-    font-weight: bold;
-    color: #fff176;
-    animation: pulseGlow 1.5s infinite;
-}
-
-.results-table tr.second-place {
-    background-color: rgba(192, 192, 192, 0.25);
-    font-weight: bold;
-    color: #e0e0e0;
-    animation: pulseGlow 2s infinite;
-}
-
-.results-table tr.third-place {
-    background-color: rgba(205, 127, 50, 0.25);
-    font-weight: bold;
-    color: #ffccbc;
-    animation: pulseGlow 2.5s infinite;
-}
-
-.results-table td:first-child {
-    text-align: left;
-    padding-left: 20px;
-}
-
-.hover-info {
-    display: none;
-    position: absolute;
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 10px;
-    font-size: 0.9em;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    border-radius: 6px;
-}
-
-#best-club-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Jura';
-    margin-top: 1rem;
-}
-
-#best-club-table thead {
-    background: linear-gradient(to right, #264653, #1d2e38);
-    color: #fff;
-}
-
-#best-club-table th,
-#best-club-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #444;
-    text-align: left;
-}
-
-.best-club-row:hover {
-    background-color: rgba(0, 255, 255, 0.08);
-    cursor: pointer;
-    transition: background-color 0.3s;
-    box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.2);
-}
-
-/* Топ 3 класации */
-.gold-row {
-    background-color: rgba(255, 223, 0, 0.3);
-    font-weight: bold;
-    color: #fff176;
-    animation: pulseGlow 1.5s infinite;
-}
-
-.silver-row {
-    background-color: rgba(192, 192, 192, 0.3);
-    font-weight: bold;
-    color: #eeeeee;
-    animation: pulseGlow 2s infinite;
-}
-
-.bronze-row {
-    background-color: rgba(205, 127, 50, 0.3);
-    font-weight: bold;
-    color: #ffccbc;
-    animation: pulseGlow 2.5s infinite;
-}
-
-/* Switch */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 28px;
-    margin-bottom: 10px;
-}
-
-.switch input { display: none; }
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(145deg, #888, #aaa);
-    transition: 0.4s;
-    border-radius: 28px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 20px; width: 20px;
-    left: 4px; bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background: linear-gradient(135deg, #00ffcc, #00c6ff);
-    box-shadow: 0 0 8px rgba(0, 255, 200, 0.6);
-}
-
-input:checked + .slider:before {
-    transform: translateX(32px);
-}
-
-/* Анимации */
-@keyframes pulseGlow {
-    0% { box-shadow: 0 0 5px rgba(255,255,255,0.2); }
-    50% { box-shadow: 0 0 15px rgba(255,255,255,0.6); }
-    100% { box-shadow: 0 0 5px rgba(255,255,255,0.2); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes floatUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-
-
-
-
-
-@media (max-width: 1600px) {
-    .results h2 {
-       color: white;
-    }
-    .results {
-        flex: 1;
-        max-width: 50%;
-        background: rgba(255 255 255 / 22%);
-        color: #333;
-        padding: 0px;
-        border-radius: 15px;
-        text-align: center;
-        width: 90%;
-        max-width: 523px;
-        position: absolute;
-        right: 90px;
-        margin-right: 104px;
-        margin-top: 7px;
-        overflow: hidden;
-        transition: transform 0.3s ease-in-out;
-    }
-    .coach-button {
-        top: 95px;
-        right: 5px;
-        font-size: 17px;
-        padding: 7px;
-    }
-    #status-button, .status-button {
-        top: 217px;
-        right: 12px;
-        font-size: 17px;
-        padding: 7px;
-    }
-    .info{
-        max-width: 252px;
-        padding: 6px;
-        border-radius: 7px;
-        margin-left: -4px;
-        padding-left: 55px;
-        padding-right: 55px;
-        margin-top: -68px;
-    }
-    #chart-info {
-        margin-left: 22px;
-        margin-right: 22px;
-        margin-top: 20px;
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        font-weight: bold;
-        color: #333;
-        background-color: rgba(255, 255, 255, 0.7);
-        padding: 20px;
-        border-radius: 10px;
-        font-size: 15px;
-        line-height: 18px;
-        animation: fadeIn 2s ease-in;
-        margin-bottom: 16px
-    }
-    #resultsChart {
-        max-width: 400px;
-        max-height: 210px;
-        margin-left: 54px;
-        margin-top: -10px;
-        margin-bottom: -8px;
-        background-color: #f0f8ffd1;
-    }
-    #chart-info p {
-        margin: 4px 0;
-        line-height: 22px;
-    }
-    .info {
-        max-width: 234px;
-        padding: 0px;
-        border-radius: 7px;
-        margin-left: -4px;
-        padding-left: 118px;
-        padding-right: 49px;
-        margin-top: -7px;
-    }
-    image{
-        width: 125px;
-        height: 125px;
-    }
-    .info .value {
-        font-size: 24px;
-    }
-    .info .info-col .value {
-        font-weight: 700;
-        color: #ffffff;
-        font-size: 24px;
-    }
-    .icon-button {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        margin-top: 106px;
-        transition: color 0.3s;
-        margin-right: -56px;
-    }
-    .icon-button #coach-button
-    {
-        margin-right: -16px;
-    }
-    #coach-button {
-        position: fixed;
-        top: 7%;
-        right: 5.5%;
-        z-index: 1000;
-    }
-}
-
-@media (max-width: 1550) {
-    
-    .results {
-        max-width: 50%;
-        padding: 20px;
-        width: 93%;
-        max-width: 700px;
-        right: -14px;
-        margin-right: 200px;
-        margin-top: 18px;
-    }
-
-    .info{
-        max-width: 252px;
-        padding: 6px;
-        border-radius: 7px;
-
-        margin-left: -4px;
-        padding-left: 55px;
-        padding-right: 55px;
-        margin-top: -68px;
-    }
-    button {
-        top: 95px;
-        right: 5px;
-        font-size: 11px;
-    }
-
-    #chart-info{
-        padding: 0px;
-        font-size: 18px;
-        line-height: 10px;
-    }
-}
-
-@media (max-width: 450px) {
-    
-    .container {
-        position: relative;
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        padding: 0px;
-        padding-bottom: 6%;
-        width: 100vw;
-        
-        /* Задава мащабиране на изображението, така че да покрие целия контейнер */
-        background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.658)), 
-            url(taiki-ishikawa-9H5rLZLyw9c-unsplash.jpg);
-        
-        background-size: cover;  /* Кара снимката да покрива целия контейнер */
-        background-position: center; /* Центрира изображението */
-        background-attachment: fixed; /* Фиксира фона при скрол */
-        background-repeat: no-repeat; /* Забранява повторението */
-    }
-    
-
-    select {
-        padding: 14px 11px;
-        border-radius: 29px;
-        border: 2px solid #1e90ff;
-        font-size: 16px;
-        margin-bottom: 20px;
-        margin-left: 22px;
-    }
-
-    .profile-image {
-        width: 85px;
-        height: 85px;
-        margin-top: 86%;
-        margin-left: 44%;
-        margin-bottom: 6%;
-    }
-
-    .info {
-        width: 58%;
-        max-width: none;
-        padding: 0px;
-        margin-top: -63px;
-        margin-right: 44%;
-    }
-
-
-
-    .info .info-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .info .label, .info .value {
-        font-size: 24px;
-        margin-left: -24%;
-        color: #8a9493;
-        font-family: 'Jura';
-        margin-top: -6%;
-        padding-inline: 28px;
-    }
-
-    .info .info-col .label {
-        font-weight: 700;
-        color: #8a9493;
-        font-size: 24px;
-        margin-bottom: 15px;
-        margin-left: 15%;
-    }
-
-    .info .info-col .value {
-        font-weight: 700;
-        font-family: 'Jura';
-        color: #8a9493;
-        font-size: 24px;
-        margin-left: -11px;
-        margin-bottom: 48%;
-        margin-top: -88px;
-        width: 113px;
-    }
-
-    .info .info-section {
-        margin-bottom: -113px;
-        margin-left: 83%;
-    }
-
-    .line{
-       display: none;   
-     }
-
-     .results h2 {
-        color: #ffffff;
-        font-size: 32px;
-        margin-top: 10%;
-        font-family: 'Jura';
-    }
-  
-    .results {
-        max-width: 100%;
-        padding: 13px;
-        max-width: 380px;
-        margin-top: 50%;
-        margin-right: -9%;
-        right: 60px;
-        background: rgba(255, 255, 255, 0);
-    }
-
-    #chart-info {
-        margin-left: 26px;
-        margin-top: 40px;
-        padding: 20px;
-        border-radius: 38px;
-        font-size: 16px;
-        line-height: 16px;
-        
-    }
-    #chart-info p {
-        display: flex;
-        justify-content: space-between;
-        padding: 9px 16px;
-        margin-top: -10px;
-        margin-right: -10px;
-        font-size: 15px;
-        line-height: 25px;
-        flex-direction: column;
-    }
-
-    #chart-info span {
-        font-weight: bold;
-        display: contents;
-        color: #1e90ff;
-    }
-
-    #resultsChart {
-        max-width: 377px;
-        max-height: 255px;
-        margin-left: 19px;
-        margin-top: 15px;
-    }
-
-    #year-of-birth.value{
-        display: none;
-    }
-
-    #club.value{
-        display: none;
-    }
-
-    .info-col:nth-child(2) .label {
-        display: none;
-    }
-    .info-col:nth-child(1) .label {
-        display: none;
-    }
-    .info-section:nth-child(3) .label {
-        display: none;
-    }
-    .info-section:nth-child(4) .label {
-        display: none;
-    }
-    #last-name ~ .label {
-        display: none;
-    }
-    .button-container {
-        top: 5px;
-        gap: 15px;
-    }
-    
-    .button-image {
-        width: 50px;
-        height: 50px;
-    }
-    
-    button {
-        border-radius: 18px;
-        padding: 13px 30px;
-        font-size: 13px;
-        margin-left: 4%;
-    }
-
-    .icon-button i {
-        font-size: 36px;
-        color: #ffffff;
-        margin-top: 120%;
-        margin-left: 58%;
-    }
-    .icon-button {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        margin-top: 6px;
-        transition: color 0.3s;
-        margin-right: 4px;
-    }
-    .header {
-        width: 100%;
-        height: 96px;
-        background-color: #00000075;
-        position: fixed;
-        top: 20px;
-        border-radius: 78px;
-        left: 0;
-        z-index: 1000;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .settings-button {
-        position: fixed;
-        top: 4%;
-        right: 11%;
-        z-index: 1100;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .settings-button img {
-        width: 50px; /* Размер на иконата */
-        height: 50px;
-    }
-    
-
-    #status-button, .status-button {
-        top: 3.5%;
-        right: 69%;
-        font-size: 17px;
-        padding: 7px;
-    }
-    #coach-button {
-        position: fixed;
-        top: 3.5%;
-        right: 41.5%;
-        z-index: 1000;
-    }
-    .icon-label {
-        font-family: Jura;
-        font-size: 12px;
-        color: #f0f8ff8c;
-        margin-top: 4px;
-        text-align: center;
-    }
-
-    #chart-container {
-        display: none; /* Скрити по подразбиране */
-    }
-    select {
-        padding: 10px 15px;
-        border-radius: 15px;
-        border: 2px solid #ffffff;
-        background-color: #f9f9f930;
-        color: #ffffff;
-        font-size: 16px;
-        font-family: 'Arial', sans-serif;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease, transform 0.2s ease;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    select:hover {
-        border-color: #ffffff18;
-        background-color: #003ba891;
-        cursor: pointer;
-    }
-    .footer-title {
-        font-size: 14px;
-        margin-bottom: 60px;
-        color: #0A2A43;
-        font-weight: 700;
-        margin-top: -20%;
-    }
-    .UserTableSection {
-    flex: 1;
-    max-width: 100%;
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    background-color: #172e39;
-    font-family: 'Segoe UI', sans-serif;
-}
-.right-section {
-    flex: 1;
-    max-width: 90%;
-    background-color: #1f3b4d;
-    padding: 20px;
-    border-radius: 10px;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-}
-.tables-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+/* =========================
+   Базови токени / Reset
+   ========================= */
+:root{
+  --bg:#ffffff;
+  --surface:#ffffff;
+  --muted-surface:#f6f7f9;
+  --border:#e6e9ef;
+
+  /* Монохромна йерархия */
+  --ink:#0b0f19;
+  --ink-2:#1f2937;
+  --muted:#6a7280;
+  --muted-2:#98a1b2;
+
+  /* Акценти */
+  --accent:#4f7cf7;
+  --accent-2:#2f5de8;
+
+  /* Структурни */
+  --radius:14px;
+  --radius-sm:10px;
+  --shadow:0 8px 28px rgba(13, 20, 33, .08);
+  --inner-shadow:inset 0 1px 0 rgba(255,255,255,.6);
+  --wrap: min(1120px, 100% - 32px);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+:root{ color-scheme: light; }
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+}
+
+/* =========================
+   Контейнер / Структура
+   ========================= */
+.wrap{width:var(--wrap);margin-inline:auto}
+.page{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto}
+
+.logo{
+  width:32px; height:32px;
+  display:grid; place-items:center;
+  border-radius:10px;
+  background-color: var(--muted-surface);
+  border:1px solid var(--border);
+  padding:0;
+}
+.logo img{
+  width:70%;
+  height:70%;
+  object-fit: contain;
+  display:block;
+}
+
+/* =========================
+   Хедър и навигация (иконки + текст)
+   ========================= */
+.header{
+  position:sticky;top:0;z-index:10;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:saturate(1.15) blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.header .wrap{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:12px 0;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+  display:grid;place-items:center;width:32px;height:32px;
+  border-radius:10px;background:var(--muted-surface);
+  border:1px solid var(--border);font-weight:700
+}
+.brand-title{font-family:"Domine",serif;font-weight:700}
+
+/* нав: иконка отгоре, текст отдолу */
+.top-nav{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+}
+.top-nav a,
+.top-nav .btn{
+  position:relative;
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  text-decoration:none;
+  padding:8px 10px;
+  min-width:64px;
+  min-height:56px;
+  border-radius:12px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--ink);
+  font-weight:600;
+  line-height:1.1;
+  transition: transform .15s ease, color .15s ease, border-color .15s ease, background .15s ease;
+}
+
+/* общ стил за иконите (плътни) */
+.top-nav a::before,
+.top-nav .btn::before{
+  content:"";
+  display:block;
+  width:24px; height:24px;
+  background: currentColor;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+  -webkit-mask-position:center;  mask-position:center;
+}
+
+/* hover/focus */
+.top-nav a:hover, .top-nav .btn:hover{
+  transform: translateY(-1px);
+  background: var(--muted-surface);
+  border-color: var(--border);
+}
+.top-nav a:active, .top-nav .btn:active{ transform: translateY(0) }
+.top-nav a:focus-visible, .top-nav .btn:focus-visible{
+  outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.15);
+  border-color:#dfe4ea;
+}
+
+/* иконки */
+.top-nav a[href*="Chat"]::before{
+  -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M4 3h16a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H10l-4 4v-4H4a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z"/></svg>');
+          mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M4 3h16a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H10l-4 4v-4H4a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z"/></svg>');
+}
+.top-nav a[href*="Settings"]::before{
+  -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M21 13.5v-3l-2.06-1.19.3-2.38-2.12-2.12-2.38.3L13.5 3h-3L9.31 5.11l-2.38-.3-2.12 2.12.3 2.38L3 10.5v 3l2.11 1.19-.3 2.38 2.12 2.12 2.38-.3L10.5 21h3l1.19-2.06 2.38.3 2.12-2.12-.3-2.38L21 13.5ZM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"/></svg>');
+          mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M21 13.5v-3l-2.06-1.19.3-2.38-2.12-2.12-2.38.3L13.5 3h-3L9.31 5.11l-2.38-.3-2.12 2.12.3 2.38L3 10.5v 3l2.11 1.19-.3 2.38 2.12 2.12 2.38-.3L10.5 21h3l1.19-2.06 2.38.3 2.12-2.12-.3-2.38L21 13.5ZM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"/></svg>');
+}
+/* Резултати / Заявки (бутоните) */
+#coach-button::before{
+  -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M3 4h2v14h16v2H3V4zm3 9 4-4 3 3 5-7 2 1-6 8-3-3-3 3-2-1z"/></svg>');
+          mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M3 4h2v14h16v2H3V4zm3 9 4-4 3 3 5-7 2 1-6 8-3-3-3 3-2-1z"/></svg>');
+}
+#status-button::before{
+  -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M19 3H5a2 2 0 0 0-2 2v6h3V6h12v12H6v-5H3v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM11 7v5H8l4 4 4-4h-3V7h-2z"/></svg>');
+          mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M19 3H5a2 2 0 0 0-2 2v6h3V6h12v12H6v-5H3v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM11 7v5H8l4 4 4-4h-3V7h-2z"/></svg>');
+}
+
+/* ред: Chat (1), nav-actions (2), Settings (вдясно) */
+.nav-actions{display:flex;gap:8px;margin-left:8px}
+.top-nav a[href*="Chat"]{ order: 1; }
+.top-nav .nav-actions{ order: 2; }
+.top-nav a[href*="Settings"]{ order: 3; margin-left:auto; }
+
+/* запазваме .hidden за JS */
+.hidden{ display:none !important }
+
+/* =========================
+   Карти / Основно съдържание
+   ========================= */
+.main{display:grid;gap:20px;padding-block:20px}
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid var(--border);gap:12px;
+}
+.card-head h1,.card-head h2,.card-head h3{margin:0;color:var(--ink-2)}
+
+/* =========================
+   Профил – по-стегната подредба
+   ========================= */
+.card-profile{padding:12px 16px 16px}
+.profile-compact{ display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center; }
+.profile-image{
+  width:84px;height:84px;border-radius:12px;object-fit:cover;border:1px solid var(--border)
+}
+.profile-meta{display:grid;gap:10px}
+.meta-row{ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px }
+.meta-item{
+  display:grid;gap:4px;padding:10px 12px;
+  background:var(--muted-surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm)
+}
+.meta-item .label{font-size:12px;color:var(--muted)}
+.meta-item .value{font-weight:600;color:var(--ink-2)}
+.meta-full{grid-column:1/-1}
+
+/* =========================
+   Форм елементи / бутони
+   ========================= */
+select,button{font:inherit}
+
+/* SELECT със стрелка/подсказка */
+#discipline,
+.inline-form select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  background-image: none !important;
+  border: 1px solid var(--border);
+  color: var(--ink);
   width: 100%;
-  padding: 0; /* Премахваме отстоянията */
-  margin: 0;
+  border-radius: 12px;
+  padding: 10px 44px 10px 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+#discipline:hover { border-color: #d8ddea; background-color: #fbfcff; }
+#discipline:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(79,124,247,.15);
+}
+.inline-form { position: relative; display: inline-block; }
+.inline-form::after{
+  content:""; position:absolute; right:12px; top:50%;
+  width:16px; height:16px; transform:translateY(-50%);
+  color:var(--muted); background:currentColor;
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M7 9l5 6 5-6z"/></svg>') no-repeat center/contain;
+          mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M7 9l5 6 5-6z"/></svg>') no-repeat center/contain;
+  pointer-events:none;
+}
+.inline-form:hover::after{ color:var(--accent); }
+.inline-form:has(select:focus)::after{ color:var(--accent); transform:translateY(-50%) rotate(180deg); }
+select::-ms-expand{ display:none; }
+.inline-form::before{
+  content:""; position:absolute; right:36px; top:50%;
+  height:60%; width:1px; transform:translateY(-50%);
+  background:#e9edf6; pointer-events:none;
 }
 
-.user-results-section,
-.best-club-section {
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 0; /* Няма вътрешен падинг */
-  border-radius: 0;
-  box-shadow: none;
-  width: 100%;
-  margin-top: 5%;
+.btn{
+  padding:10px 12px;border-radius:12px;border:1px solid var(--border);
+  background:#fff;color:var(--ink);cursor:pointer
+}
+.btn:hover{border-color:#cfd4de}
+.btn.primary{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{background:#fff}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* =========================
+   РЕЗУЛТАТИ – Модерен професионален вид
+   ========================= */
+.card-results{
+  border-color:#e9edf4;
+  background: linear-gradient(180deg, rgba(248,249,252,.8), rgba(255,255,255,.9));
+  box-shadow: 0 10px 30px rgba(15,23,42,.06);
+
+  /* Ширина на диаграмата и реда под нея (1) */
+  --chart-max: 860px;
+}
+.card-results .card-head{ background: linear-gradient(180deg,#fff, #fafbfe); }
+.card-results .card-head h2{ font-size:20px;font-weight:800;color:#0c1222;letter-spacing:.2px }
+.card-results .card-head .inline-form{margin-left:auto}
+.card-results .card-head select{
+  min-width:240px;background:#fff;color:var(--ink);
+  border-radius:12px;border:1px solid #e3e7f0;
 }
 
-.user-results-section h3,
-.best-club-section h3 {
-  font-size: 20px;
-  text-align: center;
-  margin: 12px 0;
-  font-family: 'Jura';
-  color: #f8f8f8;
-  text-shadow: 1px 1px 2px #000;
+/* Подредба */
+.results-stack{ display:grid;gap:18px;padding:14px 16px 16px; }
+
+/* Диаграма контейнер */
+.chart-center{display:flex;justify-content:center}
+.chart-center .chart{
+  padding:0;width:100%;
+  max-width: var(--chart-max);       /* (1) синхронизиран с results-row */
+  border-radius:16px; position:relative;
+}
+.chart-center .chart::before{
+  content:""; position:absolute; inset:-1px; border-radius:16px; pointer-events:none;
+  background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,0));
+  box-shadow: inset 0 0 0 1px #e6eaf3, 0 10px 24px rgba(15,23,42,.05);
+}
+#resultsChart{
+  width:100% !important;height:auto !important;
+  aspect-ratio: 16/9; max-height: 420px;
+  background: linear-gradient(180deg,#fbfcfe 0%, #f4f6fb 100%);
+  border:1px solid #e6eaf3; border-radius:16px;
+  filter: saturate(1.02);
+  font-variant-numeric: tabular-nums;
 }
 
-
-/* Таблицата */
-.user-results-section table,
-.best-club-section table {
-  width: 100%;
-  overflow-x: auto;
-  margin: 0;
-  padding: 0;
+/* Разделител */
+.results-stack::after{
+  content:""; display:block; height:1px;
+  background: linear-gradient(to right, transparent, #e7ebf5 30%, #e7ebf5 70%, transparent);
 }
 
-/* Таблица с фиксирана ширина */
-.results-table {
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-family: 'Jura';
-  font-size: 12px;
-  table-layout: fixed;
+/* Лента под диаграмата – еднаква ширина с диаграмата (1) */
+.results-row{
+  display:flex; align-items:stretch; justify-content:center;
+  gap:14px; flex-wrap:wrap;
+  max-width: var(--chart-max);
+  margin-inline:auto;
+  padding-inline:0;
 }
 
-.results-table th,
-.results-table td {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 6px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px 16px}
+.kpis-row{display:flex;gap:12px;flex-wrap:wrap;padding:0}
+.kpis-row .kpi{
+  display:grid;gap:6px;align-content:start;
+  padding:14px 16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(250,252,255,.85));
+  border:1px solid #e6eaf3;
+  border-radius:14px;
+  box-shadow: var(--inner-shadow), 0 8px 18px rgba(15,23,42,.06);
+  min-width:210px; min-height:86px;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.kpis-row .kpi:hover{ transform: translateY(-2px); box-shadow: 0 14px 28px rgba(15,23,42,.10); border-color:#dfe4ee; }
+.kpi-label{ font-size:12px;color:var(--muted);letter-spacing:.02em }
+.kpi-value{ margin:0;font-weight:800;font-size:22px;color:#0e1425;font-variant-numeric: tabular-nums }
+.kpis-row .kpi:nth-child(1){ background: linear-gradient(180deg,#0e1425, #172033); border-color:#0e1425; color:#fff }
+.kpis-row .kpi:nth-child(1) .kpi-label{color:#bfc6d4}
+.kpis-row .kpi:nth-child(1) .kpi-value{color:#fff}
+.kpis-row .kpi:nth-child(2){ background: linear-gradient(180deg,#f7f9fc,#ffffff) }
+.kpi:has(#normative-difference){ display:none !important }
+
+.caption-box{margin:0;display:flex;align-items:stretch}
+.chart-caption{
+  padding:12px 14px;
+  background:linear-gradient(180deg,#ffffff,#fafcff);
+  border:1px dashed #e2e7f0; border-radius:14px;
+  color:#6f7a8d; font-size:13px; line-height:1.5;
+  max-width:360px;
+}
+
+/* =========================
+   Таблици / Решетки  (2)
+   ========================= */
+.grid{display:grid;gap:20px}
+
+/* Без хор. скрол; позволи пренасяне и чупене */
+.table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:auto;
+}
+.table th,.table td{
+  text-align:left;
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
   white-space: normal;
-  vertical-align: middle;
+  word-break: break-word;
+  hyphens: auto;
+}
+.table thead th{background:var(--muted-surface);font-weight:600;color:var(--ink-2)}
+.table tbody tr{color:var(--ink)}
+.table tbody tr:hover{background:#fafbfc}
+
+/* =========================
+   Смяна на клуб
+   ========================= */
+#change-club-section{padding:10px 16px 16px}
+.form-row{display:flex;gap:10px;flex-wrap:wrap}
+#club-select{min-width:220px}
+
+/* =========================
+   Footer
+   ========================= */
+.footer{padding:20px 0;border-top:1px solid var(--border);color:var(--muted)}
+.footer small{font-size:12px}
+
+/* =========================
+   Отзивчивост (Десктоп надолу)
+   ========================= */
+@media (min-width: 960px){
+  .main{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width: 1180px){
+  .results-row{ padding-inline: 8px; }
+}
+@media (max-width: 1024px){
+  .card-results{ --chart-max: 820px; }   /* (1) */
+}
+@media (max-width: 960px){
+  .card-results{ --chart-max: 680px; }   /* (1) */
 }
 
-.results-table th:nth-child(1),
-.results-table td:nth-child(1) {
-  width: 35%;
+/* =========================
+   Мобилни оптимизации
+   ========================= */
+@media (max-width: 780px){
+  body{ font-size: 14px; }
+  .header .wrap{ padding:10px 0; gap:12px }
+  .brand-title{ font-size: 16px }
+  .top-nav{ gap:12px }
+  .top-nav a, .top-nav .btn{ min-height:50px; min-width:56px; padding:6px 8px }
+  .top-nav a::before, .top-nav .btn::before{ width:22px; height:22px }
+  .top-nav a, .top-nav .btn{ font-size:12px }
+
+  .card{ border-radius:12px; box-shadow: 0 6px 18px rgba(13,20,33,.06) }
+  .card-head{ padding:12px 14px }
+  .card-head h1,.card-head h2,.card-head h3{ font-size:16px }
+
+  .profile-image{ width:72px; height:72px; border-radius:10px }
+  .meta-row{ grid-template-columns:1fr 1fr }
+  .meta-item{ padding:8px 10px }
+  .meta-item .label{ font-size:11px }
+  .meta-item .value{ font-size:13px }
+
+  .results-stack{ gap:14px; padding:12px 12px 14px }
+  #resultsChart{ aspect-ratio: 4/3; max-height: 340px }
+  .results-row{ gap:10px }
+  .kpi-value{ font-size:18px }
+  .kpis-row .kpi{ min-width:calc(50% - 6px); padding:12px 12px }
+  .chart-caption{ max-width:100%; font-size:12px }
+
+  /* Таблици – по-компактно, без скрол */
+  .table th,.table td{ padding:10px 10px; font-size:13.5px; line-height:1.35; }
 }
 
-.results-table th:nth-child(2),
-.results-table td:nth-child(2) {
-  width: 30%;
+@media (max-width: 680px){
+  body{ font-size: 13.5px; }
+  .top-nav{ gap:10px }
+  .top-nav a, .top-nav .btn{ min-height:46px; min-width:52px; padding:6px 6px; font-size:11.5px }
+  .top-nav a::before, .top-nav .btn::before{ width:20px; height:20px }
+
+  .profile-compact{ grid-template-columns:auto 1fr; gap:12px }
+  .meta-row{ grid-template-columns:1fr }
+  .card-results .card-head select{ min-width: 180px }
+
+  #resultsChart{ aspect-ratio: 4/3; max-height: 300px }
+  .kpis-row .kpi{ min-width:100% }
+  .caption-box{ display:none }
+
+  /* ВАЖНО: махнат е старият overflow-x за таблиците */
+  .table th,.table td{ padding:10px 8px; }
 }
 
-.results-table th:nth-child(3),
-.results-table td:nth-child(3) {
-  width: 35%;
+@media (max-width: 520px){
+  .header .wrap{ padding:8px 0 }
+  .logo{ width:28px; height:28px; border-radius:8px }
+  .brand-title{ font-size:15px }
+  .card-head{ padding:10px 12px }
+  .card-head h1,.card-head h2,.card-head h3{ font-size:15px }
+
+  #resultsChart{ aspect-ratio: 4/3; max-height: 260px }
+
+  .btn{ padding:9px 10px; border-radius:10px }
+  select{ padding:9px 40px 9px 10px }
+
+  .card-results{ --chart-max: 100%; }   /* (1) на много малки екрани */
+  .table th,.table td{ padding:8px 6px; font-size:13px; }
 }
 
-.results-table th {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #e0e0e0;
+@media (max-width: 400px){
+  body{ font-size: 13px }
+  .top-nav a, .top-nav .btn{ min-height:44px; min-width:48px; padding:5px 6px; gap:4px; font-size:11px }
+  .top-nav a::before, .top-nav .btn::before{ width:18px; height:18px }
+
+  .card{ border-radius:10px }
+  #resultsChart{ aspect-ratio: 4/5; max-height: 220px }
+
+  .kpi-label{ font-size:11px }
+  .kpi-value{ font-size:16px }
 }
 
-.results-table tr.first-place {
-  background-color: rgba(255, 223, 0, 0.2);
-  font-weight: bold;
-  color: #ffd700;
+/* =========================
+   Карти "норматив" – grid редом една до друга
+   ========================= */
+.norm-cards{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.norm-card{ height: 100%; }
+
+@media (min-width: 900px){
+  .norm-cards{ grid-template-columns: repeat(2, minmax(320px, 1fr)); }
+}
+@media (min-width: 1300px){
+  .norm-cards{ grid-template-columns: repeat(3, minmax(320px, 1fr)); }
+}
+@media (min-width: 1680px){
+  .norm-cards{ grid-template-columns: repeat(3, minmax(380px, 1fr)); gap: 16px; }
 }
 
-.results-table tr.second-place {
-  background-color: rgba(192, 192, 192, 0.2);
-  font-weight: bold;
-  color: #c0c0c0;
+@media (hover:hover){
+  .norm-card:hover{
+    transform: translateY(-2px);
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    box-shadow: 0 14px 28px rgba(15,23,42,.10);
+    border-color: #dfe4ee;
+  }
 }
 
-.results-table tr.third-place {
-  background-color: rgba(205, 127, 50, 0.2);
-  font-weight: bold;
-  color: #cd7f32;
+/* ===== Навигация: фиксове за подреждане и wrap ===== */
+@media (min-width: 900px){
+  .top-nav{
+    flex-wrap: nowrap;
+    gap: 18px;
+  }
+  .top-nav a[href*="Settings"]{
+    margin-left: auto;
+    order: 3;
+  }
+  .top-nav a[href*="Chat"]{ order: 1; }
+  .top-nav .nav-actions{ order: 2; }
 }
 
-.results-table tr:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transition: background-color 0.3s ease;
+@media (max-width: 899.98px){
+  .header .wrap{
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .top-nav{
+    flex: 1 1 100%;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .top-nav a[href*="Settings"]{ margin-left: 0; }
+  .top-nav a[href*="Chat"]{ order: 1; }
+  .top-nav #coach-button{ order: 2; }
+  .top-nav #status-button{ order: 3; }
+  .top-nav a[href*="Settings"]{ order: 4; }
+
+  .top-nav a, .top-nav .btn{
+    min-width: 56px;
+    min-height: 50px;
+    padding: 6px 8px;
+    gap: 4px;
+    font-size: 12px;
+  }
+  .top-nav a::before, .top-nav .btn::before{
+    width: 22px; height: 22px;
+  }
 }
 
-   
-}
-
-@media (max-width: 414px) {
-    
-    .results {
-        margin-top: 47%;
-        margin-right: -33px;
-    }
-    #chart-info {
-        margin-left: 26px;
-        margin-top: 39px;
-        padding: 17px;
-        border-radius: 38px;
-        font-size: 16px;
-        line-height: 17px;
-    }
-    select {
-        font-size: 14px;
-    }
-    button {
-        font-size: 15px;
-    }
-}
-
-@media(max-width: 412px){
-    .results {
-        margin-top: 59%;
-        margin-right: -43px;
-    }
-    button {
-        border-radius: 18px;
-        padding: 13px 30px;
-        font-size: 13px;
-        margin-left: 4%;
-        margin-bottom: 25px;
-    }
-}
-
-@media (max-width: 390px) {
-    .results {
-        margin-top: 56%;
-        margin-right: -44px;
-    }
-    .footer-title {
-        font-size: 14px;
-        margin-bottom: 60px;
-        color: #0A2A43;
-        font-weight: 700;
-        margin-top: -20%;
-    }
-}
-
-@media(max-width: 375px){
-    select {
-        padding: 9px 0px;
-        font-size: 12px;
-        margin-bottom: 20px;
-    }
-    #resultsChart {
-        max-width: 389px;
-        max-height: 252px;
-        margin-left: 31px;
-        margin-top: 2px;
-        margin-bottom: 5px;
-    }
-    #chart-info {
-        margin-left: 10px;
-        margin-right: -16px;
-        margin-top: 20px;
-        padding: 21px;
-        border-radius: 28px;
-        line-height: 20px;
-    }
-    .profile-image {
-        margin-top: 91%;
-        margin-left: 40%;
-        margin-bottom: 7%;
-        width: 70px;
-        height: 70px;
-    }
-    .results h2 {
-        font-size: 31px;
-        margin-top: 31px;
-        margin-left: 21px;
-    }
-    .container{
-        padding: 0px;
-        padding-bottom: 145%;
-    }
-
-    #status-button, .status-button {
-        top: 12px;
-        right: 68%;
-        font-size: 17px;
-        padding: 7px;
-    }
-    .header {
-        width: 100%;
-        height: 83px;
-        background-color: #00000075;
-        position: fixed;
-        top: 16px;
-        border-radius: 78px;
-        left: 0;
-        z-index: 1000;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .button-image {
-        width: 47px;
-        height: 47px;
-    }
-    .settings-button img {
-        width: 47px;
-        height: 47px;
-    }
-    .info .info-col .value {
-        font-weight: 700;
-        font-family: 'Jura';
-        color: #8a9493;
-        font-size: 24px;
-        margin-left: -25px;
-        margin-bottom: 48%;
-        margin-top: -85px;
-        width: 128px;
-    }
-    .info .label, .info .value {
-        font-size: 24px;
-        margin-left: -66%;
-        color: #8a9493;
-        font-family: 'Jura';
-        margin-top: 14%;
-        padding-inline: 27px;
-    }
-}
-
-@media(max-width: 361px){
-    
-    .select {
-        padding: 9px 0px;
-        border-radius: 11px;
-        border: 2px solid #1e90ff;
-        font-size: 14px;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    #chart-info {
-        margin-left: 9px;
-        margin-right: -2px;
-        margin-top: 14px;
-        padding: 8px;
-        border-radius: 40px;
-        font-size: 13px;
-        line-height: 15px;
-    }
-
-    #chart-info p {
-        margin: 9px 0;
-    }
-
-    #resultsChart {
-        max-width: 320px;
-        max-height: 209px;
-        margin-left: 9px;
-    }
-    .container {
-        width: 101vw;
-    }
-}
-@media(max-width: 335px){
-    
-    .profile-image {
-        margin-top: 113px;
-    }
-    .results h2 {
-        font-size: 22px;
-        margin-top: 54px;
-    }
-
-
+@media (max-width: 420px){
+  .top-nav{ gap: 10px; }
+  .top-nav a, .top-nav .btn{
+    min-width: 50px;
+    min-height: 46px;
+    padding: 5px 6px;
+    font-size: 11px;
+  }
+  .top-nav a::before, .top-nav .btn::before{
+    width: 20px; height: 20px;
+  }
 }

@@ -51,54 +51,187 @@ async function checkUserStatus() {
     checkUserStatus();
 
 function renderUserInterface(user) {
- if (user.statusID === 1 || user.statusID === 3) {
-            document.body.innerHTML = `
-                <div class="status-container" style="text-align: center; padding: 30px; background-color: white; border-radius: 15px; width: 50%; margin: 50px auto; box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); font-family: Arial, sans-serif;">
-                    <img src="https://sportstats.blob.core.windows.net/$web/SportStats.png" alt="SportStats Logo" style="width: 150px; margin-bottom: 20px;">
-                    <h2 style="color: #2c3e50; font-size: 24px;">${user.statusID === 1 ? "Вашата заявка е в процес на одобрение." : "Вашата заявка е отхвърлена."}</h2>
-                    <p style="color: #555; font-size: 18px;">${user.statusID === 1 ? "Моля, изчакайте одобрение от администратора." : "Можете да изберете друг клуб."}</p>
-                    ${user.statusID === 3 || user.statusID === 1 ? '<button id="change-club-button" style="padding: 12px 25px; border: none; background-color: #ff9800; color: white; border-radius: 8px; cursor: pointer; font-size: 16px;">Смени клуба</button>' : ''}
-                </div>
-            `;
-            if (user.statusID === 3 || user.statusID === 1) {
-                document.getElementById('change-club-button').addEventListener('click', loadClubs);
-            }
+  if (user.statusID === 1 || user.statusID === 3) {
+    document.body.innerHTML = `
+      <div class="status-container" style="
+        box-sizing:border-box;
+        width: min(92%, 720px);
+        margin: 40px auto;
+        padding: 24px 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(250,252,255,.92));
+        border: 1px solid #e6e9ef;
+        border-radius: 16px;
+        backdrop-filter: blur(10px) saturate(1.05);
+        -webkit-backdrop-filter: blur(10px) saturate(1.05);
+        box-shadow: 0 10px 30px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.7);
+        font-family: inherit;
+        color: #0b0f19;
+        text-align: center;
+      ">
+        <img src="https://sportstats.blob.core.windows.net/$web/SportStats.png" alt="SportStats Logo" style="
+          width: 120px;
+          height: auto;
+          margin: 4px auto 16px;
+          display:block;
+          border-radius: 12px;
+          box-shadow: 0 6px 18px rgba(15,23,42,.10);
+        ">
+
+        <h2 style="
+          margin: 0 0 8px;
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: .2px;
+          color: #0c1222;
+        ">
+          ${user.statusID === 1 ? "Вашата заявка е в процес на одобрение." : "Вашата заявка е отхвърлена."}
+        </h2>
+
+        <p style="
+          margin: 0 0 18px;
+          font-size: 14px;
+          color: #6a7280;
+          line-height: 1.55;
+        ">
+          ${user.statusID === 1 ? "Моля, изчакайте одобрение от администратора." : "Можете да изберете друг клуб."}
+        </p>
+
+        ${
+          (user.statusID === 3 || user.statusID === 1)
+            ? `<button id="change-club-button" style="
+                 appearance:none;
+                 border:1px solid #e6e9ef;
+                 background: linear-gradient(180deg, #0e1425, #172033);
+                 color:#fff;
+                 font-weight:700;
+                 font-size:14px;
+                 padding: 12px 18px;
+                 border-radius: 12px;
+                 cursor:pointer;
+                 box-shadow: 0 10px 24px rgba(15,23,42,.18);
+                 transition: transform .12s ease, box-shadow .12s ease;
+               " onmousedown="this.style.transform='translateY(1px)'; this.style.boxShadow='0 6px 16px rgba(15,23,42,.18)';"
+                 onmouseup="this.style.transform=''; this.style.boxShadow='0 10px 24px rgba(15,23,42,.18)';">
+                 Смени клуба
+               </button>`
+            : ''
         }
+      </div>
+    `;
+    if (user.statusID === 3 || user.statusID === 1) {
+      document.getElementById('change-club-button').addEventListener('click', loadClubs);
+    }
+  }
 }
 
 async function loadClubs() {
-        try {
-            const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Clubs');
-            if (!response.ok) throw new Error("Грешка при зареждане на клубовете.");
-            
-            const clubs = await response.json();
-            document.body.innerHTML = `
-                <div class="club-selection-container" style="text-align: center; padding: 30px; background-color: white; border-radius: 15px; width: 50%; margin: 50px auto; box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); font-family: Arial, sans-serif;">
-                    <h2 style="color: #2c3e50; font-size: 22px;">Изберете нов клуб</h2>
-                    <select id="club-select" style="padding: 10px;width: 80%;margin: 10px 0;color: black;border-color: orange;">
-                        <option value="" disabled selected>Изберете клуб...</option>
-                        ${clubs.map(club => `<option value="${club.id}">${club.name}</option>`).join('')}
-                    </select>
-                    <button id="confirm-change-club" style="padding: 10px 20px; border: none; background-color: #ff9800; color: white; border-radius: 8px; cursor: pointer; font-size: 16px;">Потвърди</button>
-                </div>
-            `;
-            document.getElementById('confirm-change-club').addEventListener('click', async function () {
-                const selectedClubId = document.getElementById('club-select').value;
-                if (!selectedClubId) {
-                    alert("Моля, изберете клуб.");
-                    return;
-                }
-                const selectedClubName = document.getElementById('club-select').selectedOptions[0].textContent;
-                const isConfirmed = confirm(`Сигурни ли сте, че искате да се присъедините към клуб "${selectedClubName}"?`);
-                if (isConfirmed) {
-                    await changeUserClub(user.id, selectedClubId);
-                }
-            });
-        } catch (error) {
-            console.error("Грешка:", error);
-            alert("Неуспешно зареждане на клубовете.");
-        }
+  try {
+    const response = await fetch('https://sportstatsapi.azurewebsites.net/api/Clubs');
+    if (!response.ok) throw new Error("Грешка при зареждане на клубовете.");
+
+    const clubs = await response.json();
+    document.body.innerHTML = `
+      <div class="club-selection-container" style="
+        box-sizing:border-box;
+        width: min(92%, 720px);
+        margin: 40px auto;
+        padding: 24px 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(250,252,255,.92));
+        border: 1px solid #e6e9ef;
+        border-radius: 16px;
+        backdrop-filter: blur(10px) saturate(1.05);
+        -webkit-backdrop-filter: blur(10px) saturate(1.05);
+        box-shadow: 0 10px 30px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.7);
+        font-family: inherit;
+        color: #0b0f19;
+        text-align: center;
+      ">
+        <h2 style="
+          margin: 0 0 16px;
+          font-size: 18px;
+          font-weight: 800;
+          color:#0c1222;
+          letter-spacing:.2px;
+        ">Изберете нов клуб</h2>
+
+        <div style="
+          width: 100%;
+          max-width: 520px;
+          margin: 0 auto 14px;
+          text-align:left;
+        ">
+          <label for="club-select" style="
+            display:block;
+            font-size:12px;
+            color:#6a7280;
+            margin: 0 0 6px;
+          ">Клуб</label>
+
+          <select id="club-select" style="
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            font-size: 14px;
+            color: #0b0f19;
+            border: 1px solid #e6e9ef;
+            border-radius: 12px;
+            background: #fff;
+            outline: none;
+            transition: box-shadow .12s ease, border-color .12s ease;
+
+            /* chevron ↓ */
+            -webkit-appearance:none; appearance:none;
+            background-image:
+              url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="%236a7280" d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat:no-repeat;
+            background-position:right 12px center;
+            background-size:14px 14px;
+          "
+            onfocus="this.style.boxShadow='0 0 0 4px rgba(79,124,247,.15)'; this.style.borderColor='#4f7cf7'; this.style.backgroundImage='url(\\'data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\'><path fill=\\'%234f7cf7\\' d=\\'M7 10l5 5 5-5z\\'/></svg>\\')'"
+            onblur="this.style.boxShadow=''; this.style.borderColor='#e6e9ef'; this.style.backgroundImage='url(\\'data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\'><path fill=\\'%236a7280\\' d=\\'M7 10l5 5 5-5z\\'/></svg>\\')'"
+          >
+            <option value="" disabled selected>Изберете клуб...</option>
+            ${clubs.map(club => `<option value="${club.id}">${club.name}</option>`).join('')}
+          </select>
+        </div>
+
+        <button id="confirm-change-club" style="
+          appearance:none;
+          display:inline-block;
+          border:1px solid #e6e9ef;
+          background: linear-gradient(180deg, #0e1425, #172033);
+          color:#fff;
+          font-weight:700;
+          font-size:14px;
+          padding: 12px 18px;
+          border-radius: 12px;
+          cursor:pointer;
+          box-shadow: 0 10px 24px rgba(15,23,42,.18);
+          transition: transform .12s ease, box-shadow .12s ease;
+        " onmousedown="this.style.transform='translateY(1px)'; this.style.boxShadow='0 6px 16px rgba(15,23,42,.18)';"
+          onmouseup="this.style.transform=''; this.style.boxShadow='0 10px 24px rgba(15,23,42,.18)';">
+          Потвърди
+        </button>
+      </div>
+    `;
+    document.getElementById('confirm-change-club').addEventListener('click', async function () {
+      const selectedClubId = document.getElementById('club-select').value;
+      if (!selectedClubId) {
+        alert("Моля, изберете клуб.");
+        return;
+      }
+      const selectedClubName = document.getElementById('club-select').selectedOptions[0].textContent;
+      const isConfirmed = confirm(`Сигурни ли сте, че искате да се присъедините към клуб "${selectedClubName}"?`);
+      if (isConfirmed) {
+        await changeUserClub(user.id, selectedClubId);
+      }
+    });
+  } catch (error) {
+    console.error("Грешка:", error);
+    alert("Неуспешно зареждане на клубовете.");
+  }
 }
+
 
 async function changeUserClub(userId, newClubId) {
         try {
@@ -529,42 +662,74 @@ const oldestResult = sortedResults[sortedResults.length - 1]; // Най-стар
             : normative.valueStandart - resultToUse.valueTime;
 
         const isSuccess = diff <= 0;
-        const formattedDiff = formatDifference(diff, getUnitForDiscipline(disciplineId));
-        return `
-        <div style="
-            background-color: ${isSuccess ? '#e9f6ec' : '#fce9e9'};
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
-            margin-right: 20px;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            font-size: 13px;
-            max-width: 100%;
-            box-sizing: border-box;
-            border: 1px solid #eee;
-        ">
-            <div style="font-weight: 600; color: #1f1f1f; font-size: 15px;">
-                ${poolLabel}
-            </div>
-            <div><strong>Норматив БФПС:</strong><br> ${formatTime(normative.valueStandart)}</div>
-            <div style="color: ${isSuccess ? '#198330' : '#bd1818'};">
-                <strong>Разлика:</strong> ${formattedDiff}
-            </div>
-            <div style="
-                background-color: ${isSuccess ? '#b6e1c1' : '#f2b3b3'};
-                color: #000;
-                font-weight: 600;
-                padding: 4px 8px;
-                border-radius: 4px;
-                display: inline-block;
-            ">
-                ${isSuccess ? '✅ Покрит норматив' : '❌ Непокрит норматив'}
-            </div>
-        </div>`;
-    }
+const formattedDiff = formatDifference(diff, getUnitForDiscipline(disciplineId));
+return `
+<div class="norm-card" style="
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  margin: 0;                          /* grid поема spacing-а */
+  border-radius: 12px;
+  background: var(--glass-bg, rgba(255,255,255,.58));
+  border: 1px solid var(--glass-stroke, #e7ebf4);
+  box-shadow: var(--glass-inner, inset 0 1px 0 rgba(255,255,255,.7)), var(--glass-shadow, 0 12px 30px rgba(15,23,42,.08));
+  backdrop-filter: blur(var(--glass-blur, 14px)) saturate(1.05);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 14px)) saturate(1.05);
+  font-family: 'Inter','Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial;
+  font-size: 13px;
+  color: #0b0f19;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+">
+  <span style="
+    position:absolute; inset:0 auto 0 0; width:4px;
+    background: ${isSuccess
+      ? 'linear-gradient(180deg,#12b886,#0f9b6d)'
+      : 'linear-gradient(180deg,#f43f5e,#dc2626)'};
+    border-top-left-radius:12px; border-bottom-left-radius:12px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+  "></span>
+
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+    <div style="font-weight:700; color:#0c1222; font-size:15px; letter-spacing:.2px;">
+      ${poolLabel}
+    </div>
+    <div style="
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      background:${isSuccess ? 'rgba(18,184,134,.12)' : 'rgba(244,63,94,.12)'};
+      color:${isSuccess ? '#0f9b6d' : '#b91c1c'};
+      border:1px solid ${isSuccess ? 'rgba(18,184,134,.35)' : 'rgba(244,63,94,.35)'};
+      font-weight:700; font-size:12px;
+    ">
+      <span style="
+        width:12px; height:12px; border-radius:50%;
+        background: currentColor; box-shadow: 0 0 0 2px rgba(255,255,255,.6) inset;
+      "></span>
+      ${isSuccess ? 'Покрит норматив' : 'Непокрит норматив'}
+    </div>
+  </div>
+
+  <div style="height:1px; background:linear-gradient(to right, transparent, #e7ebf5 30%, #e7ebf5 70%, transparent);"></div>
+
+  <div style="display:grid; gap:10px; font-variant-numeric: tabular-nums;">
+    <div>
+      <div style="color:#6a7280; font-size:12px; margin-bottom:2px;">Норматив БФПС</div>
+      <div style="font-weight:700; color:#0e1425; font-size:14px;">
+        ${formatTime(normative.valueStandart)}
+      </div>
+    </div>
+    <div>
+      <div style="color:#6a7280; font-size:12px; margin-bottom:2px;">Разлика</div>
+      <div style="font-weight:800; font-size:14px; color:${isSuccess ? '#0f9b6d' : '#b91c1c'};">
+        ${formattedDiff}
+      </div>
+    </div>
+  </div>
+</div>`;
+}
 
     const bestOverall = findBestResult(results, isTimeDiscipline);
 
@@ -631,117 +796,174 @@ const oldestResult = sortedResults[sortedResults.length - 1]; // Най-стар
         gradientLine3.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
         gradientLine3.addColorStop(1, 'rgba(54, 162, 235, 0.4)');
 
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: latestLabels,
-                datasets: [
-                    {
-                        label: 'Резултати',
-                        data: latestChartData,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: gradientLine1,
-                        borderWidth: 2,
-                        tension: 0.4,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                        pointHoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
-                        pointStyle: 'rectRounded',
-                    },
-                    {
-                        label: 'Норматив 25m',
-                        data: latestChartNormative25m,
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: gradientLine2,
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        pointRadius: 0,
-                    },
-                    {
-                        label: 'Норматив 50m',
-                        data: latestChartNormative50m,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: gradientLine3,
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        pointRadius: 0,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'nearest', intersect: false },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            font: { family: 'Arial', size: 14 },
-                            padding: 20,
-                            boxWidth: 20
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleFont: { weight: 'bold', size: 14 },
-                        bodyFont: { size: 12 },
-                        callbacks: {
-                            label: function(context) {
-                                const index = context.dataIndex;
-                                const result = sortedResults[index];
-                                const value = result.valueTime;
-                                const formattedValue = isTimeDiscipline ? formatTime(value) : `${value} ${getUnitForDiscipline(disciplineId)}`;
-                                const formattedDate = new Date(result.resultDate).toLocaleDateString('bg-BG');
-                                const location = result.location || "Няма информация";
-                                const poolLength = result.swimmingPoolStandart + " м";
+        // помощник: четем CSS променливи
+const cssVar = (name, fallback = '') =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
-                                if (context.dataset.label.includes("Норматив")) {
-                                    return ` Норматив (${poolLength}): ${formatTime(context.parsed.y)}`;
-                                } else {
-                                    return [
-                                        ` Дата: ${formattedDate}`,
-                                        "",
-                                        ` Резултат: ${formattedValue}`,
-                                        "",
-                                        ` Локация: ${location}`,
-                                        "",
-                                        ` Басейн: ${poolLength}`
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: { display: false },
-                    y: {
-                        title: {
-                            display: true,
-                            text: getUnitForDiscipline(disciplineId),
-                            font: { size: 16, weight: 'bold' }
-                        },
-                        beginAtZero: !isTimeDiscipline,
-                        reverse: isTimeDiscipline,
-                        ticks: {
-                            autoSkip: true,
-                            maxTicksLimit: 8,
-                            callback: function(value) {
-                                return isTimeDiscipline ? formatTime(value) : `${value} ${getUnitForDiscipline(disciplineId)}`;
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)',
-                            lineWidth: 1
-                        }
-                    }
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutElastic',
-                }
+// базови цветове от темата
+const cInk      = cssVar('--ink', '#0b0f19');
+const cMuted    = cssVar('--muted', '#6a7280');
+const cStroke   = cssVar('--glass-stroke', '#e7ebf4');
+const cGlassBg  = cssVar('--glass-bg', 'rgba(255,255,255,.58)');
+
+// плавни линии/фонове
+const gResult = ctx.createLinearGradient(0, 0, 0, 300);
+gResult.addColorStop(0, 'rgba(15, 23, 42, 0.28)');  // тъмно неутрално (линия)
+gResult.addColorStop(1, 'rgba(15, 23, 42, 0.06)');  // към прозрачно (заливка)
+
+const gNorm25 = ctx.createLinearGradient(0, 0, 0, 300);
+gNorm25.addColorStop(0, 'rgba(79, 124, 247, 0.55)'); // студен син
+gNorm25.addColorStop(1, 'rgba(79, 124, 247, 0.10)');
+
+const gNorm50 = ctx.createLinearGradient(0, 0, 0, 300);
+gNorm50.addColorStop(0, 'rgba(16, 185, 129, 0.55)'); // мек зелен
+gNorm50.addColorStop(1, 'rgba(16, 185, 129, 0.10)');
+
+// „chip“ легенда: по-къс label
+const labelResults = 'Резултати';
+const labelN25 = 'Норматив 25м';
+const labelN50 = 'Норматив 50м';
+
+// Chart.js
+chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: latestLabels,
+    datasets: [
+      {
+        label: labelResults,
+        data: latestChartData,
+        borderColor: 'rgba(15,23,42,0.85)',
+        backgroundColor: gResult,
+        borderWidth: 2,
+        tension: 0.35,
+        fill: true,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: 'rgba(15,23,42,0.85)',
+        pointBorderWidth: 0,
+        pointHitRadius: 10,
+      },
+      {
+        label: labelN25,
+        data: latestChartNormative25m,
+        borderColor: 'rgba(79,124,247,0.9)',
+        backgroundColor: gNorm25,
+        borderWidth: 1.5,
+        borderDash: [6, 6],
+        tension: 0.25,
+        pointRadius: 0,
+        fill: false
+      },
+      {
+        label: labelN50,
+        data: latestChartNormative50m,
+        borderColor: 'rgba(16,185,129,0.9)',
+        backgroundColor: gNorm50,
+        borderWidth: 1.5,
+        borderDash: [6, 6],
+        tension: 0.25,
+        pointRadius: 0,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false },
+    layout: { padding: { left: 6, right: 6, top: 4, bottom: 2 } },
+    plugins: {
+      legend: {
+        position: 'top',
+        align: 'start',
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'line',
+          font: { family: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial', size: 12, weight: 600 },
+          color: cInk,
+          padding: 12,
+          boxWidth: 16,
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        titleColor: cInk,
+        bodyColor: cInk,
+        borderColor: cStroke,
+        borderWidth: 1,
+        displayColors: false,
+        titleFont: { family: 'Inter, system-ui, -apple-system', size: 13, weight: 700 },
+        bodyFont:  { family: 'Inter, system-ui, -apple-system', size: 12, weight: 500 },
+        padding: 10,
+        callbacks: {
+          label: (context) => {
+            const i = context.dataIndex;
+            const result = sortedResults[i];
+            const value = result?.valueTime;
+            const unit = getUnitForDiscipline(disciplineId);
+            const formattedValue = isTimeDiscipline ? formatTime(value) : `${value} ${unit}`;
+            const formattedDate = new Date(result?.resultDate).toLocaleDateString('bg-BG');
+            const location = result?.location || 'Няма информация';
+            const poolLength = (result?.swimmingPoolStandart ?? '') + ' м';
+
+            if (context.dataset.label.includes('Норматив')) {
+              const y = context.parsed.y;
+              return `Норматив (${poolLength}): ${isTimeDiscipline ? formatTime(y) : `${y} ${unit}`}`;
             }
-        });
+            return [
+              `Дата: ${formattedDate}`,
+              `Резултат: ${formattedValue}`,
+              `Локация: ${location}`,
+              `Басейн: ${poolLength}`
+            ];
+          },
+          title: (items) => {
+            // скриваме оригиналното заглавие (етикета по ос X), за по-чист вид
+            return '';
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        display: false,            // чист вид под „glass“ контейнера
+        grid: { display: false },
+        ticks: { display: false }
+      },
+      y: {
+        title: {
+          display: true,
+          text: getUnitForDiscipline(disciplineId),
+          color: cMuted,
+          font: { size: 12, weight: '600', family: 'Inter, system-ui, -apple-system' },
+          padding: { bottom: 8 }
+        },
+        beginAtZero: !isTimeDiscipline,
+        reverse: isTimeDiscipline,
+        ticks: {
+          color: cMuted,
+          padding: 6,
+          autoSkip: true,
+          maxTicksLimit: 7,
+          callback: (value) => isTimeDiscipline ? formatTime(value) : `${value} ${getUnitForDiscipline(disciplineId)}`
+        },
+        grid: {
+          color: 'rgba(15,23,42,0.06)',     // фина мрежа
+          borderColor: cStroke,
+          tickColor: 'transparent'
+        }
+      }
+    },
+    animation: { duration: 700, easing: 'easeOutQuart' },
+    elements: {
+      line: { capBezierPoints: true },
+      point: { hoverBorderWidth: 0 }
+    },
+    hover: { mode: 'nearest', intersect: false }
+  }
+});
+
     }
 
     document.getElementById('best-result').textContent = bestOverall 
@@ -754,6 +976,10 @@ const oldestResult = sortedResults[sortedResults.length - 1]; // Най-стар
 
     document.getElementById('normative-difference').innerHTML = '';
     document.getElementById('normative-value').innerHTML = normativeValueText;
+// ➜ ТУК добави класа за grid подредба
+const normWrap = document.getElementById('normative-value');
+normWrap.classList.add('norm-cards');
+
 }
 
 
@@ -767,9 +993,6 @@ const oldestResult = sortedResults[sortedResults.length - 1]; // Най-стар
             chartContainer.style.display = "none"; // Скрива графиката
         }
     });
-
-
-
 
 function formatTime(seconds) {
 
@@ -797,7 +1020,6 @@ function formatTime(seconds) {
     return timeString.trim();
 }
 
-
 function getUnitForDiscipline(disciplineId) {
     disciplineId = Number(disciplineId); // ✅ гарантира сравнение по число
 
@@ -808,8 +1030,6 @@ function getUnitForDiscipline(disciplineId) {
     if (distanceDisciplines.includes(disciplineId)) return 'метра';
     return '';
 }
-
-
 
 function formatResultValue(value, unit) {
 
@@ -827,15 +1047,10 @@ function formatResultValue(value, unit) {
     }
 }
 
-
-
-
 function formatDifference(diff, unit) {
     const sign = diff > 0 ? '+' : '-';
     if (unit === 'време') {
         return `${sign}${formatTime(Math.abs(diff))}`;
     }
     return `${sign}${diff.toFixed(2)} м`;
-}
-
-});
+}});

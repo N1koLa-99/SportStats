@@ -1,251 +1,163 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HomePage</title>
-    <link rel="stylesheet" href="HomePageStyles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&family=Domine:wght@700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HomePage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Domine:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="HomePageStyles.css" />
 </head>
 <body>
-    <div class="header"></div>
-    <div class="container"> 
-        <a href="Settings.html" class="settings-button">
-            <img src="settings.png" alt="Settings" class="button-image">
-            <span class="icon-label">Настройки</span>
-        </a>
-        
-        <button id="coach-button" class="icon-button hidden" onclick="redirectToCoacherPage()">
-            <img src="result.png" alt="Coach" class="button-image">
-            <span class="icon-label">Резултати</span>
-        </button>
-        
-        <button id="status-button" class="icon-button hidden">
-            <img src="ask.png" alt="Status" class="button-image">
-            <span class="icon-label">Заявки</span>
-        </button>
-        <a href="Chat.html" class="icon-button">
-    <img src="chat.png" alt="Chat" class="button-image">
-    <span class="icon-label">Чат</span>
-</a>
-        
-        <div class="info">
-            <img id="profile-picture" 
-                 alt="Profile Picture" 
-                 class="profile-image" 
-                 src="https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg">
-            
-            <div class="info-section">
-                <div class="info-row">
-                    <div class="info-col">
-                        <span class="label">Име:</span>
-                        <div class="line"></div>
-                        <span class="value" id="first-name">Няма данни</span>
-                    </div>
-                    <div class="info-col">
-                        <span class="label">Роден:</span>
-                        <div class="line"></div>
-                        <span class="value" id="year-of-birth">Няма данни</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <span class="label">Фамилия:</span>
-                <div class="line"></div>
+  <div class="page">
+    <header class="header">
+      <div class="wrap">
+        <div class="brand">
+          <span class="logo" aria-label="Sport Stats">
+  <img src="LogoIconSS.png" alt="Sport Stats" />
+</span>
+
+          <span class="brand-title">Sport Stats</span>
+        </div>
+
+        <nav class="top-nav">
+          <a href="Chat.html">Чат</a>
+          <a href="Settings.html">Настройки</a>
+
+          <!-- Преместени бутони в хедъра (ID-та запазени) -->
+          <div class="nav-actions">
+            <button id="coach-button" class="btn ghost hidden" onclick="redirectToCoacherPage()">Резултати</button>
+            <button id="status-button" class="btn ghost hidden">Заявки</button>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap main">
+      <!-- Профил -->
+      <section class="card card-profile info" aria-labelledby="profile-title">
+        <div class="card-head">
+          <h1 id="profile-title">Профил</h1>
+        </div>
+
+        <div class="profile profile-compact">
+          <img id="profile-picture" alt="Profile Picture" class="profile-image" src="https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg" />
+
+          <div class="profile-meta">
+            <div class="meta-row">
+              <div class="meta-item">
+                <span class="label">Име</span>
+                <span class="value" id="first-name">Няма данни</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Фамилия</span>
                 <span class="value" id="last-name">Няма данни</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Роден</span>
+                <span class="value" id="year-of-birth">Няма данни</span>
+              </div>
             </div>
-            
-            <div class="info-section">
-                <span class="label">Клуб:</span>
-                <div class="line"></div>
+
+            <div class="meta-row">
+              <div class="meta-item meta-full">
+                <span class="label">Клуб</span>
                 <span class="value" id="club">Няма данни</span>
+              </div>
             </div>
-            <!-- Sponsor Footer Ad -->
+          </div>
         </div>
+      </section>
 
-        <div class="results">
-            <h2>Резултати</h2>
-            <form id="discipline-form">
-                <select id="discipline" name="discipline">
-                    <option value="" disabled selected></option>
-                </select>
-            </form>
-
-            <div id="chart-container">
-                <canvas id="resultsChart" width="450" height="300"></canvas>
-                <div id="chart-info">
-                    <p id="best-result">Най-добър резултат: </p>
-                    <p id="latest-result">Последен резултат: </p>
-                    <p id="normative-difference">Разлика с норматив: </p>
-                    <p id="normative-value">Норматив: </p>
-                </div>
-            </div>
-        </div>
-
-        <div id="change-club-section" class="hidden">
-            <label for="club-select">Смени клуба:</label>
-            <select id="club-select">
-                <option value="" disabled selected>Изберете клуб</option>
+      <!-- Резултати -->
+      <section class="card card-results" aria-labelledby="results-title">
+        <div class="card-head">
+          <h2 id="results-title">Резултати</h2>
+          <form id="discipline-form" class="inline-form">
+            <label for="discipline" class="sr-only">Дисциплина</label>
+            <select id="discipline" name="discipline">
+              <option value="" disabled selected>Избери дисциплина…</option>
             </select>
-            <button id="change-club-button">Промени</button>
+          </form>
         </div>
-    </div>
 
-    <div class="tables-wrapper"> 
-  <div class="UserTableSection"> 
-    <div class="user-results-section">
-      <h3>Най-добри резултати в клуба</h3>
-      <table id="users-table" class="results-table">
-          <thead>
+        <div class="results-stack">
+          <!-- Диаграма в центъра -->
+          <div class="chart-center">
+            <div id="chart-container" class="chart">
+              <canvas id="resultsChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Хоризонтален ред под диаграмата -->
+          <div class="results-row">
+            <div id="kpis" class="kpis kpis-row">
+              <div class="kpi"><span class="kpi-label">Най-добър</span><p id="best-result" class="kpi-value">—</p></div>
+              <div class="kpi"><span class="kpi-label">Последен</span><p id="latest-result" class="kpi-value">—</p></div>
+              <div class="kpi"><span class="kpi-label">Разлика с норматив</span><p id="normative-difference" class="kpi-value">—</p></div>
+              <div class="kpi"><span class="kpi-label">Норматив</span><p id="normative-value" class="kpi-value">—</p></div>
+            </div>
+
+            <figure class="caption-box">
+              <figcaption class="chart-caption" id="results-caption">
+                Изберете дисциплина, за да видите тенденцията и ключовите показатели.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- Таблици -->
+      <section class="grid">
+        <div class="card">
+          <div class="card-head"><h3>Най-добри в клуба</h3></div>
+          <table id="users-table" class="table" role="table" aria-label="Най-добри резултати в клуба">
+            <thead>
               <tr>
-                  <th>Име</th>
-                  <th>Година на раждане</th>
-                  <th>Най-добър резултат</th>
+                <th>Име</th>
+                <th>Година</th>
+                <th>Най-добър резултат</th>
               </tr>
-          </thead>
-          <tbody></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="right-section">
-    <div class="best-club-section">
-      <h3>Клубове с най-добро време</h3>
-      <table id="best-club-table" class="results-table">
-        <thead>
-          <tr>
-            <th>Група</th>
-            <th>Клуб</th>
-            <th>Най-добро време</th>
-          </tr>
-        </thead>        
-        <tbody></tbody>
-      </table>
-      <div id="hover-info" class="hover-info" style="display:none;"></div>
-    </div>
-  </div>
-  
-</div>
-
-  
- <!--
-    <footer class="sponsor-footer">
-        <h3 class="footer-title">Открий ТОП продукти от нашите спонсори ⤵</h3>
-      
-        <div class="sponsor-cards-container">
-      -->
-          <!-- Decathlon 
-          <div class="sponsor-card">
-            <img src="DecatlonLogo.avif" alt="Decathlon" class="card-logo">
-            <h4>Decathlon</h4>
-            <div class="carousel">
-              <div class="carousel-slide active">
-                <img src="Decatlon-Banski.avif" class="card-product-img" alt="Продукт 1">
-                <p>🩱 Подобри плувната си форма с новата серия Nabaiji!</p>
-              </div>
-              <div class="carousel-slide">
-                <img src="Decatlon-Pedals.avif" class="card-product-img" alt="Продукт 2">
-                <p> 🏊 Педалси за тренировки – специално за плувци!</p>
-              </div>
-            </div>
-            <a href="https://www.decathlon.bg" target="_blank" class="cta-button">Разгледай</a>
-          </div>
-          -->
-      
-          <!-- GymBeam 
-          <div class="sponsor-card">
-            <img src="GymBeamNoName.webp" alt="GymBeam" class="card-logo">
-            <h4>GymBeam</h4>
-            <div class="carousel">
-              <div class="carousel-slide active">
-                <img src="GymBeam-Protein.webp" class="card-product-img" alt="Whey">
-                <p>💪 Зареди се с енергия – избери Whey Protein!</p>
-              </div>
-              <div class="carousel-slide">
-                <img src="GymBeam-BCAA.webp" class="card-product-img" alt="BCAA">
-                <p>🔋 BCAA за възстановяване след тежки тренировки!</p>
-              </div>
-            </div>
-            <a href="https://gymbeam.bg" target="_blank" class="cta-button">Купи сега</a>
-          </div>
-          -->
-      
-          <!-- Iced Out 
-          <div class="sponsor-card">
-            <img src="IcedOutNoName.png" alt="Iced Out" class="card-logo">
-            <h4>Iced Out</h4>
-            <div class="carousel">
-              <div class="carousel-slide active">
-                <img src="IcedOut-Grivna.webp" class="card-product-img" alt="Ring">
-                <p>💎 Стил за шампиони – избери премиум бижута!</p>
-              </div>
-              <div class="carousel-slide">
-                <img src="IcedOut-Gerdan.webp" class="card-product-img" alt="Chain">
-                <p>🔥 Постави акцент с блестяща верижка от Iced Out.</p>
-              </div>
-            </div>
-            <a href="https://icedout.bg" target="_blank" class="cta-button">Грабни го</a>
-          </div>
-      -->
-          <!-- Arena 
-          <div class="sponsor-card">
-            <img src="ArenaNoBG.png" alt="Арена" class="card-logo">
-            <h4>Арена</h4>
-            <div class="carousel">
-              <div class="carousel-slide active">
-                <img src="Arena-Cobra.webp" class="card-product-img" alt="Cobra">
-                <p>🏊 Подобри резултата си с <strong>Cobra Ultra Swipe</strong>!</p>
-              </div>
-              <div class="carousel-slide">
-                <img src="arena-Shapka.jpg" class="card-product-img" alt="Swim Cap">
-                <p>🎽 Силиконова шапка за комфорт и скорост.</p>
-              </div>
-            </div>
-            <a href="https://www.arenawaterinstinct.com" target="_blank" class="cta-button">Виж продукта</a>
-          </div>
-      -->
-          <!-- Proof 
-          <div class="sponsor-card">
-            <img src="Proof.png" alt="Proof" class="card-logo">
-            <h4>Proof</h4>
-            <div class="carousel">
-              <div class="carousel-slide active">
-                <img src="proof-digital.jpg" class="card-product-img" alt="Digital">
-                <p>🌐 Proof инвестира в бъдещето на спорта – бъди част от него.</p>
-              </div>
-              <div class="carousel-slide">
-                <img src="proof-tech.jpg" class="card-product-img" alt="Tech">
-                <p>📱 Следи своите плувни данни с Proof технологии.</p>
-              </div>
-            </div>
-            <a href="https://proof.bg" target="_blank" class="cta-button">Научи повече</a>
-          </div>
-      
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
-      </footer>
-      
-      <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          const carousels = document.querySelectorAll('.carousel');
-      
-          carousels.forEach(carousel => {
-            const slides = carousel.querySelectorAll('.carousel-slide');
-            let current = 0;
-      
-            setInterval(() => {
-              slides[current].classList.remove('active');
-              current = (current + 1) % slides.length;
-              slides[current].classList.add('active');
-            }, 4000); // сменя се на всеки 4 секунди
-          });
-        });
-      </script>
-           --> 
 
-    <script src="HomePageScript.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/chart.js@3.9.1/dist/chart.min.js"></script>
+        <div class="card">
+          <div class="card-head"><h3>Клубове с най-добро време</h3></div>
+          <table id="best-club-table" class="table" role="table" aria-label="Клубове с най-добро време">
+            <thead>
+              <tr>
+                <th>Група</th>
+                <th>Клуб</th>
+                <th>Най-добро време</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="hover-info" class="hover-info" style="display:none;"></div>
+        </div>
+      </section>
+
+      <!-- Смяна на клуб -->
+      <section id="change-club-section" class="card hidden" aria-labelledby="change-club-title">
+        <div class="card-head"><h3 id="change-club-title">Смени клуба</h3></div>
+        <div class="form-row">
+          <label for="club-select" class="sr-only">Изберете клуб</label>
+          <select id="club-select">
+            <option value="" disabled selected>Изберете клуб</option>
+          </select>
+          <button id="change-club-button" class="btn primary">Промени</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer wrap">
+      <small>© Sport Stats</small>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="HomePageScript.js"></script>
 </body>
 </html>
