@@ -9,12 +9,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
     color: #333;
-    background: 
-    linear-gradient(
-        rgba(0, 0, 0, 0.651),
-        rgba(0, 0, 0, 0.658)
-    ),
-    url('markus-spiske-OAg9u5E1ju0-unsplash.jpg')round
 }
 h2 {
     color: #6499d6; /* Светло синьо */
@@ -450,8 +444,9 @@ tbody tr:hover {
     font-size: 14px;
     font-weight: bold;
     border: none;
-    background-color: #007bff;
-    color: white;
+    background: linear-gradient(180deg, #007bff, #223368);
+    border-color: #1e2a55;
+    color: #fff;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
@@ -465,7 +460,9 @@ tbody tr:hover {
 
 /* Активен бутон */
 .toggle-buttons button.active {
-    background-color: #f07a05;
+    background: linear-gradient(180deg, #fdb741, #ffa400);
+    color: #fff;
+    border-color: #dbdbdb;
 }
 
 /* Скриване на формата по подразбиране */
@@ -589,12 +586,6 @@ tbody tr:hover {
         padding: 0;
         display: flex;
         justify-content: normal;
-        background: 
-        linear-gradient(
-            rgba(0, 0, 0, 0.651),
-            rgba(0, 0, 0, 0.658)
-        ),
-        url('mihaly-koles-lW_kamfcwCA-unsplash.jpg')round
     }
 
     #search-form{

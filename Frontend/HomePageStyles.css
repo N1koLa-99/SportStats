@@ -2,20 +2,34 @@
    Базови токени / Reset
    ========================= */
 :root{
-  --bg:#ffffff;
+  /* Фон/повърхности */
+  --bg:#f7f9fc;
   --surface:#ffffff;
-  --muted-surface:#f6f7f9;
+  --muted-surface:#f0f4ff;
   --border:#e6e9ef;
 
   /* Монохромна йерархия */
   --ink:#0b0f19;
-  --ink-2:#1f2937;
+  --ink-2:#111827;
   --muted:#6a7280;
   --muted-2:#98a1b2;
 
-  /* Акценти */
-  --accent:#4f7cf7;
+  /* Палитра (цвят и яснота на йерархията) */
+  --accent:#4f7cf7;      /* Primary */
   --accent-2:#2f5de8;
+  --secondary:#7c5cff;   /* Лилаво за вторични акценти */
+  --info:#06b6d4;
+  --success:#22c55e;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+
+  /* Нюансирани фонове (за блокове/ленти/етикети) */
+  --accent-tint: #eaf0ff;
+  --secondary-tint:#f1edff;
+  --success-tint:#eafcf2;
+  --warning-tint:#fff6e5;
+  --danger-tint:#fff0f0;
+  --info-tint:#e8fbff;
 
   /* Структурни */
   --radius:14px;
@@ -23,6 +37,11 @@
   --shadow:0 8px 28px rgba(13, 20, 33, .08);
   --inner-shadow:inset 0 1px 0 rgba(255,255,255,.6);
   --wrap: min(1120px, 100% - 32px);
+
+  /* Градиенти за заглавки/карти */
+  --grad-surface: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+  --grad-header: linear-gradient(180deg, rgba(79,124,247,.10), rgba(255,255,255,.70));
+  --grad-results: linear-gradient(180deg, rgba(79,124,247,.06), rgba(255,255,255,.90));
 }
 
 *{box-sizing:border-box}
@@ -48,8 +67,8 @@ body{
   width:32px; height:32px;
   display:grid; place-items:center;
   border-radius:10px;
-  background-color: var(--muted-surface);
-  border:1px solid var(--border);
+  background: var(--accent-tint);
+  border:1px solid #dbe4ff;
   padding:0;
 }
 .logo img{
@@ -62,11 +81,13 @@ body{
 /* =========================
    Хедър и навигация (иконки + текст)
    ========================= */
-.header{
-  position:sticky;top:0;z-index:10;
-  background:rgba(255,255,255,.85);
-  backdrop-filter:saturate(1.15) blur(8px);
-  border-bottom:1px solid var(--border);
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--grad-header);
+    backdrop-filter: saturate(1.15) blur(8px);
+    border-bottom: 1px solid var(--border);
 }
 .header .wrap{
   display:flex;align-items:center;justify-content:space-between;
@@ -75,10 +96,13 @@ body{
 .brand{display:flex;align-items:center;gap:10px}
 .logo{
   display:grid;place-items:center;width:32px;height:32px;
-  border-radius:10px;background:var(--muted-surface);
-  border:1px solid var(--border);font-weight:700
+  border-radius:10px;background:var(--accent-tint);
+  border:1px solid #dbe4ff;font-weight:700
 }
-.brand-title{font-family:"Domine",serif;font-weight:700}
+.brand-title{
+  font-family:"Domine",serif;font-weight:800;letter-spacing:.2px;
+  color:var(--ink-2)
+}
 
 /* нав: иконка отгоре, текст отдолу */
 .top-nav{
@@ -91,7 +115,7 @@ body{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  gap:10px;
   text-decoration:none;
   padding:8px 10px;
   min-width:64px;
@@ -100,9 +124,9 @@ body{
   border:1px solid transparent;
   background:transparent;
   color:var(--ink);
-  font-weight:600;
+  font-weight:500;
   line-height:1.1;
-  transition: transform .15s ease, color .15s ease, border-color .15s ease, background .15s ease;
+  transition: transform .15s ease, color .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
 }
 
 /* общ стил за иконите (плътни) */
@@ -118,16 +142,26 @@ body{
   -webkit-mask-position:center;  mask-position:center;
 }
 
-/* hover/focus */
+/* Ховър/Фокус/Активно (ясна йерархия) */
 .top-nav a:hover, .top-nav .btn:hover{
   transform: translateY(-1px);
-  background: var(--muted-surface);
-  border-color: var(--border);
+  background: var(--accent-tint);
+  border-color: #dbe4ff;
+  color: var(--accent-2);
+  box-shadow: 0 4px 14px rgba(79,124,247,.18);
 }
 .top-nav a:active, .top-nav .btn:active{ transform: translateY(0) }
 .top-nav a:focus-visible, .top-nav .btn:focus-visible{
-  outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.15);
-  border-color:#dfe4ea;
+  outline:none; box-shadow:0 0 0 4px rgba(79,124,247,.22);
+  border-color:#cbd8ff;
+}
+
+/* Състояние "активно" за текущ раздел */
+.top-nav a[aria-current="page"],
+.top-nav a.is-active{
+  background: linear-gradient(180deg,#ffffff, #eef3ff);
+  border-color:#cbd8ff;
+  color:var(--accent-2);
 }
 
 /* иконки */
@@ -150,7 +184,7 @@ body{
 }
 
 /* ред: Chat (1), nav-actions (2), Settings (вдясно) */
-.nav-actions{display:flex;gap:8px;margin-left:8px}
+.nav-actions{display:flex;gap:20px;margin-left:8px}
 .top-nav a[href*="Chat"]{ order: 1; }
 .top-nav .nav-actions{ order: 2; }
 .top-nav a[href*="Settings"]{ order: 3; margin-left:auto; }
@@ -163,7 +197,7 @@ body{
    ========================= */
 .main{display:grid;gap:20px;padding-block:20px}
 .card{
-  background:var(--surface);
+  background:var(--grad-surface);
   border:1px solid var(--border);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
@@ -171,8 +205,12 @@ body{
 .card-head{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 16px;border-bottom:1px solid var(--border);gap:12px;
+  background: linear-gradient(180deg,#ffffff, #f8faff);
 }
-.card-head h1,.card-head h2,.card-head h3{margin:0;color:var(--ink-2)}
+.card-head h1,.card-head h2,.card-head h3{
+  margin:0;color:var(--ink-2)
+}
+.card-head h2{ font-weight:800; letter-spacing:.2px }
 
 /* =========================
    Профил – по-стегната подредба
@@ -192,11 +230,12 @@ body{
 .meta-row{ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px }
 .meta-item{
   display:grid;gap:4px;padding:10px 12px;
-  background:var(--muted-surface);border:1px solid var(--border);
+  background:#f2f4f9;
+  border:1px solid #dbe4ff;
   border-radius:var(--radius-sm)
 }
-.meta-item .label{font-size:12px;color:var(--muted)}
-.meta-item .value{font-weight:600;color:var(--ink-2)}
+.meta-item .label{font-size:12px;color:#5c6ac4}
+.meta-item .value{font-weight:700;color:#0e1425}
 .meta-full{grid-column:1/-1}
 
 /* =========================
@@ -244,29 +283,46 @@ select::-ms-expand{ display:none; }
   background:#e9edf6; pointer-events:none;
 }
 
+/* Бутони */
 .btn{
   padding:10px 12px;border-radius:12px;border:1px solid var(--border);
-  background:#fff;color:var(--ink);cursor:pointer
+  background:#fff;color:var(--ink);cursor:pointer;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
 }
-.btn:hover{border-color:#cfd4de}
-.btn.primary{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
-.btn.primary:hover{filter:brightness(1.05)}
-.btn.ghost{background:#fff}
+.btn:hover{border-color:#cfd4de; transform: translateY(-1px)}
+.btn:active{ transform: translateY(0) }
+.btn.primary{
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-color: var(--accent-2); color:#fff
+}
+.btn.primary:hover{ filter:brightness(1.04) }
+.btn.secondary{
+  background: linear-gradient(180deg, var(--secondary), #674bff);
+  border-color:#674bff; color:#fff;
+}
+.btn.success{ background: var(--success); color:#fff; border-color: var(--success) }
+.btn.warning{ background: var(--warning); color:#fff; border-color: var(--warning) }
+.btn.ghost{background:#ffffff00}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* =========================
-   РЕЗУЛТАТИ – Модерен професионален вид
+   РЕЗУЛТАТИ – Цветен, професионален вид
    ========================= */
 .card-results{
   border-color:#e9edf4;
-  background: linear-gradient(180deg, rgba(248,249,252,.8), rgba(255,255,255,.9));
+  background: var(--grad-results);
   box-shadow: 0 10px 30px rgba(15,23,42,.06);
 
   /* Ширина на диаграмата и реда под нея (1) */
   --chart-max: 860px;
 }
-.card-results .card-head{ background: linear-gradient(180deg,#fff, #fafbfe); }
-.card-results .card-head h2{ font-size:20px;font-weight:800;color:#0c1222;letter-spacing:.2px }
+.card-results .card-head{
+  background: linear-gradient(180deg,#ffffff, #eef3ff);
+  border-bottom:1px solid #dbe4ff;
+}
+.card-results .card-head h2{
+  font-size:20px;font-weight:800;color:#0c1222;letter-spacing:.2px
+}
 .card-results .card-head .inline-form{margin-left:auto}
 .card-results .card-head select{
   min-width:240px;background:#fff;color:var(--ink);
@@ -282,17 +338,18 @@ select::-ms-expand{ display:none; }
   padding:0;width:100%;
   max-width: var(--chart-max);       /* (1) синхронизиран с results-row */
   border-radius:16px; position:relative;
+  background: linear-gradient(180deg,#fbfcfe 0%, #f4f6fb 100%);
 }
 .chart-center .chart::before{
   content:""; position:absolute; inset:-1px; border-radius:16px; pointer-events:none;
-  background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,0));
+  background: linear-gradient(180deg, rgba(255,255,255,.8), rgba(79,124,247,.08));
   box-shadow: inset 0 0 0 1px #e6eaf3, 0 10px 24px rgba(15,23,42,.05);
 }
 #resultsChart{
   width:100% !important;height:auto !important;
   aspect-ratio: 16/9; max-height: 420px;
-  background: linear-gradient(180deg,#fbfcfe 0%, #f4f6fb 100%);
-  border:1px solid #e6eaf3; border-radius:16px;
+  background: linear-gradient(180deg,#fbfcfe 0%, #eef3ff 100%);
+  border:1px solid #dbe4ff; border-radius:16px;
   filter: saturate(1.02);
   font-variant-numeric: tabular-nums;
 }
@@ -300,7 +357,7 @@ select::-ms-expand{ display:none; }
 /* Разделител */
 .results-stack::after{
   content:""; display:block; height:1px;
-  background: linear-gradient(to right, transparent, #e7ebf5 30%, #e7ebf5 70%, transparent);
+  background: linear-gradient(to right, transparent, #dbe4ff 30%, #dbe4ff 70%, transparent);
 }
 
 /* Лента под диаграмата – еднаква ширина с диаграмата (1) */
@@ -314,7 +371,7 @@ select::-ms-expand{ display:none; }
 
 /* KPI */
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px 16px}
-.kpis-row{display:flex;gap:12px;flex-wrap:wrap;padding:0}
+.kpis-row{display:flex;gap:12px;flex-wrap:wrap;padding:0;justify-content:center}
 .kpis-row .kpi{
   display:grid;gap:6px;align-content:start;
   padding:14px 16px;
@@ -327,19 +384,32 @@ select::-ms-expand{ display:none; }
 }
 .kpis-row .kpi:hover{ transform: translateY(-2px); box-shadow: 0 14px 28px rgba(15,23,42,.10); border-color:#dfe4ee; }
 .kpi-label{ font-size:12px;color:var(--muted);letter-spacing:.02em }
-.kpi-value{ margin:0;font-weight:800;font-size:22px;color:#0e1425;font-variant-numeric: tabular-nums }
-.kpis-row .kpi:nth-child(1){ background: linear-gradient(180deg,#0e1425, #172033); border-color:#0e1425; color:#fff }
+.kpi-value{ margin:0;font-weight:800;font-size:22px;color:#ffffff;font-variant-numeric: tabular-nums }
+
+/* KPI цветови статуси: 1-ви – акцент, 2-ри – неутрален, 3-ти – успех, 4-ти – предупреждение */
+.kpis-row .kpi:nth-child(1){
+  background: linear-gradient(180deg,#1e2a55, #223368);
+  border-color:#1e2a55; color:#fff
+}
 .kpis-row .kpi:nth-child(1) .kpi-label{color:#bfc6d4}
 .kpis-row .kpi:nth-child(1) .kpi-value{color:#fff}
-.kpis-row .kpi:nth-child(2){ background: linear-gradient(180deg,#f7f9fc,#ffffff) }
+.kpis-row .kpi:nth-child(2){ background: linear-gradient(180deg,#1e2a55, #223368);border-color:#1e2a55; color:#fff}
+.kpis-row .kpi:nth-child(3){
+  background: linear-gradient(180deg, var(--success), #16a34a);
+  color:#fff; border-color:#16a34a;
+}
+.kpis-row .kpi:nth-child(4){
+  background: linear-gradient(180deg, #c4dff9, #ffffff);
+  color:#fff; border-color:#dbdbdb;
+}
 .kpi:has(#normative-difference){ display:none !important }
 
 .caption-box{margin:0;display:flex;align-items:stretch}
 .chart-caption{
   padding:12px 14px;
   background:linear-gradient(180deg,#ffffff,#fafcff);
-  border:1px dashed #e2e7f0; border-radius:14px;
-  color:#6f7a8d; font-size:13px; line-height:1.5;
+  border:1px dashed #cbd8ff; border-radius:14px;
+  color:#55607a; font-size:13px; line-height:1.5;
   max-width:360px;
 }
 
@@ -348,11 +418,19 @@ select::-ms-expand{ display:none; }
    ========================= */
 .grid{display:grid;gap:20px}
 
-/* Без хор. скрол; позволи пренасяне и чупене */
 .table{
   width:100%;
-  border-collapse:collapse;
+  border-collapse:separate;
+  border-spacing:0;
   table-layout:auto;
+  background:#fff;
+  border:1px solid #e6eaf3;
+  border-radius:12px;
+  overflow:hidden;
+}
+.table thead th{
+  background:linear-gradient(180deg,#eef3ff,#e7eeff);
+  font-weight:700;color:#0e1425;border-bottom:1px solid #dbe4ff
 }
 .table th,.table td{
   text-align:left;
@@ -362,9 +440,9 @@ select::-ms-expand{ display:none; }
   word-break: break-word;
   hyphens: auto;
 }
-.table thead th{background:var(--muted-surface);font-weight:600;color:var(--ink-2)}
 .table tbody tr{color:var(--ink)}
-.table tbody tr:hover{background:#fafbfc}
+.table tbody tr:nth-child(odd){ background:#fbfdff }
+.table tbody tr:hover{background:#f2f6ff}
 
 /* =========================
    Смяна на клуб
@@ -376,33 +454,24 @@ select::-ms-expand{ display:none; }
 /* =========================
    Footer
    ========================= */
-.footer{padding:20px 0;border-top:1px solid var(--border);color:var(--muted)}
+.footer{
+  padding:20px 0;border-top:1px solid var(--border);color:var(--muted);
+  background: linear-gradient(180deg,#ffffff 0%, #f7f9ff 100%);
+}
 .footer small{font-size:12px}
 
-.kpis-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 0;
-    justify-content: center;
-}
+/* Нормативни карти – подредба */
 .results-row .norm-cards{
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
+.results-row .norm-cards .norm-card{ width: 100%; }
 
-/* Вътрешните карти да се разтягат в колоната си */
-.results-row .norm-cards .norm-card{
-  width: 100%;
-}
-
-/* На по-малки екрани – по една на ред (без празни места) */
+/* На по-малки екрани – по една на ред */
 @media (max-width: 780px){
-  .results-row .norm-cards{
-    grid-template-columns: 1fr;
-  }
+  .results-row .norm-cards{ grid-template-columns: 1fr; }
 }
 
 /* =========================
@@ -417,10 +486,10 @@ select::-ms-expand{ display:none; }
   .results-row{ padding-inline: 8px; }
 }
 @media (max-width: 1024px){
-  .card-results{ --chart-max: 820px; }   /* (1) */
+  .card-results{ --chart-max: 820px; }
 }
 @media (max-width: 960px){
-  .card-results{ --chart-max: 680px; }   /* (1) */
+  .card-results{ --chart-max: 680px; }
 }
 
 /* =========================
@@ -452,7 +521,6 @@ select::-ms-expand{ display:none; }
   .kpis-row .kpi{ min-width:calc(50% - 6px); padding:12px 12px }
   .chart-caption{ max-width:100%; font-size:12px }
 
-  /* Таблици – по-компактно, без скрол */
   .table th,.table td{ padding:10px 10px; font-size:13.5px; line-height:1.35; }
 }
 
@@ -470,7 +538,6 @@ select::-ms-expand{ display:none; }
   .kpis-row .kpi{ min-width:100% }
   .caption-box{ display:none }
 
-  /* ВАЖНО: махнат е старият overflow-x за таблиците */
   .table th,.table td{ padding:10px 8px; }
 }
 
@@ -486,7 +553,7 @@ select::-ms-expand{ display:none; }
   .btn{ padding:9px 10px; border-radius:10px }
   select{ padding:9px 40px 9px 10px }
 
-  .card-results{ --chart-max: 100%; }   /* (1) на много малки екрани */
+  .card-results{ --chart-max: 100%; }
   .table th,.table td{ padding:8px 6px; font-size:13px; }
 }
 
@@ -511,8 +578,24 @@ select::-ms-expand{ display:none; }
   gap: 14px;
   align-items: start;
 }
-.norm-card{ height: 100%; }
-
+.norm-card{
+  height: 100%;
+  background: var(--surface);
+  border:1px solid #e6eaf3;
+  border-radius:12px;
+  padding:12px;
+  box-shadow: 0 6px 18px rgba(15,23,42,.06);
+}
+.norm-card .title{
+  font-weight:700; color:#0e1425; margin:0 0 6px 0;
+}
+.norm-card .meta{
+  color:#58627a; font-size:13px;
+}
+.norm-card .badge{
+  display:inline-block; padding:4px 8px; border-radius:999px;
+  background:var(--info-tint); color:#036d82; border:1px solid #bfefff;
+}
 @media (min-width: 900px){
   .norm-cards{ grid-template-columns: repeat(2, minmax(320px, 1fr)); }
 }
@@ -546,6 +629,10 @@ select::-ms-expand{ display:none; }
   .top-nav .nav-actions{ order: 2; }
 }
 
+@media (max-width: 450px){
+  .brand { display: none; }
+}
+
 @media (max-width: 899.98px){
   .header .wrap{
     flex-wrap: wrap;
@@ -575,15 +662,13 @@ select::-ms-expand{ display:none; }
   }
 }
 
-@media (max-width: 420px){
-  .top-nav{ gap: 10px; }
-  .top-nav a, .top-nav .btn{
-    min-width: 50px;
-    min-height: 46px;
-    padding: 5px 6px;
-    font-size: 11px;
-  }
-  .top-nav a::before, .top-nav .btn::before{
-    width: 20px; height: 20px;
-  }
+/* Утилити бейджове (ако решиш да маркираш статус) */
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600;
+  border:1px solid transparent;
 }
+.badge.success{ background:var(--success-tint); color:#0f8a3c; border-color:#b8f3cf }
+.badge.warning{ background:var(--warning-tint); color:#9a5a00; border-color:#ffe2ad }
+.badge.danger{ background:var(--danger-tint); color:#b32626; border-color:#ffc5c5 }
+.badge.info{ background:var(--info-tint); color:#076d83; border-color:#bfefff }

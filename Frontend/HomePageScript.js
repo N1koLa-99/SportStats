@@ -438,7 +438,7 @@ function fetchNormativesAndDisplayResults(disciplineId, yearOfBirth, userGender,
         displayResults(disciplineId, yearOfBirth, userGender, results, []);
         return;
     }
-
+    
     fetch(`https://sportstatsapi.azurewebsites.net/api/Normatives/discipline/${disciplineId}`)
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
