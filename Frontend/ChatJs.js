@@ -2,6 +2,7 @@
 const API_BASE = 'https://sportstatsapi.azurewebsites.net'; // смени при нужда
 const POLL_MS = 3000;
 const AVATAR_FALLBACK = 'https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg';
+const SOFIA_TZ = 'Europe/Sofia';
 
 // === ПРЕНАСОЧВАНЕ / УТИЛИТИ ===
 function redirectToIndex(msg) {
@@ -91,15 +92,26 @@ function startApp(user) {
 
   // helpers
   function api(path) { return API_BASE + path; }
+
+  // >>> ВАЖНО: показваме време в Europe/Sofia <<<
   function fmtDate(d) {
     const date = new Date(d);
-    return isNaN(date.getTime()) ? '' : date.toLocaleString();
+    return isNaN(date.getTime()) ? '' : date.toLocaleString('bg-BG', {
+      timeZone: SOFIA_TZ,
+      hour12: false,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
   }
   function fmtTimeChip(d) {
     const date = new Date(d);
-    return isNaN(date.getTime()) ? '' :
-      date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return isNaN(date.getTime()) ? '' : date.toLocaleTimeString('bg-BG', {
+      timeZone: SOFIA_TZ,
+      hour12: false,
+      hour: '2-digit', minute: '2-digit'
+    });
   }
+
   function escapeHTML(s) {
     const div = document.createElement('div');
     div.textContent = s ?? '';
@@ -361,7 +373,7 @@ function startApp(user) {
       if (shouldInsertTimeSep(prevTime, created)) {
         const sep = document.createElement('div');
         sep.className = 'time-sep';
-        sep.textContent = fmtTimeChip(created);
+        sep.textContent = fmtTimeChip(created); // HH:mm в Europe/Sofia
         frag.appendChild(sep);
       }
       prevTime = created;
@@ -482,7 +494,7 @@ function startApp(user) {
       });
     }
 
-    $menuTime.textContent = fmtDate(createdAt);
+    $menuTime.textContent = fmtDate(createdAt); // дата+час в Europe/Sofia
 
     if (mine) { $menuDelete.removeAttribute('disabled'); $menuDelete.style.display = ''; }
     else { $menuDelete.setAttribute('disabled', 'true'); $menuDelete.style.display = 'none'; }
