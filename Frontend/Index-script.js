@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Пренасочване след кратко време
         setTimeout(() => {
-            window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+            window.location.href = user.roleID === 1 || user.roleID === 2 || user.roleID === 3 ? "HomePage.html" : "errorPage.html";
         }, 1000);
     
     }
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
             // Пренасочване след кратко време
             setTimeout(() => {
-                window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+                window.location.href = user.roleID === 1 || user.roleID === 2 || user.roleID === 3 ? "HomePage.html" : "errorPage.html";
             }, 1500);
         }
     
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Пренасочване към началната страница
             setTimeout(() => {
-                window.location.href = user.roleID === 1 || user.roleID === 2 ? "HomePage.html" : "errorPage.html";
+                window.location.href = user.roleID === 1 || user.roleID === 2 || user.roleID === 3 ? "HomePage.html" : "errorPage.html";
             }, 1000);
         } catch (error) {
             console.error('Грешка при влизането:', error);

@@ -61,11 +61,15 @@
       }
 
       const user = JSON.parse(userJson);
-      if (user.roleID !== 2) {
-        alert("Нямате права за достъп до тази страница.");
-        window.location.href = "HomePage.html";
-        return;
-      }
+      const role = Number(user.roleID);
+const isCoach = role === 2;
+const isAdmin = role === 3;
+
+if (!(isCoach || isAdmin)) {
+  alert('Нямате права за достъп.');
+  window.location.href = 'HomePage.html';
+  return;
+}
 
       const requestsContainer = document.getElementById("requests-container");
       requestsContainer.innerHTML = "<p class='muted'>Зареждане...</p>";

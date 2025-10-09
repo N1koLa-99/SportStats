@@ -262,25 +262,39 @@ async function changeUserClub(userId, newClubId) {
         document.getElementById('year-of-birth').textContent = user.yearOfBirth || 'Няма данни';
     
 
-        if (user.roleID === 2) {
-            const coachButton = document.getElementById('coach-button');
-            coachButton.classList.remove('hidden');
-    
-            coachButton.addEventListener('click', function () {
-                window.location.href = 'CoacherPage.html';
-            });
-    
-            // Показваме и бутона за заявките
-            const statusButton = document.getElementById('status-button');
-            statusButton.classList.remove('hidden');
-    
-            statusButton.addEventListener('click', function () {
-                window.location.href = 'Status.html';
-            });
-        } else {
-            document.getElementById('coach-button').classList.add('hidden');
-            document.getElementById('status-button').classList.add('hidden');
-        }
+       // роли
+const isCoach = Number(user.roleID) === 2;
+const isAdmin =
+  Number(user.roleID) === 3 ||                       // ако 3 е админ при теб
+  (typeof user.role === 'string' && user.role.toLowerCase() === 'admin') ||
+  user.isAdmin === true ||
+  (Array.isArray(user.roles) && user.roles.some(r => String(r).toLowerCase() === 'admin'));
+
+// референции към бутоните
+const coachButton  = document.getElementById('coach-button');
+const statusButton = document.getElementById('status-button');
+const adminButton  = document.getElementById('admin-button');
+
+// треньорски бутони -> виждат се от Треньор ИЛИ Админ
+if (isCoach || isAdmin) {
+  coachButton?.classList.remove('hidden');
+  statusButton?.classList.remove('hidden');
+
+  coachButton?.addEventListener('click', () => { window.location.href = 'CoacherPage.html'; });
+  statusButton?.addEventListener('click', () => { window.location.href = 'Status.html'; });
+} else {
+  coachButton?.classList.add('hidden');
+  statusButton?.classList.add('hidden');
+}
+
+// админ бутон -> вижда се САМО от Админ
+if (isAdmin) {
+  adminButton?.classList.remove('hidden');
+  adminButton?.addEventListener('click', () => { window.location.href = 'AdminHome.html'; });
+} else {
+  adminButton?.classList.add('hidden');
+}
+
 
         fetch(`https://sportstatsapi.azurewebsites.net/api/Clubs/${user.clubID}`)
             .then(response => {
@@ -1053,4 +1067,7 @@ function formatDifference(diff, unit) {
         return `${sign}${formatTime(Math.abs(diff))}`;
     }
     return `${sign}${diff.toFixed(2)} м`;
-}});
+}
+
+
+});

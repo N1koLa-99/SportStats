@@ -173,11 +173,15 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
     async function handleCoach() {
-        if (!user || user.roleID !== 2) {
-            showMessageBox('Няма достъп до тази страница.', true);
-            window.location.href = 'HomePage.html';
-            return;
-        }
+      const role = Number(user.roleID);
+const isCoach = role === 2;
+const isAdmin = role === 3;
+
+if (!(isCoach || isAdmin)) {
+  alert('Нямате права за достъп.');
+  window.location.href = 'HomePage.html';
+  return;
+}
     
         document.getElementById('coach-name').textContent = `${user.firstName} ${user.lastName}`;
     

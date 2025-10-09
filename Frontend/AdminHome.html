@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <title>Админ • Контролно табло</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="AdminHomeStyles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-bar" style="display:flex;align-items:center;gap:16px;justify-content:space-between;">
+      <h1 style="margin:0;">Админ • Контролно табло</h1>
+      <!-- НОВО: бутон към началната страница -->
+      <a id="btnGoHome" class="btn ghost" href="HomePage.html" aria-label="Към началната страница">
+        ← Начало
+      </a>
+    </div>
+
+    <!-- Навигация -->
+    <nav id="tabs" class="tabs" aria-label="Основни раздели">
+      <button data-tab="tab-season" class="tab active" aria-current="page">Сезон</button>
+      <button data-tab="tab-pricing" class="tab">Ценоразпис</button>
+      <button data-tab="tab-schedule" class="tab">График (Групи)</button>
+      <button data-tab="tab-pay" class="tab">Плащания и справки</button>
+    </nav>
+
+    <div id="status" class="muted"></div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- TAB 1: СЕЗОН (без промени по логика) -->
+  <section id="tab-season" class="tab-pane active" aria-labelledby="tab-season">
+
+    <article class="card">
+      <header class="card-header">
+        <h2>Сезони</h2>
+      </header>
+      <div class="table-wrap">
+        <table id="tblSeasons">
+          <thead>
+          <tr><th>Име</th><th>Период</th><th>Активен</th><th>Действия</th></tr>
+          </thead>
+        <tbody></tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="card">
+      <header class="card-header">
+        <h3>Нов сезон</h3>
+      </header>
+      <form id="formSeason" class="form">
+        <div class="field">
+          <label for="seasonName">Име на сезона</label>
+          <input type="text" id="seasonName" placeholder="Сезон 2025/26" required>
+        </div>
+        <div class="field">
+          <label for="seasonStart">Начало</label>
+          <input type="date" id="seasonStart" required>
+        </div>
+        <div class="field">
+          <label for="seasonEnd">Край</label>
+          <input type="date" id="seasonEnd" required>
+        </div>
+        <div class="field field-inline">
+          <label for="seasonActive">Активен</label>
+          <input type="checkbox" id="seasonActive" checked>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn primary">Създай</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card">
+      <header class="card-header">
+        <h3>Месеци на сезона</h3>
+      </header>
+      <div class="toolbar">
+        <!-- Скрито поле + дружелюбен селект ще се вгради от JS -->
+        <label for="seasonIdMonths" class="sr-only">SeasonId</label>
+        <input type="number" id="seasonIdMonths" inputmode="numeric">
+        <div class="actions">
+          <button id="btnGenMonths" class="btn">Генерирай</button>
+          <button id="btnLoadMonths" class="btn">Покажи</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="tblMonths">
+          <thead>
+          <tr><th>Месец</th><th>За фактуриране</th><th>Действия</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- TAB 2: ЦЕНОРАЗПИС (без промени по логика) -->
+  <section id="tab-pricing" class="tab-pane" aria-labelledby="tab-pricing">
+
+    <article class="card">
+      <header class="card-header">
+        <h2>Ценоразпис</h2>
+      </header>
+      <div class="toolbar">
+        <!-- Скрито поле + дружелюбен селект ще се вгради от JS -->
+        <label for="feeSeasonId" class="sr-only">SeasonId (по избор)</label>
+        <input type="number" id="feeSeasonId" inputmode="numeric">
+        <div class="actions">
+          <button id="btnLoadFeePlans" class="btn">Зареди</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="tblFeePlans">
+          <thead>
+          <tr><th>Тренировки/седмица</th><th>Цена</th><th>От</th><th>До</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="card">
+      <header class="card-header">
+        <h3>Нов / редакция на план</h3>
+      </header>
+      <form id="formFeePlan" class="form">
+        <input type="hidden" id="feeId">
+        <!-- Скрит input + селект (1..7) -->
+        <div class="field">
+          <label for="feeTPW">Тренировки/седмица</label>
+          <input type="number" id="feeTPW" min="1" max="7" placeholder="1..7" required>
+        </div>
+        <div class="field">
+          <label for="feePrice">Цена</label>
+          <input type="number" id="feePrice" step="0.01" placeholder="0.00" required>
+        </div>
+        <div class="field">
+          <label for="feeFrom">В сила от</label>
+          <input type="date" id="feeFrom" required>
+        </div>
+        <div class="field">
+          <label for="feeTo">В сила до (по избор)</label>
+          <input type="date" id="feeTo">
+        </div>
+        <div class="field">
+          <!-- Скрито поле + селект сезон за план -->
+          <label for="feeClubSeasonId">SeasonId (по избор)</label>
+          <input type="number" id="feeClubSeasonId" inputmode="numeric" placeholder="">
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn primary">Запиши</button>
+          <button type="button" id="btnArchiveFee" class="btn danger">Архивирай</button>
+        </div>
+      </form>
+    </article>
+
+  </section>
+
+  <!-- TAB 3: НОВО – ГРАФИК (ГРУПИ) – ЕЛЕМЕНТАРНО -->
+  <section id="tab-schedule" class="tab-pane" aria-labelledby="tab-schedule">
+
+    <!-- Легенда (етикети като на снимката) -->
+    <article class="card">
+      <header class="card-header">
+        <h2>График</h2>
+      </header>
+      <div class="legend p-3">
+        <span class="tag tag-pro">🏅 Състезатели</span>
+        <span class="tag tag-adv">💪 Напреднали</span>
+        <span class="tag tag-beg">🌱 Начинаещи</span>
+      </div>
+    </article>
+
+    <!-- Бързо добавяне: една форма за всичко -->
+    <article class="card">
+      <header class="card-header">
+        <h3>Бързо добавяне в графика</h3>
+      </header>
+
+      <form id="formQuickSlot" class="form">
+        <input type="hidden" id="quickGroupId"> <!-- ако изберем вече съществуваща група -->
+
+        <div class="field">
+          <label for="quickGroupName">Име на група</label>
+          <input type="text" id="quickGroupName" placeholder="напр. U12 Състезатели" required>
+          <small class="muted">Ако групата съществува, ще бъде използвана; ако не – ще се създаде.</small>
+        </div>
+
+        <div class="field">
+          <label for="quickLevel">Ниво</label>
+          <!-- Селект с 3 нива; JS ще оцветява на база стойност -->
+          <select id="quickLevel" required>
+            <option value="" selected>— избери —</option>
+            <option value="pro">Състезатели</option>
+            <option value="adv">Напреднали</option>
+            <option value="beg">Начинаещи</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="quickWeekday">Ден</label>
+          <select id="quickWeekday" required>
+            <option value="" selected>— ден —</option>
+            <option value="1">Понеделник</option>
+            <option value="2">Вторник</option>
+            <option value="3">Сряда</option>
+            <option value="4">Четвъртък</option>
+            <option value="5">Петък</option>
+            <option value="6">Събота</option>
+            <option value="7">Неделя</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="quickStart">Начало</label>
+          <input type="time" id="quickStart" required>
+        </div>
+
+        <div class="field">
+          <label for="quickEnd">Край</label>
+          <input type="time" id="quickEnd" required>
+        </div>
+
+        <div class="field">
+          <label for="quickLocation">Локация (по избор)</label>
+          <input type="text" id="quickLocation" placeholder="Зала / адрес">
+        </div>
+
+        <div class="field">
+          <label for="quickCap">Капацитет (по избор)</label>
+          <input type="number" id="quickCap" min="0" placeholder="бр. места">
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn primary">Добави</button>
+          <button type="button" id="btnClearQuick" class="btn">Изчисти</button>
+        </div>
+      </form>
+    </article>
+
+    <!-- Седмичен изглед – КОЛОНИ ПО ДНИ -->
+    <article class="card">
+      <header class="card-header">
+        <h3>Седмица</h3>
+      </header>
+
+      <!-- Контейнер на календара -->
+      <div id="weekGrid" class="week-grid">
+        <!-- Ден 1 -->
+        <section class="day-col" data-weekday="1" aria-label="Понеделник">
+          <h4 class="day-title">Понеделник</h4>
+          <div class="day-list" role="list" aria-live="polite"></div>
+          <button class="btn ghost add-here" data-weekday="1" title="Добави слот в Понеделник">+ Добави тук</button>
+        </section>
+
+        <!-- Ден 2 -->
+        <section class="day-col" data-weekday="2" aria-label="Вторник">
+          <h4 class="day-title">Вторник</h4>
+          <div class="day-list" role="list" aria-live="polite"></div>
+          <button class="btn ghost add-here" data-weekday="2" title="Добави слот във Вторник">+ Добави тук</button>
+        </section>
+
+        <!-- Ден 3 -->
+        <section class="day-col" data-weekday="3" aria-label="Сряда">
+          <h4 class="day-title">Сряда</h4>
+          <div class="day-list" role="list" aria-live="polite"></div>
+          <button class="btn ghost add-here" data-weekday="3" title="Добави слот в Сряда">+ Добави тук</button>
+        </section>
+
+        <!-- Ден 4 -->
+        <section class="day-col" data-weekday="4" aria-label="Четвъртък">
+          <h4 class="day-title">Четвъртък</h4>
+          <div class="day-list" role="list" aria-live="polite"></div>
+          <button class="btn ghost add-here" data-weekday="4" title="Добави слот в Четвъртък">+ Добави тук</button>
+        </section>
+
+        <!-- Ден 5 -->
+        <section class="day-col" data-weekday="5" aria-label="Петък">
+          <h4 class="day-title">Петък</h4>
+          <div class="day-list" role="list" aria-live="polite"></div>
+          <button class="btn ghost add-here" data-weekday="5" title="Добави слот в Петък">+ Добави тук</button>
+        </section>
+
+        <!-- По желание може и уикенд -->
+        <section class="day-col" data-weekday="6" aria-label="Събота">
+          <h4 class="day-title">Събота</h4>
+          <div class="day-list" role="list" aria-live="polite"></div>
+          <button class="btn ghost add-here" data-weekday="6" title="Добави слот в Събота">+ Добави тук</button>
+        </section>
+
+        <section class="day-col" data-weekday="7" aria-label="Неделя">
+          <h4 class="day-title">Неделя</h4>
+          <div class="day-list" role="list" aria-live="polite"></div>
+          <button class="btn ghost add-here" data-weekday="7" title="Добави слот в Неделя">+ Добави тук</button>
+        </section>
+      </div>
+
+      <!-- Поповър за Админ hover (ще се управлява само от JS и при админ) -->
+      <div id="slotPopover" class="slot-popover" role="dialog" aria-modal="false" hidden>
+        <div class="slot-popover__head">
+          <strong id="slotPopoverTitle">Група</strong>
+          <button id="slotPopoverClose" class="btn ghost" aria-label="Затвори">✕</button>
+        </div>
+        <div class="slot-popover__body">
+          <div class="slot-popover__meta">
+            <span id="slotPopoverCount">0</span> избрали
+          </div>
+          <ul id="slotPopoverList" class="slot-popover__list"></ul>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- TAB 4: ПЛАЩАНИЯ & СПРАВКИ -->
+  <section id="tab-pay" class="tab-pane" aria-labelledby="tab-pay">
+    <article class="card">
+      <header class="card-header card-header--split">
+        <h2>Плащания</h2>
+        <div class="toolbar">
+          <div class="field">
+            <label for="ym">Месец (YYYY-MM)</label>
+            <input type="text" id="ym" placeholder="2025-10" inputmode="numeric">
+          </div>
+          <div class="actions">
+            <button id="btnLoadUnpaid" class="btn">Неплатили</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="table-wrap">
+        <table id="tblUnpaid">
+          <thead>
+          <tr><th>Състезател</th><th>Действия</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- НОВО: ПЛАТИЛИ -->
+    <article class="card">
+      <header class="card-header card-header--split">
+        <h2>Платили</h2>
+        <div class="actions">
+          <button id="btnLoadPaid" class="btn">Зареди платили</button>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table id="tblPaid">
+          <thead>
+          <tr><th>Състезател</th><th>Действия</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+    <!-- /НОВО -->
+
+    <article class="card">
+      <header class="card-header card-header--split">
+        <h2>Очакван приход</h2>
+        <div class="actions">
+          <button id="btnLoadExpected" class="btn">Зареди</button>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table id="tblExpected">
+          <thead>
+          <tr><th>Месец</th><th>Брой абонаменти</th><th>Сума</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="card">
+      <header class="card-header card-header--split">
+        <h2>Без избрани слотове</h2>
+        <div class="actions">
+          <button id="btnLoadNoSelections" class="btn">Покажи</button>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table id="tblNoSel">
+          <thead>
+          <tr><th>UserId</th><th>Име</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+    <small>&copy; SportStats Admin</small>
+    <!-- Дублиращ линк за удобство в края на страницата -->
+    <a class="btn ghost" href="HomePage.html" aria-label="Към началната страница">← Начало</a>
+  </div>
+</footer>
+
+<!-- Скриптът ще бъде обновен на следващата стъпка -->
+<script src="AdminHomeScript.js"></script>
+</body>
+</html>

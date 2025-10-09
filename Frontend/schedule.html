@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8" />
+  <title>График – записване</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="schedule.css">
+</head>
+<body>
+<header>
+  <h1>График</h1>
+  <div class="toolbar">
+    <label>
+      Сезон:
+      <select id="seasonSelect" aria-label="Избор на сезон"></select>
+    </label>
+    <span class="pill">Клуб: <strong id="clubLabel"></strong></span>
+    <span class="pill">Потребител: <strong id="userLabel"></strong></span>
+  </div>
+  <div class="legend">
+    <span><span class="swatch swatch-mine"></span>Моите записи</span>
+    <span><span class="swatch swatch-full"></span>Пълен капацитет*</span>
+    <span class="muted">*необходимо е API за заетост по слот</span>
+  </div>
+</header>
+
+<div id="messages" class="muted" role="status" aria-live="polite"></div>
+
+<div id="grid" class="grid" aria-label="Седмична мрежа"></div>
+
+<div class="actions">
+  <div id="summary" class="pill">0 слота избрани</div>
+  <button id="saveBtn" class="primary" disabled>Запази</button>
+  <div id="feeBox" class="pill">Такса: —</div>
+</div>
+
+<noscript>Тази страница изисква JavaScript.</noscript>
+<script src="schedule.js" defer></script>
+</body>
+</html>

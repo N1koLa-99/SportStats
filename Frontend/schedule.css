@@ -1,0 +1,92 @@
+:root { --gap: 8px; --radius: 10px; --bd: #ddd; --bd2:#bbb; --sel:#e6f3ff; --hover:#f7faff; --full:#ffe6e6; }
+
+* { box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 20px; }
+header { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom: 14px; }
+h1 { margin:0; }
+
+.toolbar { display:flex; gap:10px; align-items:center; margin-bottom: 10px; }
+.legend { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.muted { color:#666; font-size: 0.9rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 110px repeat(7, 1fr);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin:14px 0;
+}
+.cell, .head {
+  border-right: 1px solid var(--bd);
+  border-bottom: 1px solid var(--bd);
+  padding: 8px;
+  min-height: 44px;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
+.head { background:#fafafa; font-weight:600; }
+.time-col { background:#fcfcfc; font-weight:500; }
+
+.slot {
+  cursor:pointer; user-select:none; border-radius:8px;
+  padding:6px 8px; border:1px dashed transparent; width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+}
+.slot:hover { background: var(--hover); border-color: var(--bd2); }
+.slot.selected { background: var(--sel); border-color:#99c3ff; }
+.slot.full { background: var(--full); }
+
+button { padding:10px 14px; border-radius:10px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+button.primary { background:#0ea5e9; color:#fff; border-color:#0ea5e9; }
+button:disabled { opacity:0.5; cursor:not-allowed; }
+.pill { padding:6px 10px; border:1px solid var(--bd); border-radius:999px; }
+
+.actions { display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+
+.swatch { width:14px; height:14px; border-radius:3px; display:inline-block; margin-right:6px; border:1px solid #aaa; }
+.swatch-mine { background:#e6f3ff; }
+.swatch-full { background:#ffe6e6; }
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+
+.day-col { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background:#fff; }
+.day-head { background:#f8fafc; font-weight:600; text-align:center; padding:8px 10px; border-bottom:1px solid #e5e7eb; }
+.day-list { display:flex; flex-direction:column; gap:10px; padding:10px; min-height:80px; }
+
+.slot-card { border:1px solid #e5e7eb; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:8px; }
+.slot-card__head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.slot-card__title-wrap { display:flex; align-items:center; gap:8px; }
+.slot-card__title { font-weight:600; }
+.slot-chip { padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #e5e7eb; background:#f9fafb; }
+
+.slot-card__row { display:flex; align-items:center; gap:8px; font-size:14px; }
+.slot-card__icon { width:18px; text-align:center; }
+.btn.ghost { background:transparent; border:1px solid #e5e7eb; border-radius:8px; padding:4px 8px; cursor:pointer; }
+
+.slot-card--pro  .slot-chip{ background:#fee2e2; border-color:#fecaca; }  /* Състезатели */
+.slot-card--adv  .slot-chip{ background:#e0e7ff; border-color:#c7d2fe; }  /* Напреднали */
+.slot-card--beg  .slot-chip{ background:#dcfce7; border-color:#bbf7d0; }  /* Начинаещи */
+.grid {
+  display: grid;
+  grid-template-columns: 110px repeat(7, 1fr);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin:14px 0;
+}
+.cell, .head {
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  min-height: 44px;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
+.head { background:#fafafa; font-weight:600; }
+.time-col { background:#fcfcfc; font-weight:500; }
+.slot { cursor:pointer; user-select:none; border-radius:8px; padding:6px 8px; border:1px dashed transparent; width:100%; height:100%; display:flex; align-items:center; justify-content:center;}
+.slot.selected { background:#e6f3ff; border-color:#99c3ff; }
+.muted { color:#666; font-size: 0.9rem; }
+

@@ -182,6 +182,17 @@ body{
   -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M19 3H5a2 2 0 0 0-2 2v6h3V6h12v12H6v-5H3v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM11 7v5H8l4 4 4-4h-3V7h-2z"/></svg>');
           mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M19 3H5a2 2 0 0 0-2 2v6h3V6h12v12H6v-5H3v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM11 7v5H8l4 4 4-4h-3V7h-2z"/></svg>');
 }
+#admin-button::before{
+  -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 6 5 2v2c0 3.54-2.27 6.95-5 8-2.73-1.05-5-4.46-5-8V9l5-2Z"/></svg>');
+          mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 6 5 2v2c0 3.54-2.27 6.95-5 8-2.73-1.05-5-4.46-5-8V9l5-2Z"/></svg>');
+}
+/* Иконка за "График" (schedule.html) */
+.top-nav a[href*="schedule"]::before{
+  -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M7 2h2v2h6V2h2v2h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3V2zm13 8H4v10h16V10zm-9 3h2v2h-2v-2zM7 13h2v2H7v-2zm8 0h2v2h-2v-2zM7 9h10v1H7V9z"/></svg>');
+          mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M7 2h2v2h6V2h2v2h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3V2zm13 8H4v10h16V10zm-9 3h2v2h-2v-2zM7 13h2v2H7v-2zm8 0h2v2h-2v-2zM7 9h10v1H7V9z"/></svg>');
+}
+
+
 
 /* ред: Chat (1), nav-actions (2), Settings (вдясно) */
 .nav-actions{display:flex;gap:20px;margin-left:8px}
