@@ -1,5 +1,5 @@
 /* ================== БАЗА / КОНФИГ ================== */
-const API_BASE = 'https://localhost:7198';
+const API_BASE = 'https://sportstatsapi.azurewebsites.net';
 let currentUser = null;
 
 /* ================== УТИЛИТИ ================== */
