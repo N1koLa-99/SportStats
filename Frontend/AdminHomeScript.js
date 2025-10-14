@@ -81,16 +81,12 @@ function toHHMM(input){
   return '';
 }
 
-// хелпър: нормализира time input в 24ч при blur/input
+// нормализира time input в 24ч при blur/input
 function normalizeTimeField(el){
   if (!el) return;
   const v = el.value;
   const hhmm = toHHMM(v);
-  if (hhmm) {
-    el.value = hhmm;
-  } else {
-    // по желание: alert('Невалиден час'); el.focus();
-  }
+  if (hhmm) el.value = hhmm;
 }
 
 const weekdayName = (n)=>({1:'Понеделник',2:'Вторник',3:'Сряда',4:'Четвъртък',5:'Петък',6:'Събота',7:'Неделя'})[n]||n;
@@ -100,13 +96,12 @@ function cyrToLat(s){
   const map = {
     'щ':'sht','ш':'sh','ч':'ch','ц':'ts','й':'y','ю':'yu','я':'ya','ь':'','ъ':'y','ж':'zh',
     'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','з':'z','и':'i','к':'k','л':'l','м':'m',
-    'н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ѝ':'i'
+    'н':'n','о':'o','п':'p','р':'р','с':'s','т':'t','у':'u','ф':'f','х':'h','ѝ':'i'
   };
   return (s||'').toLowerCase().split('').map(ch=>map[ch] ?? ch).join('');
 }
 function latToCyr(s){
   let t = (s||'').toLowerCase();
-  // важен ред: първо по-дългите комбинации
   t = t
     .replace(/sht/g,'щ')
     .replace(/sh/g,'ш')
@@ -123,30 +118,19 @@ function latToCyr(s){
 }
 function normFold(s){
   const x = (s||'').trim().toLowerCase();
-  return {
-    raw: x,
-    cyr: latToCyr(x),
-    lat: cyrToLat(x)
-  };
+  return { raw: x, cyr: latToCyr(x), lat: cyrToLat(x) };
 }
 function nameMatches(query, candidate){
   const q = normFold(query);
   const c = normFold(candidate);
-  // съвпадение, ако която и да е форма се съдържа в която и да е форма
   const qForms = [q.raw, q.cyr, q.lat].filter(Boolean);
   const cForms = [c.raw, c.cyr, c.lat].filter(Boolean);
-  for (const qa of qForms){
-    for (const ca of cForms){
-      if (ca.includes(qa)) return true;
-    }
-  }
+  for (const qa of qForms) for (const ca of cForms) if (ca.includes(qa)) return true;
   return false;
 }
 
 // КЕШ за снимки: userId -> objectURL | външен URL | null
 const userPhotoCache = new Map();
-
-// генерира fallback SVG с инициали (data URL)
 function avatarFallbackDataUrl(name){
   const initials = (name || '')
     .split(/\s+/).filter(Boolean).slice(0,2)
@@ -160,24 +144,19 @@ function avatarFallbackDataUrl(name){
      </svg>`;
   return 'data:image/svg+xml;base64,' + btoa(svg);
 }
-
-// дърпа снимка за userId; връща URL за <img src=...>
 async function getProfilePhotoUrl(userId){
   if (userPhotoCache.has(userId)) return userPhotoCache.get(userId);
   const endpoint = `https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`;
   try{
     const res = await fetch(endpoint);
     if (!res.ok) throw new Error('no image');
-
     const ct = (res.headers.get('content-type') || '').toLowerCase();
     if (ct.includes('application/json')){
-      // ако API връща JSON с url поле
       const data = await res.json();
       const url = data?.url || data?.profileImageUrl || null;
       userPhotoCache.set(userId, url);
       return url;
     } else {
-      // вероятно е image/* → blob → objectURL
       const blob = await res.blob();
       const objUrl = URL.createObjectURL(blob);
       userPhotoCache.set(userId, objUrl);
@@ -189,8 +168,6 @@ async function getProfilePhotoUrl(userId){
   }
 }
 
-
-
 /* ================== АВТЕНТИКАЦИЯ ================== */
 async function hashUserData(user) {
   const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}${user.statusID}`;
@@ -198,7 +175,6 @@ async function hashUserData(user) {
   const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
   return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }
-
 async function initAuth() {
   const userJson  = localStorage.getItem('user');
   const savedHash = localStorage.getItem('userHash');
@@ -206,7 +182,6 @@ async function initAuth() {
     redirectToIndex("Невалидни данни. Пренасочване...");
     return false;
   }
-
   try {
     const user = JSON.parse(userJson);
     const currentHash = await hashUserData(user);
@@ -239,17 +214,222 @@ function initTabs(){
 }
 
 /* ================== СЕЗОНИ ================== */
-// кеш на сезони + активен
 let seasonsCache = [];
 let activeSeasonIdCache = null;
 
-// дружелюбни селекти (скрит input → селект по име)
 function hideInput(id){
   const el = $('#'+id);
   if (!el) return;
   try { el.type = 'hidden'; } catch { el.style.display = 'none'; }
 }
-function upsertSelectForInput(inputId, selectId, items, placeholder, autoPick){
+
+// name <-> id helpers
+function seasonIdByName(name){
+  if (!name) return null;
+  const n = String(name).trim().toLowerCase();
+  const hit = (seasonsCache || []).find(s => (s.Name||'').trim().toLowerCase() === n);
+  return hit ? hit.Id : null;
+}
+function seasonNameById(id){
+  const hit = (seasonsCache || []).find(s => s.Id === id);
+  return hit ? hit.Name : null;
+}
+
+// селект, който работи с ИМЕНА (value = label)
+function upsertSelectForInputByName(inputId, selectId, items, placeholder, autoPick){
+  const input = $('#'+inputId);
+  if(!input) return null;
+  hideInput(inputId);
+
+  let select = $('#'+selectId);
+  if(!select){
+    select = document.createElement('select');
+    select.id = selectId;
+    select.className = 'friendly-select';
+    input.insertAdjacentElement('afterend', select);
+  }
+
+  const names = items.map(x => String(x.label||'').trim()).filter(Boolean);
+
+  select.innerHTML = '';
+  const ph = document.createElement('option');
+  ph.value = '';
+  ph.textContent = placeholder || '— избери —';
+  select.appendChild(ph);
+
+  names.forEach(label=>{
+    const opt = document.createElement('option');
+    opt.value = label;      // value = ИМЕ
+    opt.textContent = label;
+    select.appendChild(opt);
+  });
+
+  if (input.value){
+    const opt = Array.from(select.options).find(o => o.value === String(input.value));
+    if (opt) select.value = opt.value;
+  } else if (typeof autoPick === 'function'){
+    const autoId = autoPick(items);
+    const autoName = seasonNameById(autoId) || items.find(i=>i.id===autoId)?.label || names[0] || '';
+    if (autoName){
+      select.value = autoName;
+      input.value  = autoName;
+    }
+  }
+
+  select.onchange = () => { input.value = select.value; };
+  return select;
+}
+
+const getActiveSeasonId = () => activeSeasonIdCache ?? null;
+
+async function loadSeasons(){
+  const seasons = await getJson(`${apiBase()}/api/seasons/club/${clubId()}`);
+  seasonsCache = seasons || [];
+  activeSeasonIdCache = seasonsCache.find(s => !!s.IsActive)?.Id ?? null;
+
+  // Таблица
+  const tb = $('#tblSeasons tbody');
+  if (tb){
+    tb.innerHTML = '';
+    seasons.forEach(s=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+  <td>${s.Name}</td>
+  <td>${(s.StartDate||'').slice(0,10)} → ${(s.EndDate||'').slice(0,10)}</td>
+  <td>${s.IsActive?'Да':'Не'}</td>
+  <td>
+    <button class="btnUseSeason" data-name="${s.Name}">Избери</button>
+    <button class="btnToggleActive" data-name="${s.Name}" data-val="${s.IsActive?0:1}">
+      ${s.IsActive?'Деактивирай':'Активирай'}
+    </button>
+    <button class="btnDelSeason" data-name="${s.Name}"
+      ${s.IsActive ? 'disabled title="Активен сезон не може да се трие"' : ''}>
+      Изтрий
+    </button>
+  </td>`;
+      tb.appendChild(tr);
+    });
+
+    $$('#tblSeasons .btnUseSeason').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const name = b.dataset.name;
+        const input = $('#seasonIdMonths'); // пазим име
+        if (input) input.value = name;
+        setStatus(`Сезон "${name}" е избран за „Месеци“.`);
+      });
+    });
+
+    $$('#tblSeasons .btnToggleActive').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        await withBusy(b, async ()=>{
+          const id = seasonIdByName(b.dataset.name);
+          if (!id) throw new Error('Не откривам сезон по име.');
+          const bool = (b.dataset.val === '1') ? 'true' : 'false';
+          await patch(`${apiBase()}/api/seasons/${id}/active?value=${bool}`);
+          await loadSeasons();
+        });
+      });
+    });
+
+    $$('#tblSeasons .btnDelSeason').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const name = b.dataset.name;
+        if (!confirm(`Да изтрия сезона "${name}"?\nТова действие е необратимо.`)) return;
+
+        await withBusy(b, async ()=>{
+          try{
+            const id = seasonIdByName(name);
+            if (!id) throw new Error('Не откривам сезон по име.');
+            await del(`${apiBase()}/api/seasons/${id}`);
+            await loadSeasons();
+            setStatus(`Сезон "${name}" е изтрит.`);
+          }catch(err){
+            alert(err?.message || err);
+          }
+        });
+      });
+    });
+  }
+
+  // Селекти по име + автоподбор активен
+  const items = seasons.map(s => ({ id: s.Id, label: `${s.Name}` }));
+  const autoPickActive = (arr) => (arr.find(x=>seasons.find(s=>s.Id===x.id)?.IsActive)?.id) ?? (arr[0]?.id || null);
+
+  // филтри
+  upsertSelectForInputByName('seasonIdMonths','seasonSelectMonths',items,'— сезон за месеци —',autoPickActive);
+  upsertSelectForInputByName('feeSeasonId','seasonSelectForFee',items,'— сезон за цени —',autoPickActive);
+
+  // селект за сезон ВЪВ ФОРМАТА „Нов / редакция на план“ (пази име в #feeClubSeasonId)
+  upsertSelectForInputByName(
+    'feeClubSeasonId',
+    'seasonSelectInForm',
+    items,
+    '— сезон (по избор) —',
+    () => null
+  );
+  // ако в етикета пише "SeasonId (по избор)" — поправяме текста
+  const lbl = document.querySelector('label[for="feeClubSeasonId"]');
+  if (lbl) lbl.textContent = 'Сезон (по избор)';
+}
+
+async function createSeason(e){
+  e.preventDefault();
+  const payload = {
+    ClubId: clubId(),
+    Name: $('#seasonName').value.trim(),
+    StartDate: $('#seasonStart').value,
+    EndDate: $('#seasonEnd').value,
+    IsActive: $('#seasonActive').checked
+  };
+  const btn = e.submitter;
+  await withBusy(btn, async ()=>{
+    await postJson(`${apiBase()}/api/seasons`, payload);
+    e.target.reset();
+    await loadSeasons();
+  });
+}
+
+async function generateMonths(){
+  const nameEl = $('#seasonIdMonths');
+  const seasonName = nameEl ? String(nameEl.value).trim() : '';
+  if(!seasonName) return alert('Посочи сезон.');
+  const sid = seasonIdByName(seasonName);
+  if(!sid) return alert('Не откривам сезон по име.');
+  await postJson(`${apiBase()}/api/seasons/${sid}/months/generate?billable=true`, {});
+  await loadMonths();
+}
+
+async function loadMonths(){
+  const nameEl = $('#seasonIdMonths');
+  const seasonName = nameEl ? String(nameEl.value).trim() : '';
+  if(!seasonName) return alert('Посочи сезон.');
+  const sid = seasonIdByName(seasonName);
+  if(!sid) return alert('Не откривам сезон по име.');
+  const rows = await getJson(`${apiBase()}/api/seasons/${sid}/months`);
+  const tb = $('#tblMonths tbody'); if(!tb) return;
+  tb.innerHTML = '';
+  rows.forEach(m=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${m.YearMonth}</td>
+      <td>${m.IsBillable?'Да':'Не'}</td>
+      <td><button class="btnToggleMonth" data-id="${m.Id}" data-val="${m.IsBillable?0:1}">${m.IsBillable?'Скрий':'Покажи'}</button></td>`;
+    tb.appendChild(tr);
+  });
+  $$('#tblMonths .btnToggleMonth').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      await withBusy(b, async ()=>{
+        const bool = (b.dataset.val === '1') ? 'true' : 'false';
+        await patch(`${apiBase()}/api/seasons/months/${b.dataset.id}/billable?value=${bool}`);
+        await loadMonths();
+      });
+    });
+  });
+}
+
+/* ================== ЦЕНОРАЗПИС ================== */
+function upsertStaticSelectForInput(inputId, selectId, options, placeholder, autoPickIndex=0){
+  const items = options.map(o => typeof o === 'object' ? o : ({ id: o, label: String(o) }));
   const input = $('#'+inputId);
   if(!input) return null;
   hideInput(inputId);
@@ -276,163 +456,23 @@ function upsertSelectForInput(inputId, selectId, items, placeholder, autoPick){
   });
 
   if (input.value){
-    const opt = Array.from(select.options).find(o => o.value === String(input.value));
-    if (opt) select.value = opt.value;
-  } else if (typeof autoPick === 'function') {
-    const chosenId = autoPick(items);
-    if (chosenId){
-      select.value = String(chosenId);
-      input.value  = String(chosenId);
+    select.value = String(input.value);
+  } else {
+    const pick = items[autoPickIndex]?.id ?? null;
+    if (pick!=null){
+      select.value = String(pick);
+      input.value  = String(pick);
     }
   }
-
   select.onchange = () => { input.value = select.value; };
   return select;
 }
 
-const getActiveSeasonId = () => activeSeasonIdCache ?? null;
-
-async function loadSeasons(){
-  const seasons = await getJson(`${apiBase()}/api/seasons/club/${clubId()}`);
-  seasonsCache = seasons || [];
-  activeSeasonIdCache = seasonsCache.find(s => !!s.IsActive)?.Id ?? null;
-
-  // Таблица
-  const tb = $('#tblSeasons tbody');
-  if (tb){
-    tb.innerHTML = '';
-    seasons.forEach(s=>{
-      const tr = document.createElement('tr');
-    tr.innerHTML = `
-  <td>${s.Name}</td>
-  <td>${(s.StartDate||'').slice(0,10)} → ${(s.EndDate||'').slice(0,10)}</td>
-  <td>${s.IsActive?'Да':'Не'}</td>
-  <td>
-    <button class="btnUseSeason" data-id="${s.Id}">Избери</button>
-    <button class="btnToggleActive" data-id="${s.Id}" data-val="${s.IsActive?0:1}">
-      ${s.IsActive?'Деактивирай':'Активирай'}
-    </button>
-    <button class="btnDelSeason" data-id="${s.Id}" data-name="${s.Name}"
-      ${s.IsActive ? 'disabled title="Активен сезон не може да се трие"' : ''}>
-      Изтрий
-    </button>
-  </td>`;
-
-      tb.appendChild(tr);
-    });
-
-    $$('#tblSeasons .btnUseSeason').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        const id = b.dataset.id;
-        const input = $('#seasonIdMonths');
-        if (input) input.value = id;
-        setStatus(`SeasonId=${id} е избран за „Месеци“.`);
-      });
-    });
-
-    $$('#tblSeasons .btnToggleActive').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        await withBusy(b, async ()=>{
-          const bool = (b.dataset.val === '1') ? 'true' : 'false';
-          await patch(`${apiBase()}/api/seasons/${b.dataset.id}/active?value=${bool}`);
-          await loadSeasons();
-        });
-      });
-    });
-    $$('#tblSeasons .btnDelSeason').forEach(b=>{
-  b.addEventListener('click', async ()=>{
-    const id   = b.dataset.id;
-    const name = b.dataset.name || `ID ${id}`;
-    if (!confirm(`Да изтрия сезона "${name}"?\nТова действие е необратимо.`)) return;
-
-    await withBusy(b, async ()=>{
-      try{
-        await del(`${apiBase()}/api/seasons/${id}`);
-        await loadSeasons(); // рефреш на списъка
-        setStatus(`Сезон "${name}" е изтрит.`);
-      }catch(err){
-        // Бекендът връща 409 при активен сезон или 404 ако липсва;
-        // del() вече хвърля Error с текст от отговора – показваме го.
-        alert(err?.message || err);
-      }
-    });
-  });
-});
-
-  }
-
-  // Селекти по име + автоподбор активен
-  const items = seasons.map(s => ({
-    id: s.Id,
-    label: `${s.Name} (${(s.StartDate||'').slice(0,10)} → ${(s.EndDate||'').slice(0,10)})`,
-    _isActive: !!s.IsActive
-  }));
-  const autoPickActive = (arr) => (arr.find(x=>x._isActive)?.id) ?? (arr[0]?.id || null);
-
-  upsertSelectForInput('seasonIdMonths','seasonSelectMonths',items,'— сезон за месеци —',autoPickActive);
-  upsertSelectForInput('feeSeasonId','seasonSelectForFee',items,'— сезон за цени —',autoPickActive);
-}
-
-async function createSeason(e){
-  e.preventDefault();
-  const payload = {
-    ClubId: clubId(),
-    Name: $('#seasonName').value.trim(),
-    StartDate: $('#seasonStart').value,
-    EndDate: $('#seasonEnd').value,
-    IsActive: $('#seasonActive').checked
-  };
-  const btn = e.submitter;
-  await withBusy(btn, async ()=>{
-    await postJson(`${apiBase()}/api/seasons`, payload);
-    e.target.reset();
-    await loadSeasons();
-  });
-}
-
-async function generateMonths(){
-  const sidEl = $('#seasonIdMonths');
-  const sid = sidEl ? parseInt(sidEl.value,10) : 0;
-  if(!sid) return alert('Посочи сезон.');
-  await postJson(`${apiBase()}/api/seasons/${sid}/months/generate?billable=true`, {});
-  await loadMonths();
-}
-
-async function loadMonths(){
-  const sidEl = $('#seasonIdMonths');
-  const sid = sidEl ? parseInt(sidEl.value,10) : 0;
-  if(!sid) return alert('Посочи сезон.');
-  const rows = await getJson(`${apiBase()}/api/seasons/${sid}/months`);
-  const tb = $('#tblMonths tbody'); if(!tb) return;
-  tb.innerHTML = '';
-  rows.forEach(m=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${m.YearMonth}</td>
-      <td>${m.IsBillable?'Да':'Не'}</td>
-      <td><button class="btnToggleMonth" data-id="${m.Id}" data-val="${m.IsBillable?0:1}">${m.IsBillable?'Скрий':'Покажи'}</button></td>`;
-    tb.appendChild(tr);
-  });
-  $$('#tblMonths .btnToggleMonth').forEach(b=>{
-    b.addEventListener('click', async ()=>{
-      await withBusy(b, async ()=>{
-        const bool = (b.dataset.val === '1') ? 'true' : 'false';
-        await patch(`${apiBase()}/api/seasons/months/${b.dataset.id}/billable?value=${bool}`);
-        await loadMonths();
-      });
-    });
-  });
-}
-
-/* ================== ЦЕНОРАЗПИС ================== */
-function upsertStaticSelectForInput(inputId, selectId, options, placeholder, autoPickIndex=0){
-  const items = options.map(o => typeof o === 'object' ? o : ({ id: o, label: String(o) }));
-  return upsertSelectForInput(inputId, selectId, items, placeholder, () => items[autoPickIndex]?.id ?? null);
-}
-
 async function loadFeePlans(e){
-  const sidEl = $('#feeSeasonId');
-  const sid = sidEl ? sidEl.value.trim() : '';
+  const nameEl = $('#feeSeasonId'); // име на сезон (филтър)
+  const seasonName = nameEl ? String(nameEl.value).trim() : '';
+  const sid = seasonName ? seasonIdByName(seasonName) : null;
+
   const url = `${apiBase()}/api/feeplans/club/${clubId()}${sid?`?seasonId=${sid}`:''}`;
   const btn = e?.currentTarget;
   await withBusy(btn, async ()=>{
@@ -447,15 +487,21 @@ async function loadFeePlans(e){
         <td>${(p.ValidFrom||'').slice(0,10)}</td>
         <td>${p.ValidTo?(p.ValidTo.slice(0,10)):""}</td>`;
       tr.addEventListener('click', ()=>{
-        $('#feeId').value = p.Id;
+        $('#feeId').value = p.Id; // вътрешно поле
         $('#feeTPW').value = p.TrainingsPerWeek;
         $('#feeTPWSelect') && ($('#feeTPWSelect').value = String(p.TrainingsPerWeek));
         $('#feePrice').value = p.MonthlyFee;
         $('#feeFrom').value = (p.ValidFrom||'').slice(0,10);
         $('#feeTo').value   = p.ValidTo ? p.ValidTo.slice(0,10) : '';
-        $('#feeClubSeasonId').value = p.ClubSeasonId ?? '';
-        const seasonSel = $('#seasonSelectForFee');
-        if (seasonSel && p.ClubSeasonId) seasonSel.value = String(p.ClubSeasonId);
+
+        // Сезон по ИМЕ за формата
+        const sName = p.ClubSeasonId ? (seasonNameById(p.ClubSeasonId) || '') : '';
+        $('#feeClubSeasonId').value = sName;                // пазим ИМЕ
+        const selForm = $('#seasonSelectInForm');
+        if (selForm) selForm.value = sName;
+
+        const selFilter = $('#seasonSelectForFee');
+        if (selFilter && sName) selFilter.value = sName;
       });
       tb.appendChild(tr);
     });
@@ -470,6 +516,9 @@ async function submitFeePlan(e){
   if (isNaN(tpw) || tpw<1 || tpw>7) return alert('Избери тренировки/седмица 1–7.');
   if (isNaN(price) || price<=0) return alert('Въведи валидна цена.');
 
+  const seasonName = ($('#feeClubSeasonId')?.value || '').trim(); // ИМЕ
+  const clubSeasonId = seasonName ? seasonIdByName(seasonName) : null;
+
   const payload = {
     Id: id? parseInt(id,10): 0,
     ClubId: clubId(),
@@ -477,7 +526,7 @@ async function submitFeePlan(e){
     MonthlyFee: price,
     ValidFrom: $('#feeFrom').value,
     ValidTo: $('#feeTo').value || null,
-    ClubSeasonId: $('#feeClubSeasonId').value || null
+    ClubSeasonId: clubSeasonId
   };
   const btn = e.submitter;
   await withBusy(btn, async ()=>{
@@ -490,7 +539,7 @@ async function submitFeePlan(e){
 }
 
 async function archiveFee(e){
-  const id = $('#feeId').value;
+  const id = $('#feeId').value;          // вътрешно
   const validTo = $('#feeTo').value;
   if(!id || !validTo) return alert('Избери план и попълни „В сила до“.');
   const btn = e?.currentTarget;
@@ -501,7 +550,6 @@ async function archiveFee(e){
 }
 
 /* ================== ГРАФИК (ГРУПИ + СЛОТОВЕ) ================== */
-// кеш на групи (Id→обект) и име→Id
 let groupsCache = [];
 let groupsByName = new Map();
 let groupsById   = new Map();
@@ -520,12 +568,11 @@ async function ensureGroupByName(name, level){
   const key = name.trim().toLowerCase();
   if (groupsByName.has(key)) return groupsByName.get(key);
 
-  // създай
   const payload = {
     Id: 0,
     ClubId: clubId(),
     Name: name.trim(),
-    Description: levelToDescription(level) // пазим нивото и в описанието
+    Description: levelToDescription(level)
   };
   const newId = await postJson(`${apiBase()}/api/traininggroups`, payload);
   await refreshGroupsCache();
@@ -538,7 +585,6 @@ function levelToDescription(level){
   if (level === 'beg') return 'Начинаещи';
   return null;
 }
-
 function levelFromGroup(g){
   const text = `${g?.Description ?? ''} ${g?.Name ?? ''}`.toLowerCase();
   if (text.includes('състезател')) return 'pro';
@@ -546,19 +592,13 @@ function levelFromGroup(g){
   if (text.includes('начина'))     return 'beg';
   return '';
 }
-
-// помощни иконки
 const ico = { clock:'⏱️', pin:'📍', users:'👥' };
-
-// връща CSS клас според нивото
 function badgeClass(level){
   return level === 'pro' ? 'slot-card--pro'
        : level === 'adv' ? 'slot-card--adv'
        : level === 'beg' ? 'slot-card--beg'
        : '';
 }
-
-// за сортиране по време HH:MM
 function hhmmToMinutes(hhmm){
   if (!hhmm) return 0;
   const [h,m] = hhmm.split(':').map(Number);
@@ -631,7 +671,7 @@ async function loadWeekSchedule(){
       </div>
     `;
 
-    // Изтриване (без да отваря поповър)
+    // Изтриване
     card.querySelector('.btnDelSlot').addEventListener('click', async (ev)=>{
       ev.stopPropagation();
       if (!confirm('Да изтрия ли слота?')) return;
@@ -639,28 +679,13 @@ async function loadWeekSchedule(){
       await loadWeekSchedule();
     });
 
-    // Клик -> поповър (или alert)
+    // Клик -> отваря поповър
     card.addEventListener('click', async ()=>{
       const title = `${g?.Name ?? 'Група'} • ${weekdayName(s.Weekday)} ${start}–${end}`;
-      const pop = document.getElementById('slotPopover');
-      if (pop) {
-        await showSlotPopover(s.Id, card, title);
-      } else {
-        try {
-          const list = await getSlotAttendees(s.Id);
-          if (!list || list.length === 0) {
-            alert(`${title}\n\nНяма записани.`);
-          } else {
-            const names = list.map(u => `${u.FirstName} ${u.LastName}`.trim()).join('\n');
-            alert(`${title}\n\nЗаписани (${list.length}):\n${names}`);
-          }
-        } catch(err) {
-          alert(`Грешка при зареждане на записаните: ${err?.message || err}`);
-        }
-      }
+      await showSlotPopover(s.Id, card, title);
     });
 
-    // Hover поповър
+    // Hover поповър (устойчив)
     card.addEventListener('mouseenter', ()=>{
       const title = `${g?.Name ?? 'Група'} • ${weekdayName(s.Weekday)} ${start}–${end}`;
       scheduleShowPopover(s.Id, card, title);
@@ -679,18 +704,15 @@ async function loadWeekSchedule(){
         if (span) span.textContent = taken;
 
         if (Number.isFinite(s.Capacity) && taken >= s.Capacity) {
-          card.classList.add('slot-full');           // по желание стил за пълен слот
-          if (span) span.style.color = '#dc2626';    // оцветяване на брояча
+          card.classList.add('slot-full');
+          if (span) span.style.color = '#dc2626';
         }
       }catch(_){}
     })();
   }
 }
 
-
-
-
-// обработчик на „+ Добави тук“
+// „+ Добави тук“
 function bindAddHere(){
   $$('#weekGrid .add-here').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -760,39 +782,28 @@ function initDefaultYM(){
     ym.value = ym.value.replace(/[^\d-]/g,'').slice(0,7);
   });
 }
-
-// колатор за BG азбучен ред
 const nameCollator = new Intl.Collator('bg', { sensitivity:'base', ignorePunctuation:true });
-// формат левове
 const fmt = (n) => Number(n || 0).toFixed(2);
 
-// събира статистика за конкретен месец: очаквано, платено, неплатили
 async function getMonthStats(ym) {
   const seasonId = getActiveSeasonId();
-
-  // 1) Очаквано (по правилната логика per season, per user)
   const expectedRes = await getJson(
     `${apiBase()}/api/Payments/expected/by-user?clubId=${clubId()}&ym=${encodeURIComponent(ym)}${seasonId?`&seasonId=${seasonId}`:''}`
   );
   const expected = Number(expectedRes?.Total || 0);
 
-  // 2) Платено: този ендпойнт е вече по месец; ако някъде връща повече – изрично филтрираме.
   const paidRowsAll = await getJson(`${apiBase()}/api/payments/month/club/${clubId()}?ym=${encodeURIComponent(ym)}`);
   const paidRows = Array.isArray(paidRowsAll)
     ? paidRowsAll.filter(p => (p.YearMonth || p.yearMonth) === ym)
     : [];
   const paidTotal = paidRows.reduce((sum, p) => sum + Number(p.AmountPaid || p.amountPaid || 0), 0);
 
-  // 3) Неплатили (старият ендпойнт; може да не е сезон-осъзнат, но върши работа за броя)
   const unpaidRows = await getJson(`${apiBase()}/api/payments/unpaid/club/${clubId()}?ym=${encodeURIComponent(ym)}`);
   const unpaidCount = (unpaidRows || []).length;
-
-  console.debug('[getMonthStats]', { ym, expectedRes, expected, paidRows, paidTotal, unpaidCount });
 
   return { expected, paidTotal, unpaidCount, paidCount: paidRows.length };
 }
 
-// визуална лента с обобщение над таблицата с неплатили
 function renderUnpaidSummary(stats, ym) {
   const hostTable = document.getElementById('tblUnpaid');
   if (!hostTable) return;
@@ -834,10 +845,8 @@ async function loadUnpaid(e){
       getMonthStats(ym)
     ]);
 
-    // обобщение
     renderUnpaidSummary(stats, ym);
 
-    // сортиране по Фамилия, Име
     rows.sort((a, b) => {
       const na = `${a.LastName ?? ''} ${a.FirstName ?? ''}`.trim();
       const nb = `${b.LastName ?? ''} ${b.FirstName ?? ''}`.trim();
@@ -854,7 +863,6 @@ async function loadUnpaid(e){
       tb.appendChild(tr);
     });
 
-    // потвърждение преди маркиране платено + автоматично обновяване
     $$('#tblUnpaid .btnMarkPaid').forEach(b=>{
       b.addEventListener('click', async ()=>{
         const s = await getMonthStats(ym);
@@ -877,29 +885,27 @@ async function loadUnpaid(e){
             YearMonth: ym,
             RecordedByUserId: null
           });
-          await loadUnpaid(); // рефреш след успех
+          await loadUnpaid();
         });
       });
     });
   });
 }
+
 async function loadPaid(e){
   const ymEl = $('#ym'); const ym = ymEl ? ymEl.value.trim() : '';
   if(!/^\d{4}-\d{2}$/.test(ym)) return alert('Въведи месец във формат YYYY-MM.');
   const btn = e?.currentTarget;
 
   await withBusy(btn, async ()=>{
-    // 1) списък платили
     const rows = await getJson(`${apiBase()}/api/payments/paid/club/${clubId()}?ym=${encodeURIComponent(ym)}`);
 
-    // 2) сортиране по Фамилия, Име
     rows.sort((a, b) => {
       const na = `${a.LastName ?? ''} ${a.FirstName ?? ''}`.trim();
       const nb = `${b.LastName ?? ''} ${b.FirstName ?? ''}`.trim();
       return nameCollator.compare(na, nb);
     });
 
-    // 3) рендер
     const tb = $('#tblPaid tbody'); if(!tb) return;
     tb.innerHTML = '';
     rows.forEach(u=>{
@@ -914,7 +920,6 @@ async function loadPaid(e){
       tb.appendChild(tr);
     });
 
-    // 4) обработчик: „Маркирай неплатено“
     $$('#tblPaid .btnMarkUnpaid').forEach(b=>{
       b.addEventListener('click', async ()=>{
         const msg = [
@@ -931,9 +936,7 @@ async function loadPaid(e){
             UserId: parseInt(b.dataset.id,10),
             YearMonth: ym
           });
-          // след успех рефреш на платили + опционално и на неплатили (ако е заредена)
           await loadPaid();
-          // ако имаш заредена таблица с неплатили – рефрешни и нея:
           try { await loadUnpaid(); } catch(_) {}
         });
       });
@@ -941,8 +944,6 @@ async function loadPaid(e){
   });
 }
 
-
-// Очакван приход — вече по избрания месец и активния сезон
 async function loadExpected(e){
   const ym = ($('#ym')?.value || '').trim();
   if(!/^\d{4}-\d{2}$/.test(ym)) return alert('Въведи месец във формат YYYY-MM.');
@@ -970,7 +971,7 @@ async function loadNoSelections(e){
     tb.innerHTML='';
     rows.forEach(u=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${u.Id}</td><td>${u.FirstName} ${u.LastName}</td>`;
+      tr.innerHTML = `<td>${u.FirstName} ${u.LastName}</td>`;
       tb.appendChild(tr);
     });
   });
@@ -981,33 +982,29 @@ function attach24hPicker(inputId, stepMinutes = 5) {
   const input = document.getElementById(inputId);
   if (!input) return;
 
-  // скрий native time input, ще го пълним ние (HH:MM)
   input.type = 'hidden';
 
   const wrap = document.createElement('div');
   wrap.className = 'time24-wrap';
 
-  // Часове 00..23
   const selH = document.createElement('select');
   selH.className = 'time24-hour';
   for (let h = 0; h <= 23; h++) {
     const opt = document.createElement('option');
     opt.value = String(h).padStart(2, '0');
-    opt.textContent = opt.value; // 00..23
+    opt.textContent = opt.value;
     selH.appendChild(opt);
   }
 
-  // Минути 00, step, 55
   const selM = document.createElement('select');
   selM.className = 'time24-minute';
   for (let m = 0; m < 60; m += stepMinutes) {
     const opt = document.createElement('option');
     opt.value = String(m).padStart(2, '0');
-    opt.textContent = opt.value; // 00..59
+    opt.textContent = opt.value;
     selM.appendChild(opt);
   }
 
-  // ако имаш предварителна стойност HH:MM — избери я
   if (input.value && /^\d{2}:\d{2}$/.test(input.value)) {
     const [hh, mm] = input.value.split(':');
     if ([...selH.options].some(o => o.value === hh)) selH.value = hh;
@@ -1021,16 +1018,13 @@ function attach24hPicker(inputId, stepMinutes = 5) {
   selH.addEventListener('change', sync);
   selM.addEventListener('change', sync);
 
-  // първоначална синхронизация
   sync();
-
-  // вмъкни селектите след скритото поле
   wrap.appendChild(selH);
   wrap.appendChild(selM);
   input.insertAdjacentElement('afterend', wrap);
 }
 
-// малък debounce
+// debounce
 function debounce(fn, delay=250){
   let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), delay); };
 }
@@ -1038,12 +1032,10 @@ function debounce(fn, delay=250){
 // кеш на последно заредените слотове за търсене
 let slotsCache = []; // [{ Id, GroupId, Weekday, StartTime, EndTime }]
 
-// инжектира поле за търсене над #weekGrid
+// поле за търсене над #weekGrid
 function ensureSearchUI(){
   const host = document.getElementById('weekGrid');
   if (!host) return;
-
-  // ако вече е създадено – не дублираме
   if (document.getElementById('attendeeSearchBox')) return;
 
   const box = document.createElement('div');
@@ -1058,7 +1050,6 @@ function ensureSearchUI(){
   input.addEventListener('input', debounce(()=> runAttendeeSearch(input.value), 300));
 }
 
-// визуализация на резултатите
 function renderAttendeeResults(results, query){
   const wrap = document.getElementById('attendeeSearchResults');
   if (!wrap) return;
@@ -1073,7 +1064,6 @@ function renderAttendeeResults(results, query){
     return;
   }
 
-  // Първо – скелет
   results.forEach(r=>{
     const div = document.createElement('div');
     div.className = 'result-item';
@@ -1089,26 +1079,21 @@ function renderAttendeeResults(results, query){
       if (card){
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         const title = `${r.groupLabel} • ${r.weekdayLabel} ${r.start}–${r.end}`;
-        const pop = document.getElementById('slotPopover');
-        if (pop) showSlotPopover(r.slotId, card, title).catch(console.error);
+        showSlotPopover(r.slotId, card, title).catch(console.error);
       }
     });
     wrap.appendChild(div);
   });
 
-  // После – асинхронно зареждаме снимките
   (async ()=>{
     for (const r of results){
       const url = await getProfilePhotoUrl(r.userId);
       const img = wrap.querySelector(`img[data-user-id="${r.userId}"]`);
-      if (img && url) img.src = url; // fallback остава, ако няма снимка
+      if (img && url) img.src = url;
     }
   })();
 }
 
-showSlotPopover
-
-// основна логика за търсене по име: обхожда всички слотове, кеширайки списъците
 async function runAttendeeSearch(query){
   const q = (query || '').trim().toLowerCase();
   if (q.length < 2){
@@ -1116,9 +1101,7 @@ async function runAttendeeSearch(query){
     return;
   }
 
-  // взимаме attendees за всеки слот (ползва кеша slotAttendeesCache от твоя код)
   const out = [];
-  // ограничаване на паралелизма, за да не изстреляме стотици заявки наведнъж
   const batchSize = 10;
   for (let i=0; i<slotsCache.length; i+=batchSize){
     const batch = slotsCache.slice(i, i+batchSize);
@@ -1133,25 +1116,21 @@ async function runAttendeeSearch(query){
           const start = toHHMM(s.StartTime);
           const end   = toHHMM(s.EndTime);
           for (const u of matches){
-        out.push({
-  slotId: s.Id,
-  userId: u.UserId,                         // НОВО
-  name: `${u.FirstName} , ${u.LastName}`.trim(),
-  groupLabel,
-  weekdayLabel,
-  start, end
-});
-
+            out.push({
+              slotId: s.Id,
+              userId: u.UserId,
+              name: `${u.FirstName} ${u.LastName}`.trim(),
+              groupLabel,
+              weekdayLabel,
+              start, end
+            });
           }
         }
-      }catch(e){
-        // игнор за конкретния слот
-      }
+      }catch(e){ /* игнор */ }
     });
     await Promise.all(promises);
   }
 
-  // по избор: сортираме по име, после по ден/час
   out.sort((a,b)=>{
     const byName = a.name.localeCompare(b.name, 'bg', { sensitivity:'base' });
     if (byName) return byName;
@@ -1163,7 +1142,176 @@ async function runAttendeeSearch(query){
   renderAttendeeResults(out, query);
 }
 
-/* ================== BIND / BOOTСТАРТ ================== */
+/* ---------- Hover popover: избраният слот ---------- */
+const slotAttendeesCache = new Map();        // slotId -> [{UserId, FirstName, LastName}]
+const slotAttendeesInflight = new Map();     // slotId -> Promise
+const hoverState = { showTimer: null, hideTimer: null };
+const popoverState = {
+  currentSlotId: null,
+  currentToken: 0,
+  anchorEl: null,
+  visible: false
+};
+
+async function getSlotAttendees(slotId){
+  if (slotAttendeesCache.has(slotId)) return slotAttendeesCache.get(slotId);
+  if (slotAttendeesInflight.has(slotId)) return slotAttendeesInflight.get(slotId);
+  const p = (async ()=>{
+    const url = `${apiBase()}/api/athleteselections/slot/${slotId}`;
+    const rows = await getJson(url);
+    slotAttendeesCache.set(slotId, rows);
+    slotAttendeesInflight.delete(slotId);
+    return rows;
+  })().catch(err=>{
+    slotAttendeesInflight.delete(slotId);
+    throw err;
+  });
+  slotAttendeesInflight.set(slotId, p);
+  return p;
+}
+
+function ensureSlotPopoverDOM(){
+  let pop = document.getElementById('slotPopover');
+  if (pop) return pop;
+
+  pop = document.createElement('div');
+  pop.id = 'slotPopover';
+  pop.hidden = true;
+  pop.setAttribute('role','dialog');
+  pop.className = 'slot-popover';
+  pop.innerHTML = `
+    <div class="slot-popover__head">
+      <strong id="slotPopoverTitle">Група</strong>
+      <button id="slotPopoverClose" class="btn ghost" aria-label="Затвори">✕</button>
+    </div>
+    <div class="slot-popover__meta">Записани: <span id="slotPopoverCount">0</span></div>
+    <ul id="slotPopoverList" class="slot-popover__list"></ul>
+  `;
+  document.body.appendChild(pop);
+
+  const close = document.getElementById('slotPopoverClose');
+  pop.addEventListener('mouseenter', ()=> clearTimeout(hoverState.hideTimer));
+  pop.addEventListener('mouseleave', scheduleHidePopover);
+  if (close) close.addEventListener('click', ()=> { pop.hidden = true; popoverState.visible = false; });
+
+  window.addEventListener('scroll', ()=>{
+    if (popoverState.visible) positionPopover(popoverState.anchorEl);
+  }, { passive: true });
+  window.addEventListener('resize', ()=>{
+    if (popoverState.visible) positionPopover(popoverState.anchorEl);
+  });
+
+  return pop;
+}
+
+function positionPopover(anchorEl){
+  const pop = ensureSlotPopoverDOM();
+  if (!pop || !anchorEl) return;
+
+  pop.hidden = false;
+  pop.style.visibility = 'hidden';
+  pop.style.position = 'fixed';
+  pop.style.maxWidth = 'min(340px, 90vw)';
+  pop.style.zIndex = 9999;
+
+  const rect = anchorEl.getBoundingClientRect();
+  const gap = 8;
+
+  let top  = rect.bottom + gap;
+  let left = rect.left;
+
+  const maxLeft = window.innerWidth - pop.offsetWidth - 8;
+  const maxTop  = window.innerHeight - pop.offsetHeight - 8;
+
+  left = Math.max(8, Math.min(left, maxLeft));
+  top  = Math.max(8, Math.min(top, maxTop));
+
+  pop.style.left = `${left}px`;
+  pop.style.top  = `${top}px`;
+  pop.style.visibility = 'visible';
+  popoverState.visible = true;
+}
+
+async function showSlotPopover(slotId, anchorEl, titleText){
+  const pop = ensureSlotPopoverDOM();
+  if (!pop) return;
+
+  const token = ++popoverState.currentToken;
+  popoverState.currentSlotId = slotId;
+  popoverState.anchorEl = anchorEl;
+
+  const title = document.getElementById('slotPopoverTitle');
+  const count = document.getElementById('slotPopoverCount');
+  const ul    = document.getElementById('slotPopoverList');
+
+  if (title) title.textContent = titleText || 'Група';
+  if (count) count.textContent = '…';
+  if (ul)    ul.innerHTML = `<li class="muted">Зареждам…</li>`;
+
+  positionPopover(anchorEl);
+
+  try{
+    const list  = await getSlotAttendees(slotId);
+    if (token !== popoverState.currentToken) return;
+
+    if (count) count.textContent = String(list.length);
+
+    if (ul){
+      if (!list || list.length === 0){
+        ul.innerHTML = `<li class="muted">Няма записани.</li>`;
+      } else {
+        ul.innerHTML = list.map(u => {
+          const fullName = `${u.FirstName} ${u.LastName}`.trim();
+          const fallback = avatarFallbackDataUrl(fullName);
+          return `
+            <li class="attendee-row">
+              <img class="avatar" alt="" data-user-id="${u.UserId}" src="${fallback}" />
+              <span class="attendee-name">${fullName}</span>
+            </li>`;
+        }).join('');
+
+        (async ()=>{
+          for (const u of list){
+            try{
+              const url = await getProfilePhotoUrl(u.UserId);
+              if (token !== popoverState.currentToken) return;
+              if (url){
+                const img = ul.querySelector(`img[data-user-id="${u.UserId}"]`);
+                if (img){
+                  img.src = url;
+                  img.onload = ()=> positionPopover(anchorEl);
+                }
+              }
+            }catch(_){}
+          }
+        })();
+      }
+    }
+
+    positionPopover(anchorEl);
+  }catch(err){
+    if (token !== popoverState.currentToken) return;
+    if (ul) ul.innerHTML = `<li class="muted">Грешка при зареждане.</li>`;
+  }
+}
+
+function scheduleShowPopover(slotId, anchorEl, titleText){
+  clearTimeout(hoverState.hideTimer);
+  clearTimeout(hoverState.showTimer);
+  hoverState.showTimer = setTimeout(()=>{
+    showSlotPopover(slotId, anchorEl, titleText).catch(console.error);
+  }, 180);
+}
+function scheduleHidePopover(){
+  clearTimeout(hoverState.showTimer);
+  clearTimeout(hoverState.hideTimer);
+  hoverState.hideTimer = setTimeout(()=>{
+    const pop = ensureSlotPopoverDOM();
+    if (pop) { pop.hidden = true; popoverState.visible = false; }
+  }, 140);
+}
+
+/* ================== BIND / BOОTСТАРТ ================== */
 function bind(){
   initTabs();
   initDefaultYM();
@@ -1173,7 +1321,6 @@ function bind(){
   $('#btnGenMonths')?.addEventListener('click', generateMonths);
   $('#btnLoadMonths')?.addEventListener('click', loadMonths);
   $('#btnLoadPaid')?.addEventListener('click', loadPaid);
-
 
   // Цени
   upsertStaticSelectForInput('feeTPW','feeTPWSelect',
@@ -1220,8 +1367,9 @@ async function bootstrap(){
 
   bind();
 
-  // НОВО: инжектирай търсачката
+  // търсачка и поповър DOM
   ensureSearchUI();
+  ensureSlotPopoverDOM();
 
   try{
     setStatus('Зареждам…');
@@ -1236,124 +1384,5 @@ async function bootstrap(){
     alert(e.message || e);
   }
 }
-
-
-/* ---------- Hover popover: избрали слота ---------- */
-const slotAttendeesCache = new Map(); // slotId -> [{UserId, FirstName, LastName}]
-const hoverState = { showTimer: null, hideTimer: null };
-
-async function getSlotAttendees(slotId){
-  const url = `${apiBase()}/api/athleteselections/slot/${slotId}`;
-  if (slotAttendeesCache.has(slotId)) return slotAttendeesCache.get(slotId);
-  const rows = await getJson(url);
-  slotAttendeesCache.set(slotId, rows);
-  return rows;
-}
-
-function positionPopover(anchorEl){
-  const pop = document.getElementById('slotPopover');
-  if (!pop || !anchorEl) return;
-
-  pop.hidden = false;
-  pop.style.visibility = 'hidden';
-  pop.style.position = 'fixed';
-
-  const rect = anchorEl.getBoundingClientRect();
-  const gap = 8;
-
-  let top  = rect.bottom + gap;
-  let left = rect.left;
-
-  const maxLeft = window.innerWidth - pop.offsetWidth - 8;
-  const maxTop  = window.innerHeight - pop.offsetHeight - 8;
-
-  left = Math.max(8, Math.min(left, maxLeft));
-  top  = Math.max(8, Math.min(top, maxTop));
-
-  pop.style.left = `${left}px`;
-  pop.style.top  = `${top}px`;
-  pop.style.visibility = 'visible';
-}
-
-async function showSlotPopover(slotId, anchorEl, titleText){
-  const pop = document.getElementById('slotPopover');
-  if (!pop) return;
-
-  const list  = await getSlotAttendees(slotId); // [{UserId, FirstName, LastName}]
-  const title = document.getElementById('slotPopoverTitle');
-  const count = document.getElementById('slotPopoverCount');
-  const ul    = document.getElementById('slotPopoverList');
-
-  if (title) title.textContent = titleText || 'Група';
-  if (count) count.textContent = list.length;
-
-  if (ul){
-    if (!list || list.length === 0){
-      ul.innerHTML = `<li class="muted">Няма записани.</li>`;
-    } else {
-      // първо рендерираме скелет (име на един ред + евентуален аватар плейсхолдър)
-      ul.innerHTML = list.map(u => {
-        const fullName = `${u.FirstName} ${u.LastName}`.trim();
-        // ако имаш avatarFallbackDataUrl, ползвай го; иначе празен src
-        const fallback = (typeof avatarFallbackDataUrl === 'function')
-          ? avatarFallbackDataUrl(fullName)
-          : '';
-        return `
-          <li class="attendee-row">
-            ${typeof getProfilePhotoUrl === 'function'
-              ? `<img class="avatar" alt="" data-user-id="${u.UserId}" src="${fallback}" />`
-              : ''
-            }
-            <span class="attendee-name">${fullName}</span>
-          </li>`;
-      }).join('');
-
-      // асинхронно до-зареждаме реалните снимки, ако имаме хелпъра
-      if (typeof getProfilePhotoUrl === 'function'){
-        (async ()=>{
-          for (const u of list){
-            try{
-              const url = await getProfilePhotoUrl(u.UserId);
-              if (url){
-                const img = ul.querySelector(`img[data-user-id="${u.UserId}"]`);
-                if (img) img.src = url;
-              }
-            }catch(_){}
-          }
-        })();
-      }
-    }
-  }
-
-  positionPopover(anchorEl);
-}
-
-
-function scheduleShowPopover(slotId, anchorEl, titleText){
-  clearTimeout(hoverState.hideTimer);
-  clearTimeout(hoverState.showTimer);
-  hoverState.showTimer = setTimeout(()=>{
-    showSlotPopover(slotId, anchorEl, titleText).catch(console.error);
-  }, 220);
-}
-
-function scheduleHidePopover(){
-  clearTimeout(hoverState.showTimer);
-  clearTimeout(hoverState.hideTimer);
-  hoverState.hideTimer = setTimeout(()=>{
-    const pop = document.getElementById('slotPopover');
-    if (pop) pop.hidden = true;
-  }, 180);
-}
-
-(function wirePopoverHover(){
-  const pop = document.getElementById('slotPopover');
-  const close = document.getElementById('slotPopoverClose');
-  if (!pop) return;
-
-  pop.addEventListener('mouseenter', ()=> clearTimeout(hoverState.hideTimer));
-  pop.addEventListener('mouseleave', scheduleHidePopover);
-  if (close) close.addEventListener('click', ()=> { pop.hidden = true; });
-})();
 
 document.addEventListener('DOMContentLoaded', bootstrap);
