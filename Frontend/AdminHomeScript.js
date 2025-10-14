@@ -95,6 +95,102 @@ function normalizeTimeField(el){
 
 const weekdayName = (n)=>({1:'Понеделник',2:'Вторник',3:'Сряда',4:'Четвъртък',5:'Петък',6:'Събота',7:'Неделя'})[n]||n;
 
+// --- Транслитерация BG <-> LAT за търсене ---
+function cyrToLat(s){
+  const map = {
+    'щ':'sht','ш':'sh','ч':'ch','ц':'ts','й':'y','ю':'yu','я':'ya','ь':'','ъ':'y','ж':'zh',
+    'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','з':'z','и':'i','к':'k','л':'l','м':'m',
+    'н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ѝ':'i'
+  };
+  return (s||'').toLowerCase().split('').map(ch=>map[ch] ?? ch).join('');
+}
+function latToCyr(s){
+  let t = (s||'').toLowerCase();
+  // важен ред: първо по-дългите комбинации
+  t = t
+    .replace(/sht/g,'щ')
+    .replace(/sh/g,'ш')
+    .replace(/zh/g,'ж')
+    .replace(/ch/g,'ч')
+    .replace(/ts/g,'ц')
+    .replace(/yu/g,'ю')
+    .replace(/ya/g,'я');
+  const map = {
+    'a':'а','b':'б','v':'в','g':'г','d':'д','e':'е','z':'з','i':'и','y':'й','k':'к','l':'л','m':'м',
+    'n':'н','o':'о','p':'п','r':'р','s':'с','t':'т','u':'у','f':'ф','h':'х'
+  };
+  return t.split('').map(ch=>map[ch] ?? ch).join('');
+}
+function normFold(s){
+  const x = (s||'').trim().toLowerCase();
+  return {
+    raw: x,
+    cyr: latToCyr(x),
+    lat: cyrToLat(x)
+  };
+}
+function nameMatches(query, candidate){
+  const q = normFold(query);
+  const c = normFold(candidate);
+  // съвпадение, ако която и да е форма се съдържа в която и да е форма
+  const qForms = [q.raw, q.cyr, q.lat].filter(Boolean);
+  const cForms = [c.raw, c.cyr, c.lat].filter(Boolean);
+  for (const qa of qForms){
+    for (const ca of cForms){
+      if (ca.includes(qa)) return true;
+    }
+  }
+  return false;
+}
+
+// КЕШ за снимки: userId -> objectURL | външен URL | null
+const userPhotoCache = new Map();
+
+// генерира fallback SVG с инициали (data URL)
+function avatarFallbackDataUrl(name){
+  const initials = (name || '')
+    .split(/\s+/).filter(Boolean).slice(0,2)
+    .map(x=>x[0]?.toUpperCase() || '').join('');
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+      <rect width='100%' height='100%' fill='#e5e7eb'/>
+      <text x='50%' y='50%' dy='.35em' text-anchor='middle'
+            font-family='Inter,Segoe UI,Arial,sans-serif'
+            font-size='14' fill='#374151'>${initials || '?'}</text>
+     </svg>`;
+  return 'data:image/svg+xml;base64,' + btoa(svg);
+}
+
+// дърпа снимка за userId; връща URL за <img src=...>
+async function getProfilePhotoUrl(userId){
+  if (userPhotoCache.has(userId)) return userPhotoCache.get(userId);
+  const endpoint = `https://sportstatsapi.azurewebsites.net/api/Users/profilePicture/${userId}`;
+  try{
+    const res = await fetch(endpoint);
+    if (!res.ok) throw new Error('no image');
+
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    if (ct.includes('application/json')){
+      // ако API връща JSON с url поле
+      const data = await res.json();
+      const url = data?.url || data?.profileImageUrl || null;
+      userPhotoCache.set(userId, url);
+      return url;
+    } else {
+      // вероятно е image/* → blob → objectURL
+      const blob = await res.blob();
+      const objUrl = URL.createObjectURL(blob);
+      userPhotoCache.set(userId, objUrl);
+      return objUrl;
+    }
+  }catch{
+    userPhotoCache.set(userId, null);
+    return null;
+  }
+}
+
+
+
 /* ================== АВТЕНТИКАЦИЯ ================== */
 async function hashUserData(user) {
   const data = `${user.firstName}${user.lastName}${user.email}${user.gender}${user.roleID}${user.clubID}${user.profileImage_url}${user.id}${user.yearOfBirth}${user.statusID}`;
@@ -474,6 +570,11 @@ async function loadWeekSchedule(){
 
   const list = await getJson(`${apiBase()}/api/scheduleslots/club/${clubId()}`);
 
+  // обнови cache за търсене
+  slotsCache = Array.isArray(list) ? list.map(s => ({
+    Id: s.Id, GroupId: s.GroupId, Weekday: s.Weekday, StartTime: s.StartTime, EndTime: s.EndTime
+  })) : [];
+
   // изчисти колоните
   $$('#weekGrid .day-list').forEach(dl => dl.innerHTML = '');
 
@@ -493,6 +594,7 @@ async function loadWeekSchedule(){
     const card = document.createElement('article');
     card.className = `slot-card ${levelClass}`;
     card.setAttribute('role','listitem');
+    card.dataset.slotId = String(s.Id);
 
     const levelLabel = level === 'pro' ? 'Състезатели'
                       : level === 'adv' ? 'Напреднали'
@@ -519,23 +621,74 @@ async function loadWeekSchedule(){
           <span class="slot-card__text">${s.Location}</span>
         </div>` : ''}
 
-      ${Number.isFinite(s.Capacity) ? `
-        <div class="slot-card__row">
-          <span class="slot-card__icon">${ico.users}</span>
-          <span class="slot-card__text">Капацитет: ${s.Capacity}</span>
-        </div>` : ''}
+      <div class="slot-card__row">
+        <span class="slot-card__icon">${ico.users}</span>
+        <span class="slot-card__text">
+          ${Number.isFinite(s.Capacity)
+            ? `Капацитет: ${s.Capacity} • Записани: <strong class="slot-taken" data-slot-id="${s.Id}">—</strong>`
+            : `Записани: <strong class="slot-taken" data-slot-id="${s.Id}">—</strong>`}
+        </span>
+      </div>
     `;
 
-    card.querySelector('.btnDelSlot').addEventListener('click', async ()=>{
+    // Изтриване (без да отваря поповър)
+    card.querySelector('.btnDelSlot').addEventListener('click', async (ev)=>{
+      ev.stopPropagation();
       if (!confirm('Да изтрия ли слота?')) return;
       await del(`${apiBase()}/api/scheduleslots/${s.Id}`);
       await loadWeekSchedule();
     });
 
+    // Клик -> поповър (или alert)
+    card.addEventListener('click', async ()=>{
+      const title = `${g?.Name ?? 'Група'} • ${weekdayName(s.Weekday)} ${start}–${end}`;
+      const pop = document.getElementById('slotPopover');
+      if (pop) {
+        await showSlotPopover(s.Id, card, title);
+      } else {
+        try {
+          const list = await getSlotAttendees(s.Id);
+          if (!list || list.length === 0) {
+            alert(`${title}\n\nНяма записани.`);
+          } else {
+            const names = list.map(u => `${u.FirstName} ${u.LastName}`.trim()).join('\n');
+            alert(`${title}\n\nЗаписани (${list.length}):\n${names}`);
+          }
+        } catch(err) {
+          alert(`Грешка при зареждане на записаните: ${err?.message || err}`);
+        }
+      }
+    });
+
+    // Hover поповър
+    card.addEventListener('mouseenter', ()=>{
+      const title = `${g?.Name ?? 'Група'} • ${weekdayName(s.Weekday)} ${start}–${end}`;
+      scheduleShowPopover(s.Id, card, title);
+    });
+    card.addEventListener('mouseleave', scheduleHidePopover);
+
     const col = $(`.day-col[data-weekday="${s.Weekday}"] .day-list`);
     if (col) col.appendChild(card);
+
+    // След рендър: попълни броя „Записани“ и маркирай, ако е пълен
+    (async ()=>{
+      try{
+        const attendees = await getSlotAttendees(s.Id);
+        const taken = attendees?.length ?? 0;
+        const span = document.querySelector(`.slot-taken[data-slot-id="${s.Id}"]`);
+        if (span) span.textContent = taken;
+
+        if (Number.isFinite(s.Capacity) && taken >= s.Capacity) {
+          card.classList.add('slot-full');           // по желание стил за пълен слот
+          if (span) span.style.color = '#dc2626';    // оцветяване на брояча
+        }
+      }catch(_){}
+    })();
   }
 }
+
+
+
 
 // обработчик на „+ Добави тук“
 function bindAddHere(){
@@ -877,6 +1030,139 @@ function attach24hPicker(inputId, stepMinutes = 5) {
   input.insertAdjacentElement('afterend', wrap);
 }
 
+// малък debounce
+function debounce(fn, delay=250){
+  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), delay); };
+}
+
+// кеш на последно заредените слотове за търсене
+let slotsCache = []; // [{ Id, GroupId, Weekday, StartTime, EndTime }]
+
+// инжектира поле за търсене над #weekGrid
+function ensureSearchUI(){
+  const host = document.getElementById('weekGrid');
+  if (!host) return;
+
+  // ако вече е създадено – не дублираме
+  if (document.getElementById('attendeeSearchBox')) return;
+
+  const box = document.createElement('div');
+  box.id = 'attendeeSearchBox';
+  box.innerHTML = `
+    <input id="attendeeSearch" type="search" placeholder="Търси по име (мин. 2 букви)..." autocomplete="off" />
+    <div id="attendeeSearchResults"></div>
+  `;
+  host.insertAdjacentElement('beforebegin', box);
+
+  const input = document.getElementById('attendeeSearch');
+  input.addEventListener('input', debounce(()=> runAttendeeSearch(input.value), 300));
+}
+
+// визуализация на резултатите
+function renderAttendeeResults(results, query){
+  const wrap = document.getElementById('attendeeSearchResults');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  if (!query || query.trim().length < 2){
+    wrap.innerHTML = `<div class="muted">Въведи поне 2 букви за търсене.</div>`;
+    return;
+  }
+  if (!results || results.length === 0){
+    wrap.innerHTML = `<div class="muted">Няма съвпадения.</div>`;
+    return;
+  }
+
+  // Първо – скелет
+  results.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 'result-item';
+    div.innerHTML = `
+      <img class="avatar" alt="" data-user-id="${r.userId}" src="${avatarFallbackDataUrl(r.name)}" />
+      <div>
+        <div><strong>${r.name}</strong></div>
+        <div class="meta">${r.groupLabel} • ${r.weekdayLabel} ${r.start}–${r.end}</div>
+      </div>
+    `;
+    div.addEventListener('click', ()=>{
+      const card = document.querySelector(`.slot-card[data-slot-id="${r.slotId}"]`);
+      if (card){
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const title = `${r.groupLabel} • ${r.weekdayLabel} ${r.start}–${r.end}`;
+        const pop = document.getElementById('slotPopover');
+        if (pop) showSlotPopover(r.slotId, card, title).catch(console.error);
+      }
+    });
+    wrap.appendChild(div);
+  });
+
+  // После – асинхронно зареждаме снимките
+  (async ()=>{
+    for (const r of results){
+      const url = await getProfilePhotoUrl(r.userId);
+      const img = wrap.querySelector(`img[data-user-id="${r.userId}"]`);
+      if (img && url) img.src = url; // fallback остава, ако няма снимка
+    }
+  })();
+}
+
+showSlotPopover
+
+// основна логика за търсене по име: обхожда всички слотове, кеширайки списъците
+async function runAttendeeSearch(query){
+  const q = (query || '').trim().toLowerCase();
+  if (q.length < 2){
+    renderAttendeeResults([], query);
+    return;
+  }
+
+  // взимаме attendees за всеки слот (ползва кеша slotAttendeesCache от твоя код)
+  const out = [];
+  // ограничаване на паралелизма, за да не изстреляме стотици заявки наведнъж
+  const batchSize = 10;
+  for (let i=0; i<slotsCache.length; i+=batchSize){
+    const batch = slotsCache.slice(i, i+batchSize);
+    const promises = batch.map(async s=>{
+      try{
+        const attendees = await getSlotAttendees(s.Id);
+        const matches = attendees.filter(u => nameMatches(query, `${u.FirstName} ${u.LastName}`));
+        if (matches.length > 0){
+          const g = groupsById.get(s.GroupId);
+          const groupLabel = g?.Name ?? 'Група';
+          const weekdayLabel = weekdayName(s.Weekday);
+          const start = toHHMM(s.StartTime);
+          const end   = toHHMM(s.EndTime);
+          for (const u of matches){
+        out.push({
+  slotId: s.Id,
+  userId: u.UserId,                         // НОВО
+  name: `${u.FirstName} , ${u.LastName}`.trim(),
+  groupLabel,
+  weekdayLabel,
+  start, end
+});
+
+          }
+        }
+      }catch(e){
+        // игнор за конкретния слот
+      }
+    });
+    await Promise.all(promises);
+  }
+
+  // по избор: сортираме по име, после по ден/час
+  out.sort((a,b)=>{
+    const byName = a.name.localeCompare(b.name, 'bg', { sensitivity:'base' });
+    if (byName) return byName;
+    if (a.weekdayLabel !== b.weekdayLabel) return a.weekdayLabel.localeCompare(b.weekdayLabel, 'bg');
+    if (a.start !== b.start) return a.start.localeCompare(b.start);
+    return 0;
+  });
+
+  renderAttendeeResults(out, query);
+}
+
 /* ================== BIND / BOOTСТАРТ ================== */
 function bind(){
   initTabs();
@@ -934,6 +1220,9 @@ async function bootstrap(){
 
   bind();
 
+  // НОВО: инжектирай търсачката
+  ensureSearchUI();
+
   try{
     setStatus('Зареждам…');
     await loadSeasons();
@@ -947,6 +1236,7 @@ async function bootstrap(){
     alert(e.message || e);
   }
 }
+
 
 /* ---------- Hover popover: избрали слота ---------- */
 const slotAttendeesCache = new Map(); // slotId -> [{UserId, FirstName, LastName}]
@@ -989,8 +1279,7 @@ async function showSlotPopover(slotId, anchorEl, titleText){
   const pop = document.getElementById('slotPopover');
   if (!pop) return;
 
-  const list = await getSlotAttendees(slotId);
-
+  const list  = await getSlotAttendees(slotId); // [{UserId, FirstName, LastName}]
   const title = document.getElementById('slotPopoverTitle');
   const count = document.getElementById('slotPopoverCount');
   const ul    = document.getElementById('slotPopoverList');
@@ -999,15 +1288,46 @@ async function showSlotPopover(slotId, anchorEl, titleText){
   if (count) count.textContent = list.length;
 
   if (ul){
-    if (list.length === 0){
+    if (!list || list.length === 0){
       ul.innerHTML = `<li class="muted">Няма записани.</li>`;
     } else {
-      ul.innerHTML = list.map(u => `<li>${u.FirstName} ${u.LastName}</li>`).join('');
+      // първо рендерираме скелет (име на един ред + евентуален аватар плейсхолдър)
+      ul.innerHTML = list.map(u => {
+        const fullName = `${u.FirstName} ${u.LastName}`.trim();
+        // ако имаш avatarFallbackDataUrl, ползвай го; иначе празен src
+        const fallback = (typeof avatarFallbackDataUrl === 'function')
+          ? avatarFallbackDataUrl(fullName)
+          : '';
+        return `
+          <li class="attendee-row">
+            ${typeof getProfilePhotoUrl === 'function'
+              ? `<img class="avatar" alt="" data-user-id="${u.UserId}" src="${fallback}" />`
+              : ''
+            }
+            <span class="attendee-name">${fullName}</span>
+          </li>`;
+      }).join('');
+
+      // асинхронно до-зареждаме реалните снимки, ако имаме хелпъра
+      if (typeof getProfilePhotoUrl === 'function'){
+        (async ()=>{
+          for (const u of list){
+            try{
+              const url = await getProfilePhotoUrl(u.UserId);
+              if (url){
+                const img = ul.querySelector(`img[data-user-id="${u.UserId}"]`);
+                if (img) img.src = url;
+              }
+            }catch(_){}
+          }
+        })();
+      }
     }
   }
 
   positionPopover(anchorEl);
 }
+
 
 function scheduleShowPopover(slotId, anchorEl, titleText){
   clearTimeout(hoverState.hideTimer);

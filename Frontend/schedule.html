@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <title>График – записване</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- За по-добри мобилни шрифтове -->
+  <meta name="format-detection" content="telephone=no,email=no,address=no">
   <link rel="stylesheet" href="schedule.css">
 </head>
 <body>
@@ -16,17 +18,21 @@
     </label>
     <span class="pill">Клуб: <strong id="clubLabel"></strong></span>
     <span class="pill">Потребител: <strong id="userLabel"></strong></span>
+    <a href="HomePage.html" class="btn secondary back-home" aria-label="Към началната страница">
+      <span class="icon-home" aria-hidden="true"></span>
+      Начало
+    </a>
   </div>
-  <div class="legend">
-    <span><span class="swatch swatch-mine"></span>Моите записи</span>
-    <span><span class="swatch swatch-full"></span>Пълен капацитет*</span>
-    <span class="muted">*необходимо е API за заетост по слот</span>
+  <div class="legend" aria-hidden="true">
+    <span><span class="swatch swatch-mine"></span>Мой избор</span>
+    <span><span class="swatch swatch-full"></span>Пълен слот</span>
   </div>
 </header>
 
 <div id="messages" class="muted" role="status" aria-live="polite"></div>
 
-<div id="grid" class="grid" aria-label="Седмична мрежа"></div>
+<!-- JS ще рендерира таблицата вътре -->
+<div id="grid" class="grid" aria-label="Седмичен график"></div>
 
 <div class="actions">
   <div id="summary" class="pill">0 слота избрани</div>

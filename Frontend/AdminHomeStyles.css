@@ -36,7 +36,7 @@ body{
   font:15px/1.5 system-ui, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-.container{max-width:1200px; margin:0 auto; padding:0 var(--space-4)}
+.container{max-width:1200px; margin:0 5% 0 5%; padding:0 var(--space-4)}
 .muted{color:var(--muted)}
 .p-3{padding:var(--space-3)}
 .sr-only{
@@ -385,8 +385,86 @@ body.is-admin .slot-pill{ cursor:help }
   border-color: #cbd5e1;
   background: #f8fafc;
 }
+/* списъкът в поповъра да се скролва при много редове */
+#slotPopoverList {
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 6px; /* малко място за скролбара */
+}
 
+/* контейнер за търсачката */
+#attendeeSearchBox {
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+}
 
+#attendeeSearchBox input[type="search"] {
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  width: 100%;
+}
+
+#attendeeSearchResults .result-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fafafa;
+  cursor: pointer;
+}
+#attendeeSearchResults .result-item + .result-item { margin-top: 6px; }
+#attendeeSearchResults .muted { color: #6b7280; }
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eee;
+  flex: 0 0 32px;
+}
+.result-item {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.result-item .meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+#slotPopover { max-width: 320px; }
+#slotPopoverList { max-height: 260px; overflow-y: auto; }
+
+#slotPopoverList .attendee-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#slotPopoverList .attendee-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e5e7eb;
+  flex: 0 0 28px;
+}
+/* когато е пълен */
+.slot-card.slot-full {
+  outline: 2px solid #dc2626;
+  outline-offset: -2px;
+}
 
 /* ================== Респонсив ================== */
 @media (max-width: 1024px){

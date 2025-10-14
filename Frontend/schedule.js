@@ -193,6 +193,30 @@ async function ensureGroupNames() {
   });
 }
 
+/* ========= КЕШ: инфо за слот (count + mine + capacity) ========= */
+const slotInfoCache = new Map(); // slotId -> { count, mine, capacity }
+
+async function getSlotInfo(slotId, capacity){
+  if (slotInfoCache.has(slotId)) return slotInfoCache.get(slotId);
+  try{
+    const res = await fetch(`${API_BASE}/athleteselections/slot/${slotId}`);
+    if (!res.ok) throw new Error();
+    const arr = await res.json(); // [{ UserId/userId/... }]
+    const count = Array.isArray(arr) ? arr.length : 0;
+    const mine  = Array.isArray(arr) && arr.some(u => {
+      const uid = Number(u.UserId ?? u.userId ?? u.userid ?? u.id);
+      return uid === userId;
+    });
+    const info = { count, mine: !!mine, capacity: Number.isFinite(capacity) ? capacity : null };
+    slotInfoCache.set(slotId, info);
+    return info;
+  }catch{
+    const info = { count: 0, mine: false, capacity: Number.isFinite(capacity) ? capacity : null };
+    slotInfoCache.set(slotId, info);
+    return info;
+  }
+}
+
 /* ========= LOAD ========= */
 async function loadSeasons() {
   setMessage('Зареждам сезони…');
@@ -356,17 +380,33 @@ function renderGrid() {
         btn.dataset.slotId = slot.id;
         if (selectedSlotIds.has(slot.id)) btn.classList.add('selected');
 
-        if (Number.isFinite(slot.currentCount) && Number.isFinite(slot.capacity) && slot.currentCount >= slot.capacity) {
-          btn.classList.add('full');
-        }
+        // съдържание + ред за капацитет/заети
+        btn.innerHTML = `
+          <div class="slot-title">${slot.groupName ? slot.groupName : 'Тренировка'}</div>
+          <div class="slot-meta">
+            ${Number.isFinite(slot.capacity)
+              ? `Капацитет: <span class="cap">${slot.capacity}</span> • Записани: <span class="taken" data-slot-id="${slot.id}">—</span>`
+              : `Записани: <span class="taken" data-slot-id="${slot.id}">—</span>`}
+          </div>
+        `;
 
-        btn.textContent = slot.groupName ? `${slot.groupName}` : 'Тренировка';
+        // tooltip
         btn.title = `${days[(slot.dayOfWeek-1)]} ${start}-${end}${slot.capacity ? ` • капацитет: ${slot.capacity}` : ''}`;
 
-        btn.addEventListener('click', () => {
-          if (btn.classList.contains('full') && !btn.classList.contains('selected')) return;
+        // клик: ако е пълен и НЕ е мой и НЕ е селектиран → блокирай; иначе allow toggle
+        btn.addEventListener('click', async () => {
           const id = parseInt(btn.dataset.slotId,10);
-          if (selectedSlotIds.has(id)) {
+          const isSelected = selectedSlotIds.has(id);
+
+          const info = await getSlotInfo(id, slot.capacity);
+          const isFull = Number.isFinite(info.capacity) && info.count >= info.capacity;
+
+          if (!isSelected && isFull && !info.mine) {
+            return; // блокирай нов запис в чужд пълен слот
+          }
+
+          // toggle
+          if (isSelected) {
             selectedSlotIds.delete(id);
             btn.classList.remove('selected');
           } else {
@@ -378,6 +418,21 @@ function renderGrid() {
         });
 
         cell.appendChild(btn);
+
+        // след рендър: вземи count + mine и маркирай Full (и mine)
+        (async ()=>{
+          try{
+            const info = await getSlotInfo(slot.id, slot.capacity);
+            const takenEl = gridEl.querySelector(`.taken[data-slot-id="${slot.id}"]`);
+            if (takenEl) takenEl.textContent = info.count;
+
+            if (Number.isFinite(info.capacity) && info.count >= info.capacity){
+              btn.classList.add('full');                 // визуално „пълен“
+              if (takenEl) takenEl.style.color = '#dc2626';
+              if (info.mine) btn.classList.add('mine');  // мой пълен слот (по желание стил)
+            }
+          }catch(_){}
+        })();
       }
       gridEl.appendChild(cell);
     }

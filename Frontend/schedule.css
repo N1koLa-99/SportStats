@@ -1,92 +1,317 @@
-:root { --gap: 8px; --radius: 10px; --bd: #ddd; --bd2:#bbb; --sel:#e6f3ff; --hover:#f7faff; --full:#ffe6e6; }
+/* =========================================
+   schedule.css — Light, Ultra-Compact, Mobile H-Scroll
+   (без промяна на HTML/ID/class)
+   ========================================= */
 
-* { box-sizing: border-box; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 20px; }
-header { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom: 14px; }
-h1 { margin:0; }
+/* --------- ТЕМА / ТОКЕНИ --------- */
+:root{
+  /* цветове */
+  --bg:#f7f9fc;
+  --surface:#ffffff;
+  --border:#e6e9ef;
 
-.toolbar { display:flex; gap:10px; align-items:center; margin-bottom: 10px; }
-.legend { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.muted { color:#666; font-size: 0.9rem; }
+  --ink:#0b0f19;
+  --ink-2:#111827;
+  --muted:#667085;
 
-.grid {
-  display: grid;
-  grid-template-columns: 110px repeat(7, 1fr);
-  border: 1px solid var(--bd);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin:14px 0;
+  --accent:#4f7cf7;
+  --accent-2:#2f5de8;
+
+  --success:#16a34a;
+  --danger:#ef4444;
+
+  --tint-accent:#eaf0ff;
+  --tint-danger:#fff0f0;
+
+  /* радиус/сенки */
+  --radius:12px;
+  --radius-sm:10px;
+  --shadow:0 6px 22px rgba(13,20,33,.07);
+  --inset:inset 0 1px 0 rgba(255,255,255,.6);
+
+  /* типография — компактна по подразбиране (desktop) */
+  --fs: .82rem;      /* ≈ 13.1px */
+  --fs-sm: .76rem;   /* ≈ 12.2px */
+  --fs-h1: clamp(1.0rem, .85rem + .5vw, 1.18rem);
+
+  /* редове в таблицата */
+  --row-min: 52px;
+
+  /* spacing */
+  --pad-xs: 4px;
+  --pad-sm: 6px;
+  --pad-md: 10px;
+  --pad-lg: 12px;
+  --gap-sm: 6px;
+  --gap-md: 10px;
+  --gap-lg: 12px;
 }
-.cell, .head {
-  border-right: 1px solid var(--bd);
-  border-bottom: 1px solid var(--bd);
-  padding: 8px;
-  min-height: 44px;
+
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin: var(--pad-md);
+  background: var(--bg);
+  color: var(--ink);
+  font: 500 var(--fs)/1.6 "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+.muted{ color:var(--muted); font-size:var(--fs-sm); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+}
+
+/* --------- HEADER / TOOLBAR --------- */
+header{
+  display:flex; flex-wrap:wrap; gap:var(--gap-md); align-items:center;
+  background: linear-gradient(180deg, rgba(79,124,247,.07), rgba(255,255,255,.96));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding: var(--pad-md) var(--pad-lg);
+  margin-bottom: var(--pad-md);
+  box-shadow:var(--shadow);
+  padding-right: 120px; /* място за фиксирания бутон "Начало" вдясно */
+}
+h1{
+  margin:0;
+  font-size:var(--fs-h1);
+  color:var(--ink-2);
+  font-weight:900;
+  letter-spacing:.1px;
+}
+.toolbar{
+  display:flex; gap:var(--gap-md); align-items:center; flex-wrap:wrap; width:100%;
+}
+
+select#seasonSelect{
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#fff; color:var(--ink);
+  box-shadow:var(--inset);
+  font-size: var(--fs);
+}
+.pill{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg,#fff,#fbfdff);
+  box-shadow:var(--inset);
+  font-weight:800;
+  font-size: var(--fs);
+}
+button,.btn{
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#fff; color:var(--ink);
+  font-weight:800;
+  font-size: var(--fs);
+  cursor:pointer;
+  box-shadow:var(--inset);
+  transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+button:hover,.btn:hover{ transform: translateY(-1px); box-shadow:0 6px 16px rgba(13,20,33,.10); }
+button:active,.btn:active{ transform: translateY(0); }
+button:focus-visible,.btn:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.18); border-color:var(--accent); }
+
+button.primary,.btn.primary{
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color:#000;
+  border-color:var(--accent-2);
+  box-shadow:0 8px 18px rgba(79,124,247,.22);
+}
+
+/* --------- СЪОБЩЕНИЯ --------- */
+#messages{ margin-top: var(--pad-sm); padding: var(--pad-sm) 0; }
+
+/* =========================================
+   GRID — desktop
+   ========================================= */
+.grid{
+  display:grid;
+  grid-template-columns: 108px repeat(7, minmax(128px, 1fr));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:#fff;
+  box-shadow:var(--shadow);
+  overflow:auto;                         /* хор. + верт. скрол при нужда */
+  -webkit-overflow-scrolling: touch;
+}
+.head,.cell{
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  min-height:var(--row-min);
+  padding: var(--pad-md);
   display:flex; align-items:center; justify-content:center; text-align:center;
-}
-.head { background:#fafafa; font-weight:600; }
-.time-col { background:#fcfcfc; font-weight:500; }
-
-.slot {
-  cursor:pointer; user-select:none; border-radius:8px;
-  padding:6px 8px; border:1px dashed transparent; width:100%; height:100%;
-  display:flex; align-items:center; justify-content:center;
-}
-.slot:hover { background: var(--hover); border-color: var(--bd2); }
-.slot.selected { background: var(--sel); border-color:#99c3ff; }
-.slot.full { background: var(--full); }
-
-button { padding:10px 14px; border-radius:10px; border:1px solid #ccc; background:#fff; cursor:pointer; }
-button.primary { background:#0ea5e9; color:#fff; border-color:#0ea5e9; }
-button:disabled { opacity:0.5; cursor:not-allowed; }
-.pill { padding:6px 10px; border:1px solid var(--bd); border-radius:999px; }
-
-.actions { display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
-
-.swatch { width:14px; height:14px; border-radius:3px; display:inline-block; margin-right:6px; border:1px solid #aaa; }
-.swatch-mine { background:#e6f3ff; }
-.swatch-full { background:#ffe6e6; }
-.week-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 12px;
+  font-size:var(--fs);
+  background:#fff;
 }
 
-.day-col { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background:#fff; }
-.day-head { background:#f8fafc; font-weight:600; text-align:center; padding:8px 10px; border-bottom:1px solid #e5e7eb; }
-.day-list { display:flex; flex-direction:column; gap:10px; padding:10px; min-height:80px; }
-
-.slot-card { border:1px solid #e5e7eb; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:8px; }
-.slot-card__head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-.slot-card__title-wrap { display:flex; align-items:center; gap:8px; }
-.slot-card__title { font-weight:600; }
-.slot-chip { padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #e5e7eb; background:#f9fafb; }
-
-.slot-card__row { display:flex; align-items:center; gap:8px; font-size:14px; }
-.slot-card__icon { width:18px; text-align:center; }
-.btn.ghost { background:transparent; border:1px solid #e5e7eb; border-radius:8px; padding:4px 8px; cursor:pointer; }
-
-.slot-card--pro  .slot-chip{ background:#fee2e2; border-color:#fecaca; }  /* Състезатели */
-.slot-card--adv  .slot-chip{ background:#e0e7ff; border-color:#c7d2fe; }  /* Напреднали */
-.slot-card--beg  .slot-chip{ background:#dcfce7; border-color:#bbf7d0; }  /* Начинаещи */
-.grid {
-  display: grid;
-  grid-template-columns: 110px repeat(7, 1fr);
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-  margin:14px 0;
+/* лепкав горен ред и първа колона */
+.head{
+  position:sticky; top:0; z-index:3;
+  background:linear-gradient(180deg,#ffffff, #f4f7ff);
+  font-weight:900; color:var(--ink-2);
 }
-.cell, .head {
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  padding: 8px;
-  min-height: 44px;
-  display:flex; align-items:center; justify-content:center; text-align:center;
+.time-col{
+  position:sticky; left:0; z-index:2;
+  background:#f6f8ff; font-weight:800; color:#475569;
+  box-shadow:-1px 0 0 var(--border) inset;
 }
-.head { background:#fafafa; font-weight:600; }
-.time-col { background:#fcfcfc; font-weight:500; }
-.slot { cursor:pointer; user-select:none; border-radius:8px; padding:6px 8px; border:1px dashed transparent; width:100%; height:100%; display:flex; align-items:center; justify-content:center;}
-.slot.selected { background:#e6f3ff; border-color:#99c3ff; }
-.muted { color:#666; font-size: 0.9rem; }
 
+/* =========================================
+   MOBILE — min font, H-scroll, fixed header
+   ========================================= */
+@media (max-width: 720px){
+  /* максимално дребен, но четим шрифт */
+  :root{
+    --fs: .75rem;     /* ≈ 12px */
+    --fs-sm: .70rem;  /* ≈ 11.2px */
+    --fs-h1: .95rem;
+    --row-min: 46px;
+  }
+
+  /* фиксиран header най-отгоре (не се скролва) */
+  header{
+    position: fixed; top: 0; left: 0; right: 0;
+    margin: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    z-index: 20;
+    padding-right: 96px; /* по-малко, защото бутонът е по-компактен на мобилно */
+  }
+  /* отстъп под фиксирания header, за да не го покрива съдържанието */
+  body{ padding-top:40%; } /* ако заглавката стане по-висока – увеличи */
+
+  /* скриваме .pill за повече въздух */
+  .pill{ display: none; }
+
+  /* още по-компактни контроли */
+  select#seasonSelect{ padding:6px 8px; border-radius:8px; }
+  button,.btn{ padding:7px 10px; border-radius:8px; }
+
+  /* удобен хоризонтален скрол — фиксирани тесни колони */
+  .grid{
+    grid-template-columns: 72px repeat(7, 132px);
+    margin-top: var(--pad-md);
+  }
+  .head,.cell{
+    min-height: 44px;
+    padding: 8px;
+    font-size: var(--fs);
+    justify-content:flex-start;
+    text-align:left;
+  }
+}
+
+/* много малки телефони (≤400px) — още една стъпка надолу */
+@media (max-width: 400px){
+  :root{
+    --fs: .72rem;     /* ≈ 11.5px */
+    --fs-sm: .68rem;  /* ≈ 10.9px */
+    --row-min: 42px;
+  }
+  .grid{ grid-template-columns: 68px repeat(7, 124px); }
+  body{ padding-top: 44%; }
+  .head,.cell{ min-height: 42px; padding: 7px; }
+}
+
+/* =========================================
+   SLOT (бутон вътре в клетката)
+   ========================================= */
+.slot{
+  display:block; width:100%;
+  padding: 8px;                 /* компактно, но щадящо палец */
+  background:#fff;
+  border:2px dashed transparent;
+  border-radius:10px;
+  font-weight:800;
+  line-height:1.35;
+  color:var(--ink);
+  cursor:pointer; user-select:none; outline:none;
+  white-space:normal; word-break:break-word; hyphens:auto;
+  transition: box-shadow .18s, background .18s, border-color .18s, transform .08s;
+}
+.slot:hover{
+  background:#fff;
+  border-color:#cadeff;
+  box-shadow:0 6px 16px rgba(79,124,247,.14);
+  transform: translateY(-1px);
+}
+.slot:focus-visible{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(79,124,247,.18); }
+.slot.selected{
+  background: linear-gradient(180deg,#ffffff, var(--tint-accent));
+  border-color:#7ea0ff;
+  box-shadow:0 0 0 2px #dfe7ff inset;
+}
+.slot.full{
+  background: var(--tint-danger);
+  border-color: rgba(239,68,68,.30);
+  color: #7f1d1d;
+  font-weight:900;
+}
+.slot.full.mine{ outline:2px solid #f59e0b; outline-offset:-2px; }
+
+/* вътрешни редове (ако ги ползваш) */
+.slot .slot-title{ margin: 0 0 3px 0; font-weight:900; color:var(--ink-2); font-size: var(--fs); }
+.slot .slot-meta{
+  font-size:var(--fs-sm); color:var(--muted);
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.slot .slot-meta .cap, .slot .slot-meta .taken{ font-weight: 900; }
+
+/* =========================================
+   ACTIONS (под грида)
+   ========================================= */
+.actions{
+  display:flex; gap:var(--gap-md); align-items:center; flex-wrap:wrap;
+  margin-top: var(--pad-sm);
+}
+button:disabled{ opacity:.6; cursor:not-allowed; }
+#summary,#feeBox{ font-weight:900; letter-spacing:.1px; }
+
+/* =========================================
+   Допълнителна четимост ред-ред (subtle zebra)
+   ========================================= */
+@media (max-width: 720px){
+  .cell:nth-child(16n+1),
+  .cell:nth-child(16n+2),
+  .cell:nth-child(16n+3),
+  .cell:nth-child(16n+4),
+  .cell:nth-child(16n+5),
+  .cell:nth-child(16n+6),
+  .cell:nth-child(16n+7),
+  .cell:nth-child(16n+8){ background:#fcfdff; }
+}
+
+/* =========================================
+   A11y / High-contrast предпочитания
+   ========================================= */
+@media (prefers-contrast: more){
+  .slot{ border-width:2px; }
+  .slot.selected{ box-shadow: 0 0 0 3px #bcd0ff inset; }
+  .btn.primary{ box-shadow: 0 0 0 3px rgba(79,124,247,.30); }
+}
+
+/* ===== Pin "Начало" button top-right at all times ===== */
+.back-home{
+  position: fixed;
+  top: 10px;
+  right: 12px;
+  z-index: 1000;
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+/* по-компактно на много малки екрани */
+@media (max-width: 420px){
+  .back-home{
+    top: 8px;
+    right: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: .72rem;
+  }
+  header{ padding-right: 96px; } /* да не се припокрива с фиксирания бутон */
+}
