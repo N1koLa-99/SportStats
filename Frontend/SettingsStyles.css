@@ -19,6 +19,14 @@
   --radius-sm:10px;
   --shadow:0 8px 28px rgba(13, 20, 33, .08);
   --wrap: min(1120px, 100% - 32px);
+
+  /* Типография (fluid) */
+  --fs-12: clamp(11px, 0.75rem, 12px);
+  --fs-13: clamp(12px, 0.82rem, 13px);
+  --fs-14: clamp(13px, 0.9rem, 14px);
+  --fs-16: clamp(14px, 1rem, 16px);
+  --fs-18: clamp(16px, 1.12rem, 18px);
+  --fs-20: clamp(18px, 1.25rem, 20px);
 }
 
 *{ box-sizing:border-box }
@@ -26,17 +34,25 @@ html,body{ height:100% }
 html{ color-scheme: light }
 body{
   margin:0;
-  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Segoe UI Emoji";
+  font-size: var(--fs-16);
   color:var(--ink);
   background:var(--bg);
   -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
+img{ max-width:100%; display:block }
+button{ font:inherit }
 .page{ min-height:100dvh; display:grid; grid-template-rows:auto 1fr auto }
+
+/* По-малко анимации при предпочитание */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important }
+}
 
 /* =========================
    Wrap
    ========================= */
-.wrap{ width:var(--wrap); margin-inline:auto }
+.wrap{ width:var(--wrap); margin-inline:auto; padding-inline:0 }
 
 /* =========================
    HEADER – в стила на HomePage
@@ -49,13 +65,13 @@ body{
 }
 .header .wrap{
   display:flex; align-items:center; justify-content:space-between;
-  gap:16px; padding:12px 0;
+  gap:12px; padding:10px 0;
 }
 .brand{ display:flex; align-items:center; gap:10px }
-.brand-title{ font-weight:800; letter-spacing:.2px; color:var(--ink-2); margin:0 }
+.brand-title{ font: 800 var(--fs-20)/1.2 "Inter", system-ui; letter-spacing:.2px; color:var(--ink-2); margin:0 }
 
 /* Плочки с икона + текст (Начало / Изход) */
-.quick-actions{ display:flex; gap:12px; align-items:center }
+.quick-actions{ display:flex; gap:10px; align-items:center }
 .icon-tile{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:6px; text-decoration:none; cursor:pointer;
@@ -64,12 +80,13 @@ body{
   background:#fff; color:var(--ink);
   box-shadow:var(--shadow);
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+  touch-action: manipulation;
 }
 .icon-tile i{ font-size:20px; line-height:1 }
-.icon-tile .nav-label{ font-size:12px; color:var(--muted); font-weight:700; letter-spacing:.02em }
+.icon-tile .nav-label{ font-size:var(--fs-12); color:var(--muted); font-weight:700; letter-spacing:.02em }
 .icon-tile:hover{ transform:translateY(-2px); border-color:#dfe4ee; background:#fafbfe }
 .icon-tile:active{ transform:translateY(0) }
-.icon-tile:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.18) }
+.icon-tile:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.28) }
 
 .home-btn{ color:var(--ink) }
 #logout-button.icon-tile{
@@ -83,31 +100,38 @@ body{
   .icon-tile{ width:80px; min-height:74px }
 }
 @media (max-width: 380px){
-  .icon-tile{ width:70px; min-height:66px }
+  .header .wrap{ padding:8px 0 }
+  .icon-tile{ width:68px; min-height:64px; gap:4px }
   .icon-tile i{ font-size:18px }
   .icon-tile .nav-label{ font-size:11px }
 }
 
 /* =========================
-   Фон + основен layout
+   Основно
    ========================= */
-.main{
-  padding-block:18px 24px;
-}
+.main{ padding-block:16px 24px }
+
+/* Старият фон (по желание, ако се ползва .container) */
 .container{
-  /* (оставена за съвместимост с твоя стар HTML) */
   display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-  padding-top:76px;
-  min-height:100%;
+  padding-top:76px; min-height:100%;
   background:
     linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.66)),
     url('https://sportstats.blob.core.windows.net/$web/SwimmingAi2.webp') no-repeat center center fixed;
   background-size:107% auto;
   color:#fff;
 }
+@media (max-width: 450px){
+  .container{
+    background:
+      linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+      url(https://sportstats.blob.core.windows.net/$web/SettingsImg.jpg) no-repeat center bottom fixed;
+    background-size:cover;
+  }
+}
 
 /* =========================
-   Карта Профил – в стила на HomePage
+   Карта Профил
    ========================= */
 .card{
   background:var(--surface);
@@ -121,43 +145,49 @@ body{
   padding:14px 16px; border-bottom:1px solid var(--border);
   background:linear-gradient(180deg,#fff,#fafbfe);
 }
-.card-head h2{ margin:0; color:var(--ink-2); font-size:20px; font-weight:800; letter-spacing:.2px }
+.card-head h2{ margin:0; color:var(--ink-2); font-size:var(--fs-20); font-weight:800; letter-spacing:.2px }
 .actions{ display:flex; gap:8px; align-items:center }
 
-/* Бутонна система (съвместима с твоите ID-та) */
+/* Бутонна система */
 .btn{
-  padding:10px 12px; border-radius:12px;
+  padding:12px 14px; border-radius:12px;
   border:1px solid var(--border); background:#fff; color:var(--ink);
-  cursor:pointer; font-weight:600; line-height:1;
+  cursor:pointer; font-weight:700; line-height:1;
   transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+  touch-action: manipulation;
+  min-height:42px;
 }
 .btn:hover{ border-color:#cfd4de; transform:translateY(-1px) }
 .btn:active{ transform:translateY(0) }
-.btn:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.18) }
+.btn:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.28) }
 .btn.primary{ background:var(--ink-2); border-color:var(--ink-2); color:#fff }
 .btn.primary:hover{ filter:brightness(1.05) }
 .btn.ghost{ background:#fff }
 .btn.soft{ background:var(--muted-surface) }
-.btn.icon{ background:#fff; border-color:var(--border); width:40px; height:40px; display:grid; place-items:center; padding:0 }
+.btn.icon{ background:#fff; border-color:var(--border); width:40px; height:40px; display:grid; place-items:center; padding:0; min-height:40px }
 
 /* Тяло на картата – подредба */
 .profile{
-  display:grid; grid-template-columns:auto 1fr; gap:20px;
+  display:grid; grid-template-columns:200px 1fr; gap:20px;
   padding:16px;
 }
 @media (max-width: 720px){
   .profile{ grid-template-columns:1fr }
 }
 
-/* Аватар блок */
+/* Аватар */
 .avatar{ display:grid; gap:12px; justify-items:center; align-content:start }
 #profile-image{
   width:132px; height:132px; border-radius:16px; object-fit:cover;
   border:1px solid var(--border); background:#fff;
 }
-#edit-image-button{ border-radius:12px }
+#edit-image-button{ border-radius:12px; width:100%; max-width:160px }
 
-/* Формата – компактна мрежа */
+@media (max-width:720px){
+  #profile-image{ width:128px; height:128px }
+}
+
+/* Формата – мрежа */
 .form-grid{
   display:grid; gap:12px;
 }
@@ -170,7 +200,7 @@ body{
   .form-row{ grid-template-columns:1fr }
 }
 .label{
-  align-self:center; color:var(--muted); font-size:12.5px; font-weight:700; letter-spacing:.02em;
+  align-self:center; color:var(--muted); font-size:var(--fs-12); font-weight:800; letter-spacing:.02em;
 }
 .value{
   display:grid; gap:6px; align-content:center;
@@ -184,11 +214,13 @@ input[type="number"],
 input[type="email"],
 input[type="password"],
 select{
-  display:none; /* важно: твоят JS управлява видимостта */
-  width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--border);
+  display:none; /* JS управлява видимостта */
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
   background:#fff; color:var(--ink);
   transition: border-color .15s ease, box-shadow .15s ease;
+  min-height:44px;
 }
+input::placeholder{ color:#9aa3b2 }
 select{
   appearance:none; -webkit-appearance:none; -moz-appearance:none;
   background-image:
@@ -204,37 +236,56 @@ input:focus, select:focus{
   box-shadow:0 0 0 4px rgba(79,124,247,.15);
 }
 
-/* Пароли – икона око */
-.password-container{ position:relative; display:flex; align-items:center }
-.password-container input{ flex:1; padding-right:36px }
-.toggle-password{ position:absolute; right:10px; color:#6b7280; cursor:pointer; display:none }
+/* Валидно / невалидно */
+.form-row.is-valid input,
+.form-row.is-valid select{ border-color:#10b981 }
+.form-row.is-invalid input,
+.form-row.is-invalid select{ border-color:#ef4444 }
 
-/* Съобщение за промени */
-.note{
-  margin-top:6px;
-  padding:10px 12px;
-  border-radius:12px;
-  background:linear-gradient(180deg,#ffffff,#fafcff);
-  border:1px dashed #e2e7f0;
-  color:#6f7a8d; font-size:13px;
+.error-msg{
+  display:none;
+  color:#ef4444;
+  font-size:var(--fs-12);
+  font-weight:700;
 }
 
 /* =========================
-   Message box / Toast (запазени ID-та)
+   Пароли – wrap + оченце + индикатор отдолу
+   ========================= */
+.password-container{ position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:6px }
+.password-wrap{ position:relative; width:100% }
+.password-wrap input{ width:100%; padding-right:42px }
+.toggle-password{
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  background:transparent; border:0; cursor:pointer; color:#6b7280; font-size:18px;
+  width:36px; height:36px; display:none; place-items:center;
+}
+.toggle-password:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(79,124,247,.28); border-radius:8px }
+
+#pwd-strength{ width:100% }
+.pwd-meter{
+  width:100%; height:6px; background:#e5e7eb; border-radius:999px; overflow:hidden;
+}
+.pwd-bar{ height:100%; width:0%; background:#ef4444; transition:width .2s ease }
+.pwd-label{ display:block; margin-top:4px; font-size:var(--fs-12); color:#6b7280 }
+
+/* =========================
+   Toast / Message box
    ========================= */
 .message-box{
-  position: fixed; top: 20px; left: 5%;
-  width: 350px; display:none; flex-direction:column;
+  position: fixed; top: 16px; left: 16px; right: 16px;
+  width: min(420px, 92vw); margin-inline:auto;
+  display:none; flex-direction:column;
   background: linear-gradient(145deg, #1a2b3c, #2a3b4c);
   border-radius: 15px; color:#fff; z-index:1000;
-  box-shadow:0 10px 40px rgba(0,0,0,.2); opacity:0; padding:25px;
-  animation: fadeIn .6s ease-out forwards; overflow:hidden; backdrop-filter: blur(10px);
+  box-shadow:0 10px 40px rgba(0,0,0,.2); opacity:0; padding:16px;
+  animation: fadeIn .4s ease-out forwards; overflow:hidden; backdrop-filter: blur(10px);
   border:2px solid rgba(255,255,255,.1);
 }
-.message-box-content{ background: rgba(255,255,255,.05); padding:25px; border-radius:12px; text-align:center; width:100% }
-.message-box-progress{ width:100%; height:8px; background: rgba(255,255,255,.15); border-radius:5px; margin-top:15px; overflow:hidden }
+.message-box-content{ background: rgba(255,255,255,.06); padding:14px; border-radius:12px; text-align:center; width:100% }
+.message-box-progress{ width:100%; height:6px; background: rgba(255,255,255,.18); border-radius:5px; margin-top:10px; overflow:hidden }
 .message-box-progress-bar{ height:100%; background:#4CAF50; width:0; border-radius:5px; animation: progressBar 3s ease-out forwards }
-@keyframes fadeIn{ 0%{opacity:0; transform: translateY(-30px)} 100%{opacity:1; transform: translateY(0)} }
+@keyframes fadeIn{ 0%{opacity:0; transform: translateY(-16px)} 100%{opacity:1; transform: translateY(0)} }
 @keyframes progressBar{ 0%{width:0} 100%{width:100%} }
 
 /* =========================
@@ -245,98 +296,64 @@ input:focus, select:focus{
   color:var(--muted);
   padding:16px 0;
 }
-.footer small{ font-size:12px }
+.footer small{ font-size:var(--fs-12) }
 
 /* =========================
-   Алтернативен фон за много малки екрани
+   Модал за излизане
    ========================= */
-@media (max-width: 450px){
-  .container{
-    background:
-      linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
-      url(https://sportstats.blob.core.windows.net/$web/SettingsImg.jpg) no-repeat center bottom fixed;
-    background-size:cover;
-  }
-}
-
-/* =========================
-   Дребни подобрения за компактност
-   ========================= */
-@media (max-width: 768px){
-  .main{ padding-block:12px 18px }
-  .card-head{ padding:12px 14px }
-  .profile{ padding:14px }
-  .form-row{ gap:12px; padding:10px 10px }
-  .label{ font-size:12px }
-}
-/* ===== Центриран модал за излизане ===== */
 .confirmation-overlay{
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
+  position: fixed; inset: 0; z-index: 9999;
   background: rgba(15, 23, 42, .55);
-  display: grid;
-  place-items: center;
-  padding: 24px;
+  display: grid; place-items: center; padding: 24px;
   animation: fadeBackdrop .15s ease-out;
 }
-
-.confirmation-overlay.closing{
-  animation: fadeBackdropOut .15s ease-in forwards;
-}
-
+.confirmation-overlay.closing{ animation: fadeBackdropOut .15s ease-in forwards }
 .confirmation-box{
   width: min(520px, 92vw);
-  background: #ffffff;
-  border: 1px solid #e6e9ef;
-  border-radius: 16px;
+  background: #ffffff; border: 1px solid #e6e9ef; border-radius: 16px;
   box-shadow: 0 18px 48px rgba(15,23,42,.18);
-  padding: 22px 20px;
-  transform: translateY(6px) scale(.98);
+  padding: 22px 20px; transform: translateY(6px) scale(.98);
   animation: popIn .18s ease-out forwards;
 }
-
-.confirmation-overlay.closing .confirmation-box{
-  animation: popOut .15s ease-in forwards;
-}
-
+.confirmation-overlay.closing .confirmation-box{ animation: popOut .15s ease-in forwards }
 .confirm-title{
-  margin: 0 0 14px 0;
-  font-size: 18px;
-  font-weight: 800;
-  color: #0b0f19;
-  text-align: center;
+  margin: 0 0 14px 0; font-size: var(--fs-18); font-weight: 800; color: #0b0f19; text-align: center;
 }
-
 .confirm-button{
-  display: block;
-  width: 100%;
-  padding: 14px 18px;
-  border: none;
-  border-radius: 12px;
-  background: #ff4d4d;
-  color: #fff;
-  font-size: 16.5px;
-  font-weight: 800;
-  letter-spacing: .2px;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(255,77,77,.32);
+  display: block; width: 100%; padding: 14px 18px; border: none; border-radius: 12px;
+  background: #ff4d4d; color: #fff; font-size: var(--fs-16); font-weight: 800; letter-spacing: .2px;
+  cursor: pointer; box-shadow: 0 10px 24px rgba(255,77,77,.32);
   transition: transform .06s ease, filter .15s ease;
 }
 .confirm-button:hover{ filter: brightness(1.03) }
 .confirm-button:active{ transform: translateY(1px) }
 
-@keyframes popIn{
-  from{ opacity: 0; transform: translateY(10px) scale(.96) }
-  to{   opacity: 1; transform: translateY(0)     scale(1) }
+@keyframes popIn{ from{ opacity:0; transform: translateY(10px) scale(.96) } to{ opacity:1; transform: translateY(0) scale(1) } }
+@keyframes popOut{ from{ opacity:1; transform: translateY(0) scale(1) } to{ opacity:0; transform: translateY(6px) scale(.98) } }
+@keyframes fadeBackdrop{ from{ opacity:0 } to{ opacity:1 } }
+@keyframes fadeBackdropOut{ from{ opacity:1 } to{ opacity:0 } }
+
+/* =========================
+   Допълнителни mobile доработки
+   ========================= */
+@media (max-width: 1024px){
+  .profile{ gap:16px }
+  .form-row{ gap:12px; padding:10px 10px }
 }
-@keyframes popOut{
-  from{ opacity: 1; transform: translateY(0)     scale(1) }
-  to{   opacity: 0; transform: translateY(6px)   scale(.98) }
+@media (max-width: 768px){
+  .main{ padding-block:12px 18px }
+  .card-head{ padding:12px 14px }
+  .profile{ padding:14px }
+  .label{ font-size:12px }
+  .btn{ min-height:44px }
 }
-@keyframes fadeBackdrop{
-  from{ opacity: 0 } to{ opacity: 1 }
+@media (max-width: 560px){
+  .wrap{ --wrap: min(100%, 100% - 20px) }
+  .profile{ padding:12px }
+  .form-row{ padding:10px 10px }
+  .icon-tile{ width:76px; min-height:70px }
 }
-@keyframes fadeBackdropOut{
-  from{ opacity: 1 } to{ opacity: 0 }
+@media (max-width: 380px){
+  .card-head h2{ font-size:var(--fs-18) }
+  #edit-image-button{ width:100% }
 }

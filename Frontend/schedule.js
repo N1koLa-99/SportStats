@@ -1,7 +1,11 @@
 'use strict';
 
 /* ========= КОНФИГ ========= */
-const API_BASE = 'https://localhost:7198/api'; // смени при нужда
+const API_HOST = 'https://sportstatsapi.azurewebsites.net';
+const API = (path) => {
+  const clean = String(path).replace(/^\/+/, '');
+  return `${API_HOST}/api/${clean}`;
+};
 
 /* ========= DOM ========= */
 const gridEl       = document.getElementById('grid');
@@ -23,7 +27,6 @@ function redirectToIndex(message) {
   window.location.href = 'Index.html';
 }
 
-// безопасно взимане на поле с fallback-и
 function pick(obj, keys, def = '') {
   for (const k of keys) {
     if (obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== '') {
@@ -81,14 +84,13 @@ let dirty = false;
 
 const days = ['Пон', 'Вто', 'Сря', 'Чет', 'Пет', 'Съб', 'Нед'];
 
-// кеш: имена на групи по id
 let groupNameById = new Map();
 
 /* ========= HELPERS ========= */
 function normalizeDow(dow) {
   const n = Number(dow);
   if (Number.isNaN(n)) return null;
-  return n === 0 ? 7 : n; // 0 (Нед) -> 7
+  return n === 0 ? 7 : n;
 }
 function toHHMM(ts) {
   if (!ts) return '';
@@ -155,23 +157,19 @@ async function apiPut(url, body) {
   return res.text();
 }
 
-/* ========= LABELS: имена вместо ID ========= */
+/* ========= LABELS ========= */
 async function resolveClubDisplayName(user, clubId) {
-  // 1) опит от user обекта
   const fromUser = pick(user, ['clubName','ClubName']) ||
                    (user.club?.name || user.Club?.Name || '');
   if (fromUser) return fromUser;
 
-  // 2) опит през API (ако има ендпойнт)
   try {
-    const club = await apiGet(`${API_BASE}/clubs/${clubId}`);
+    const club = await apiGet(API(`Clubs/${clubId}`));
     return club.name ?? club.Name ?? 'Клуб';
   } catch { /* ignore */ }
 
-  // 3) fallback
   return 'Клуб';
 }
-
 function resolveUserDisplayName(user) {
   const full = [pick(user, ['firstName','FirstName']), pick(user, ['lastName','LastName'])].filter(Boolean).join(' ').trim();
   if (full) return full;
@@ -185,7 +183,7 @@ function resolveUserDisplayName(user) {
 /* ========= GROUPS ========= */
 async function ensureGroupNames() {
   if (groupNameById.size) return;
-  const groups = await apiGet(`${API_BASE}/traininggroups/club/${clubId}`);
+  const groups = await apiGet(API(`TrainingGroups/club/${clubId}`));
   groups.forEach(g => {
     const id = g.id ?? g.Id;
     const name = g.name ?? g.Name ?? 'Група';
@@ -193,15 +191,15 @@ async function ensureGroupNames() {
   });
 }
 
-/* ========= КЕШ: инфо за слот (count + mine + capacity) ========= */
+/* ========= СЛОТ INFO КЕШ ========= */
 const slotInfoCache = new Map(); // slotId -> { count, mine, capacity }
 
 async function getSlotInfo(slotId, capacity){
   if (slotInfoCache.has(slotId)) return slotInfoCache.get(slotId);
   try{
-    const res = await fetch(`${API_BASE}/athleteselections/slot/${slotId}`);
+    const res = await fetch(API(`AthleteSelections/slot/${slotId}`));
     if (!res.ok) throw new Error();
-    const arr = await res.json(); // [{ UserId/userId/... }]
+    const arr = await res.json();
     const count = Array.isArray(arr) ? arr.length : 0;
     const mine  = Array.isArray(arr) && arr.some(u => {
       const uid = Number(u.UserId ?? u.userId ?? u.userid ?? u.id);
@@ -217,10 +215,29 @@ async function getSlotInfo(slotId, capacity){
   }
 }
 
+/* ========= UI helpers за броячи (NEW) ========= */
+function updateSlotVisual(slotId, info) {
+  // ъпдейт на числото „Записани“
+  const takenEl = gridEl.querySelector(`.taken[data-slot-id="${slotId}"]`);
+  if (takenEl) takenEl.textContent = info.count;
+
+  // намери самия бутон (слота) за класове
+  const slotBtn = gridEl.querySelector(`.slot[data-slot-id="${slotId}"]`);
+  if (!slotBtn) return;
+
+  // пълнота
+  const isFull = Number.isFinite(info.capacity) && info.count >= info.capacity;
+  slotBtn.classList.toggle('full', isFull);
+  if (takenEl) takenEl.style.color = isFull ? '#dc2626' : '';
+
+  // мой ли е
+  slotBtn.classList.toggle('mine', !!info.mine);
+}
+
 /* ========= LOAD ========= */
 async function loadSeasons() {
   setMessage('Зареждам сезони…');
-  seasons = await apiGet(`${API_BASE}/seasons/club/${clubId}`);
+  seasons = await apiGet(API(`Seasons/club/${clubId}`));
   seasonSelect.innerHTML = '';
   for (const s of seasons) {
     const opt = document.createElement('option');
@@ -237,17 +254,16 @@ async function loadSeasons() {
   setMessage('');
 }
 
-// fallback: ако няма слотове за seasonId → проба без сезон
 async function loadSlots() {
   setMessage('Зареждам слотове…');
   const withSeason = seasonId
-    ? `${API_BASE}/scheduleslots/club/${clubId}?seasonId=${seasonId}`
-    : `${API_BASE}/scheduleslots/club/${clubId}`;
+    ? API(`ScheduleSlots/club/${clubId}?seasonId=${seasonId}`)
+    : API(`ScheduleSlots/club/${clubId}`);
 
   let raw = await apiGet(withSeason);
 
   if (seasonId && (!Array.isArray(raw) || raw.length === 0)) {
-    const raw2 = await apiGet(`${API_BASE}/scheduleslots/club/${clubId}`);
+    const raw2 = await apiGet(API(`ScheduleSlots/club/${clubId}`));
     if (Array.isArray(raw2) && raw2.length > 0) {
       setMessage('Показвам слотовете без филтър по сезон (ClubSeasonId липсва).');
       raw = raw2;
@@ -265,15 +281,14 @@ async function loadSlots() {
     .filter(s => s.id && s.dayOfWeek && s.startTime && s.endTime)
     .map(s => ({ ...s, groupName: s.groupName || groupNameById.get(s.groupId) || 'Група' }));
 
-  console.log('Seasons:', seasons);
-  console.log('Chosen seasonId:', seasonId);
-  console.log('Slots received (raw):', raw);
-  console.log('Slots normalized:', slots.slice(0, 10));
+  // изчистваме кеша за броячите при нов рендер
+  slotInfoCache.clear();
 }
 
+/* ========= MY SELECTIONS ========= */
 async function loadMySelections() {
   if (!userId) return;
-  const arr = await apiGet(`${API_BASE}/athleteselections/user/${userId}`);
+  const arr = await apiGet(API(`AthleteSelections/user/${userId}`));
   selectedSlotIds = new Set(arr.map(x => x.slotId ?? x.SlotId));
 }
 
@@ -281,36 +296,32 @@ async function loadMySelections() {
 async function refreshFee() {
   if (!userId || !clubId) { feeBox.textContent = 'Такса: —'; return; }
 
-  // 1) колко тренировки/седмица (TPW) имаш по текущите избори
-  const mySel = await apiGet(`${API_BASE}/athleteselections/user/${userId}`);
+  const mySel = await apiGet(API(`AthleteSelections/user/${userId}`));
   const mySlotIds = new Set(mySel.map(x => x.slotId ?? x.SlotId));
   const mySlots = slots.filter(s => mySlotIds.has(s.id));
   const tpw = new Set(mySlots.map(s => `${s.dayOfWeek}-${s.startTime}-${s.endTime}`)).size;
 
-  // 2) активен сезон
   const active = seasons.find(x => (x.isActive ?? x.IsActive) === true);
   const sid = active ? (active.id ?? active.Id) : null;
 
-  // 3) има ли активен план за този TPW?
   let planOk = true;
   if (tpw > 0) {
     const today = new Date();
     const ymStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-15`;
     try {
-      const url = `${API_BASE}/feeplans/active?clubId=${clubId}&tpw=${tpw}` + (sid ? `&seasonId=${sid}` : '') + `&on=${ymStr}`;
-      await apiGet(url); // ако 404 -> ще влезем в catch
+      const url = API(`FeePlans/active?clubId=${clubId}&tpw=${tpw}`) + (sid ? `&seasonId=${sid}` : '') + `&on=${ymStr}`;
+      await apiGet(url);
     } catch {
       planOk = false;
     }
   }
 
-  // 4) опитай реалната сметка
-  const fee = await apiGetOrNull(`${API_BASE}/athleteselections/monthly-fee?clubId=${clubId}&userId=${userId}`);
+  const fee = await apiGetOrNull(API(`AthleteSelections/monthly-fee?clubId=${clubId}&userId=${userId}`));
 
   if (fee) {
     const ym = fee.yearMonth ?? fee.YearMonth ?? 'текущ месец';
     const amount = Number(
-      fee.monthlyFee ?? fee.MonthlyFee ?? // <- връща API-то
+      fee.monthlyFee ?? fee.MonthlyFee ??
       fee.amountDue  ?? fee.AmountDue  ?? 0
     ).toFixed(2);
     const tpwR = fee.trainingsPerWeek ?? fee.TrainingsPerWeek ?? tpw;
@@ -331,20 +342,33 @@ async function refreshFee() {
 }
 
 /* ========= SAVE ========= */
+// NEW: общо „меко презареждане“ след запис
+async function refreshAllAfterSave() {
+  await loadSlots();
+  await loadMySelections();
+  renderGrid();
+  await refreshFee();
+}
+
 async function saveSelections() {
   if (!userId) return;
   const payload = { slotIds: Array.from(selectedSlotIds) };
   try {
     setMessage('Запис…');
-    await apiPut(`${API_BASE}/athleteselections/user/${userId}/replace`, payload);
+    await apiPut(API(`AthleteSelections/user/${userId}/replace`), payload);
     dirty = false;
     updateSummary();
-    await refreshFee();
+
+    // NEW: вместо да чакаш ръчен reload – правим меко презареждане
+    await refreshAllAfterSave();
+
     setMessage('Записано.');
     setTimeout(()=> setMessage(''), 1200);
   } catch (e) {
     console.error(e);
     setMessage('Грешка при запис.');
+    // по желание можем да „ресинхронизираме“
+    await refreshAllAfterSave();
   }
 }
 
@@ -380,7 +404,6 @@ function renderGrid() {
         btn.dataset.slotId = slot.id;
         if (selectedSlotIds.has(slot.id)) btn.classList.add('selected');
 
-        // съдържание + ред за капацитет/заети
         btn.innerHTML = `
           <div class="slot-title">${slot.groupName ? slot.groupName : 'Тренировка'}</div>
           <div class="slot-meta">
@@ -390,47 +413,51 @@ function renderGrid() {
           </div>
         `;
 
-        // tooltip
         btn.title = `${days[(slot.dayOfWeek-1)]} ${start}-${end}${slot.capacity ? ` • капацитет: ${slot.capacity}` : ''}`;
 
-        // клик: ако е пълен и НЕ е мой и НЕ е селектиран → блокирай; иначе allow toggle
+        // КЛИК: оптимистично обновяване (NEW)
         btn.addEventListener('click', async () => {
           const id = parseInt(btn.dataset.slotId,10);
-          const isSelected = selectedSlotIds.has(id);
+          const wasSelected = selectedSlotIds.has(id);
 
+          // вземи текущото инфо и работи оптимистично върху него
           const info = await getSlotInfo(id, slot.capacity);
-          const isFull = Number.isFinite(info.capacity) && info.count >= info.capacity;
 
-          if (!isSelected && isFull && !info.mine) {
-            return; // блокирай нов запис в чужд пълен слот
-          }
-
-          // toggle
-          if (isSelected) {
-            selectedSlotIds.delete(id);
-            btn.classList.remove('selected');
-          } else {
+          if (!wasSelected) {
+            // добавям нов избор
+            const isFull = Number.isFinite(info.capacity) && info.count >= info.capacity;
+            if (isFull && !info.mine) {
+              // чужд и пълен → блокираме
+              return;
+            }
             selectedSlotIds.add(id);
             btn.classList.add('selected');
+
+            // оптимистично вдигаме броя само ако преди не е бил „mine“
+            if (!info.mine) { info.count += 1; info.mine = true; }
+          } else {
+            // махам избор
+            selectedSlotIds.delete(id);
+            btn.classList.remove('selected');
+
+            // оптимистично сваляме броя само ако беше „mine“
+            if (info.mine && info.count > 0) { info.count -= 1; info.mine = false; }
           }
+
+          // визуален ъпдейт на брояча/класовете
+          updateSlotVisual(id, info);
+
           dirty = true;
           updateSummary();
         });
 
         cell.appendChild(btn);
 
-        // след рендър: вземи count + mine и маркирай Full (и mine)
+        // първоначален fetch за броячите
         (async ()=>{
           try{
             const info = await getSlotInfo(slot.id, slot.capacity);
-            const takenEl = gridEl.querySelector(`.taken[data-slot-id="${slot.id}"]`);
-            if (takenEl) takenEl.textContent = info.count;
-
-            if (Number.isFinite(info.capacity) && info.count >= info.capacity){
-              btn.classList.add('full');                 // визуално „пълен“
-              if (takenEl) takenEl.style.color = '#dc2626';
-              if (info.mine) btn.classList.add('mine');  // мой пълен слот (по желание стил)
-            }
+            updateSlotVisual(slot.id, info);
           }catch(_){}
         })();
       }
@@ -458,7 +485,6 @@ saveBtn.addEventListener('click', saveSelections);
     if (!payload) return;
     const { user, savedHash } = payload;
 
-    // валидирай хеша
     try {
       const currentHash = await hashUserData(user);
       if (currentHash !== savedHash) {
@@ -471,7 +497,6 @@ saveBtn.addEventListener('click', saveSelections);
       return;
     }
 
-    // Id-та остават само вътрешно
     userId = Number(user.id ?? user.Id ?? user.ID ?? 0) || null;
     clubId = Number(user.clubID ?? user.clubId ?? user.ClubID ?? user.ClubId ?? 0) || null;
     if (!userId || !clubId) {
@@ -479,7 +504,6 @@ saveBtn.addEventListener('click', saveSelections);
       return;
     }
 
-    // Етикети: имена вместо числа
     userLabelEl.textContent = resolveUserDisplayName(user);
     clubLabelEl.textContent = await resolveClubDisplayName(user, clubId);
 
