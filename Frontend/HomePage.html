@@ -4,45 +4,68 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HomePage</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Domine:wght@700&display=swap" rel="stylesheet" />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Domine:wght@700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Основен стил -->
   <link rel="stylesheet" href="HomePageStyles.css" />
+  <!-- Coach/Admin резултати -->
+  <link rel="stylesheet" href="HomePageCoachResults.css" />
 </head>
 <body>
   <div class="page">
+    <!-- =========================
+         Header
+         ========================= -->
     <header class="header">
       <div class="wrap">
         <div class="brand">
           <span class="logo" aria-label="Sport Stats">
-  <img src="LogoIconSS.png" alt="Sport Stats" />
-</span>
-
+            <img src="LogoIconSS.png" alt="Sport Stats" />
+          </span>
           <span class="brand-title">Sport Stats</span>
         </div>
 
-        <nav class="top-nav">
-  <a href="schedule.html" class="btn ghost" id="schedule-button">График</a>
-  <a href="Groups.html">Чат</a>
-  <a href="Settings.html">Настройки</a>
+        <nav class="top-nav" aria-label="Главна навигация">
+          <a href="Settings.html">Настройки</a>
+          <a href="schedule.html" id="schedule-button">График</a>
 
-  <div class="nav-actions">
-    <button id="coach-button" class="btn ghost hidden" onclick="redirectToCoacherPage()">Резултати</button>
-    <button id="status-button" class="btn ghost hidden">Заявки</button>
-    <button id="admin-button" class="btn ghost hidden">Админ</button>
-  </div>
-</nav>
-
+          <!-- Оставяме id="status-button", за да не се счупи JS логиката -->
+          <a
+            href="#"
+            id="status-button"
+            role="button"
+            onclick="event.preventDefault();"
+          >
+            Заявки
+          </a>
+        </nav>
       </div>
     </header>
 
+    <!-- =========================
+         Main Content
+         ========================= -->
     <main class="wrap main">
-      <!-- Профил -->
+      <!-- =========================
+           Профил
+           ========================= -->
       <section class="card card-profile info" aria-labelledby="profile-title">
         <div class="card-head">
           <h1 id="profile-title">Профил</h1>
         </div>
 
         <div class="profile profile-compact">
-          <img id="profile-picture" alt="Profile Picture" class="profile-image" src="https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg" />
+          <img
+            id="profile-picture"
+            alt="Profile Picture"
+            class="profile-image"
+            loading="lazy"
+            src="https://sportstats.blob.core.windows.net/$web/ProfilePhoto2.jpg"
+          />
 
           <div class="profile-meta">
             <div class="meta-row">
@@ -50,10 +73,12 @@
                 <span class="label">Име</span>
                 <span class="value" id="first-name">Няма данни</span>
               </div>
+
               <div class="meta-item">
                 <span class="label">Фамилия</span>
                 <span class="value" id="last-name">Няма данни</span>
               </div>
+
               <div class="meta-item">
                 <span class="label">Роден</span>
                 <span class="value" id="year-of-birth">Няма данни</span>
@@ -70,96 +95,404 @@
         </div>
       </section>
 
-      <!-- Резултати -->
+      <!-- =========================
+           Резултати
+           ========================= -->
       <section class="card card-results" aria-labelledby="results-title">
-        <div class="card-head">
+        <div class="card-head results-head-extended">
           <h2 id="results-title">Резултати</h2>
-          <form id="discipline-form" class="inline-form">
-            <label for="discipline" class="sr-only">Дисциплина</label>
-            <select id="discipline" name="discipline">
-              <option value="" disabled selected>Избери дисциплина…</option>
-            </select>
-          </form>
+
+          <div class="results-filters-row" role="group" aria-label="Филтри за резултати">
+            <form id="discipline-form" class="inline-form" autocomplete="off">
+              <label for="discipline" class="sr-only">Дисциплина</label>
+              <select id="discipline" name="discipline">
+                <option value="" disabled selected>Избери дисциплина…</option>
+              </select>
+            </form>
+
+            <!-- Филтър по атлет (само за треньор/админ) -->
+            <div id="coach-athlete-filter-wrap" class="inline-form hidden">
+              <label for="coach-athlete-filter" class="sr-only">Избери атлет</label>
+              <select id="coach-athlete-filter" name="coach-athlete-filter">
+                <option value="">Всички деца (таблица)</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div class="results-stack">
-          <!-- Диаграма в центъра -->
+        <!-- Legacy view (атлет / стар изглед) -->
+        <div id="results-legacy-stack" class="results-stack">
+          <!-- Диаграма -->
           <div class="chart-center">
             <div id="chart-container" class="chart">
               <canvas id="resultsChart"></canvas>
             </div>
           </div>
 
-          <!-- Хоризонтален ред под диаграмата -->
+          <!-- KPI + описание -->
           <div class="results-row">
-            <div id="kpis" class="kpis kpis-row">
-              <div class="kpi"><span class="kpi-label">Най-добър</span><p id="best-result" class="kpi-value">—</p></div>
-              <div class="kpi"><span class="kpi-label">Последен</span><p id="latest-result" class="kpi-value">—</p></div>
-              <div class="kpi"><span class="kpi-label">Разлика с норматив</span><p id="normative-difference" class="kpi-value">—</p></div>
-              <div class="kpi"><span class="kpi-label">Норматив</span><p id="normative-value" class="kpi-value">—</p></div>
+            <div id="kpis" class="kpis kpis-row" aria-label="Ключови показатели">
+              <div class="kpi">
+                <span class="kpi-label">Най-добър</span>
+                <p id="best-result" class="kpi-value">—</p>
+              </div>
+
+              <div class="kpi">
+                <span class="kpi-label">Последен</span>
+                <p id="latest-result" class="kpi-value">—</p>
+              </div>
+
+              <div class="kpi">
+                <span class="kpi-label">Разлика с норматив</span>
+                <p id="normative-difference" class="kpi-value">—</p>
+              </div>
+
+              <div class="kpi">
+                <span class="kpi-label">Норматив</span>
+                <p id="normative-value" class="kpi-value">—</p>
+              </div>
             </div>
 
             <figure class="caption-box">
-              <figcaption class="chart-caption" id="results-caption">
+              <figcaption class="chart-caption" id="results-caption" aria-live="polite">
                 Изберете дисциплина, за да видите тенденцията и ключовите показатели.
               </figcaption>
             </figure>
           </div>
         </div>
+
+        <!-- Coach/Admin panel -->
+        <div
+          id="coach-results-panel"
+          class="coach-results-panel hidden"
+          aria-label="Резултати за треньор и администратор"
+        >
+          <!-- View: Всички деца (таблица) -->
+          <div id="coach-overview-view" class="coach-view">
+            <div class="coach-toolbar">
+              <div class="coach-search-group">
+                <input
+                  id="coach-results-search"
+                  type="text"
+                  placeholder="Име Фамилия..."
+                  autocomplete="off"
+                />
+                <button id="coach-results-search-btn" type="button" class="coach-btn primary">
+                  Търсене
+                </button>
+              </div>
+
+              <div id="coach-overview-caption" class="coach-caption" role="status" aria-live="polite">
+                Избери дисциплина. Ако не е избран атлет — показва таблица с всички деца.
+              </div>
+
+              <!-- Бутони за coach/admin -->
+              <div class="coach-toolbar-actions">
+                <button
+                  id="coach-open-create-athlete-btn"
+                  type="button"
+                  class="coach-btn primary hidden"
+                  aria-expanded="false"
+                  aria-controls="coach-create-athlete-inline-panel"
+                >
+                  + Добави състезател
+                </button>
+
+                <button
+                  id="coach-open-access-codes-btn"
+                  type="button"
+                  class="coach-btn ghost hidden"
+                  aria-expanded="false"
+                  aria-controls="coach-access-codes-panel"
+                >
+                  Преглед на кодове за достъп
+                </button>
+              </div>
+            </div>
+
+            <!-- Inline форма за създаване на дете -->
+            <div
+              id="coach-create-athlete-inline-panel"
+              class="coach-create-inline-panel hidden"
+              aria-labelledby="coach-create-athlete-inline-title"
+            >
+              <div class="coach-create-inline-head">
+                <h4 id="coach-create-athlete-inline-title">Създай профил на дете</h4>
+                <button id="coach-close-create-athlete-btn" type="button" class="coach-btn ghost">
+                  Затвори
+                </button>
+              </div>
+
+              <form id="coach-create-athlete-form" class="coach-create-form" autocomplete="off">
+                <div class="coach-create-grid">
+                  <div class="coach-create-field">
+                    <label for="coach-athlete-first-name">Име</label>
+                    <input id="coach-athlete-first-name" type="text" placeholder="Име" required />
+                  </div>
+
+                  <div class="coach-create-field">
+                    <label for="coach-athlete-last-name">Фамилия</label>
+                    <input id="coach-athlete-last-name" type="text" placeholder="Фамилия" required />
+                  </div>
+
+                  <div class="coach-create-field">
+                    <label for="coach-athlete-year">Година на раждане</label>
+                    <input
+                      id="coach-athlete-year"
+                      type="number"
+                      placeholder="напр. 2012"
+                      min="1900"
+                      max="2100"
+                      required
+                    />
+                  </div>
+
+                  <div class="coach-create-field">
+                    <label for="coach-athlete-gender">Пол</label>
+                    <select id="coach-athlete-gender">
+                      <option value="M">Мъж</option>
+                      <option value="F">Жена</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="coach-create-actions">
+                  <button id="coach-create-athlete-btn" type="submit" class="coach-btn primary">
+                    Създай профил
+                  </button>
+                  <span
+                    id="coach-create-athlete-status"
+                    class="coach-create-status"
+                    aria-live="polite"
+                  ></span>
+                </div>
+              </form>
+
+              <div id="coach-create-athlete-result" class="coach-create-result">
+                <div class="coach-create-result-grid">
+                  <div><strong>Дете:</strong> <span id="created-athlete-name">—</span></div>
+                  <div><strong>Година:</strong> <span id="created-athlete-year">—</span></div>
+
+                  <div class="coach-code-row">
+                    <strong>Код за вход:</strong>
+                    <code id="created-athlete-code" class="coach-access-code">—</code>
+                    <button id="copy-created-athlete-code-btn" type="button" class="coach-btn ghost">
+                      Копирай
+                    </button>
+                  </div>
+
+                  <div class="coach-create-hint">
+                    Този код се използва за вход от екрана за login с код.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Панел за кодове за достъп -->
+            <div
+              id="coach-access-codes-panel"
+              class="coach-create-inline-panel coach-access-codes-panel hidden"
+              aria-labelledby="coach-access-codes-title"
+            >
+              <div class="coach-create-inline-head">
+                <h4 id="coach-access-codes-title">Кодове за достъп</h4>
+
+                <div class="coach-toolbar-actions">
+                  <button id="coach-refresh-access-codes-btn" type="button" class="coach-btn ghost">
+                    Обнови
+                  </button>
+                  <button id="coach-close-access-codes-btn" type="button" class="coach-btn ghost">
+                    Затвори
+                  </button>
+                </div>
+              </div>
+
+              <div
+                id="coach-access-codes-status"
+                class="coach-create-status"
+                role="status"
+                aria-live="polite"
+              >
+                Натисни „Преглед на кодове за достъп“, за да заредиш списъка.
+              </div>
+
+              <div class="coach-table-wrap">
+                <table
+                  id="coach-access-codes-table"
+                  class="coach-table"
+                  aria-label="Кодове за достъп на атлети"
+                >
+                  <thead>
+                    <tr>
+                      <th>Снимка</th>
+                      <th>Име Фамилия</th>
+                      <th>Година</th>
+                      <th>Код за достъп</th>
+                      <th>Копирай</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="5" class="coach-empty">
+                        Натисни „Преглед на кодове за достъп“.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="coach-table-wrap">
+              <table
+                id="coach-discipline-table"
+                class="coach-table"
+                aria-label="Резултати на всички деца по дисциплина"
+              >
+                <thead>
+                  <tr>
+                    <th>Име Фамилия</th>
+                    <th>Година на раждане</th>
+                    <th>Най-добър резултат</th>
+                    <th>Стари резултати</th>
+                    <th>+</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5" class="coach-empty">Избери дисциплина.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View: Конкретно дете (диаграма) -->
+          <div id="coach-athlete-view" class="coach-view hidden">
+            <div class="coach-athlete-header">
+              <div>
+                <h3 id="coach-athlete-title">Диаграма на атлет</h3>
+                <p id="coach-athlete-subtitle" class="coach-subtitle">
+                  Избери дете от падащото меню.
+                </p>
+              </div>
+
+              <button id="coach-details-btn" type="button" class="coach-btn ghost hidden">
+                Подробна информация
+              </button>
+            </div>
+
+            <div class="coach-chart-card">
+              <div class="coach-chart-wrap">
+                <canvas id="coachAthleteChart"></canvas>
+              </div>
+
+              <div id="coach-athlete-summary" class="coach-summary" role="status" aria-live="polite">
+                Няма избрани данни.
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- Таблици -->
-      <section class="grid">
+      <!-- =========================
+           Таблици (долен ред)
+           ========================= -->
+      <section class="grid" aria-label="Обобщени таблици">
         <div class="card">
-          <div class="card-head"><h3>Най-добри в клуба</h3></div>
-          <table id="users-table" class="table" role="table" aria-label="Най-добри резултати в клуба">
-            <thead>
-              <tr>
-                <th>Име</th>
-                <th>Година</th>
-                <th>Най-добър резултат</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <div class="card-head">
+            <h3>Най-добри в клуба</h3>
+          </div>
+
+          <div class="table-panel">
+            <table
+              id="users-table"
+              class="table"
+              role="table"
+              aria-label="Най-добри резултати в клуба"
+            >
+              <thead>
+                <tr>
+                  <th>Име</th>
+                  <th>Година</th>
+                  <th>Най-добър резултат</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
 
         <div class="card">
-          <div class="card-head"><h3>Клубове с най-добро време</h3></div>
-          <table id="best-club-table" class="table" role="table" aria-label="Клубове с най-добро време">
-            <thead>
-              <tr>
-                <th>Група</th>
-                <th>Клуб</th>
-                <th>Най-добро време</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div id="hover-info" class="hover-info" style="display:none;"></div>
+          <div class="card-head">
+            <h3>Клубове с най-добро време</h3>
+          </div>
+
+          <div class="table-panel">
+            <table
+              id="best-club-table"
+              class="table"
+              role="table"
+              aria-label="Клубове с най-добро време"
+            >
+              <thead>
+                <tr>
+                  <th>Група</th>
+                  <th>Клуб</th>
+                  <th>Най-добро време</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div id="hover-info" class="hover-info hidden" aria-live="polite"></div>
         </div>
       </section>
 
-      <!-- Смяна на клуб -->
+      <!-- =========================
+           Смяна на клуб
+           ========================= -->
       <section id="change-club-section" class="card hidden" aria-labelledby="change-club-title">
-        <div class="card-head"><h3 id="change-club-title">Смени клуба</h3></div>
+        <div class="card-head">
+          <h3 id="change-club-title">Смени клуба</h3>
+        </div>
+
         <div class="form-row">
           <label for="club-select" class="sr-only">Изберете клуб</label>
           <select id="club-select">
             <option value="" disabled selected>Изберете клуб</option>
           </select>
-          <button id="change-club-button" class="btn primary">Промени</button>
+
+          <button id="change-club-button" type="button" class="btn primary">
+            Промени
+          </button>
         </div>
       </section>
     </main>
 
+    <!-- =========================
+         Footer
+         ========================= -->
     <footer class="footer wrap">
       <small>© Sport Stats</small>
     </footer>
   </div>
 
+  <!-- API base (важно при Live Server / друг origin) -->
+  <script>
+    window.SPORTSTATS_API_BASE = "https://sportstatsapi.azurewebsites.net/api/Users";
+  </script>
+
+  <!-- Само един Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/chart.js@3.9.1/dist/chart.min.js"></script>
+
+  <!-- Основен JS -->
   <script src="HomePageScript.js"></script>
+
+  <!-- Coach/Admin модул -->
+  <script src="HomePageCoachResults.js"></script>
+
+  <!-- Coach create athlete модул -->
+  <script src="HomePageCoachCreateAthlete.js"></script>
 </body>
 </html>

@@ -1,161 +1,277 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogInPage</title>
-    <link rel="stylesheet" href="Index_Style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="button-53.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sport Stats • Вход</title>
+
+  <link rel="stylesheet" href="Index_Style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-    <div class="container">
-        <div class="left-side">
-            <img src="https://sportstats.blob.core.windows.net/$web/SwimImg.jpg" 
-                 alt="Swimming" 
-                 class="form-image left">
+  <!-- Video background (slideshow) -->
+  <div class="bgVideo" aria-hidden="true">
+    <video class="bgVideo__vid is-active" id="bgVidA" muted playsinline preload="metadata"></video>
+    <video class="bgVideo__vid" id="bgVidB" muted playsinline preload="metadata"></video>
+    <div class="bgVideo__scrim"></div>
+  </div>
+
+  <!-- Soft light background (blobs/noise) -->
+  <div class="bg" aria-hidden="true">
+    <div class="bg__blob bg__blob--a"></div>
+    <div class="bg__blob bg__blob--b"></div>
+    <div class="bg__noise"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true">
+    <div class="toast__icon" id="toastIcon"></div>
+    <div class="toast__text">
+      <div class="toast__title" id="toastTitle"></div>
+      <div class="toast__msg" id="toastMsg"></div>
+    </div>
+    <button class="toast__close" id="toastClose" type="button" aria-label="Затвори">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <main class="shell">
+    <section class="card" aria-label="Вход / Регистрация">
+      <header class="card__header">
+        <div class="brand">
+          <div class="brand__mark">
+            <i class="fa-solid fa-dumbbell"></i>
+          </div>
+          <div class="brand__txt">
+            <div class="brand__name">Sport Stats</div>
+            <div class="brand__hint">Вход и регистрация</div>
+          </div>
         </div>
-        
-        <div class="middle-side">
-            <div class="content">
-                <img src="https://sportstats.blob.core.windows.net/$web/SportStats.png" 
-                     alt="Sport Stats Logo" 
-                     width="625" 
-                     height="240">
-                
-                <h1>Welcome to<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sports Stats</h1>
-                
-                <div class="tabs">
-                    <button class="button-53 tab-button active" data-tab="login">Вход</button>
-                    <button class="button-53 tab-button" data-tab="registration">Регистрация</button>
-                </div>
 
-                <div id="message-box" class="message-box">
-                    <p id="message-text"></p>
-                </div>
-                
-                
-                <form id="registration-form" class="form tab-content" novalidate>
-                    <div class="form-group">
-                        <input type="text" 
-                               id="firstName" 
-                               name="firstName" 
-                               required>
-                        <label for="firstName" class="required-label">Име</label>
-                        <span class="error-message" id="firstName-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" 
-                               id="lastName" 
-                               name="lastName" 
-                               required>
-                        <label for="lastName" class="required-label">Фамилия</label>
-                        <span class="error-message" id="lastName-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" 
-                               id="email" 
-                               name="email" 
-                               required>
-                        <label for="email" class="required-label">Имейл</label>
-                        <span class="error-message" id="email-error"></span>
-                        <div class="hint-message" id="email-hint">
-                            Валиден имейл формат (напр. user@example.com).
-                        </div>
-                    </div>
-                    <div class="form-group">
-    <input type="password" 
-           id="password" 
-           name="password" 
-           required 
-           minlength="6">
-    <label for="password" class="required-label">Парола</label>
-    <span class="error-message" id="password-error"></span>
-    <div class="hint-message" id="password-hint">
-        Поне 8 символа, 1 главна буква и 1 цифра.
-    </div>
-    <i class="fa-solid fa-eye toggle-password" data-target="password"></i>
-</div>
+        <div class="segmented" role="tablist" aria-label="Избор">
+          <button class="segmented__btn is-active" id="tabLogin" type="button" role="tab" aria-selected="true">
+            Вход
+          </button>
+          <button class="segmented__btn" id="tabRegister" type="button" role="tab" aria-selected="false">
+            Регистрация
+          </button>
+          <span class="segmented__pill" id="segPill" aria-hidden="true"></span>
+        </div>
+      </header>
 
-
-                    <div class="form-group">
-                        <select id="yearOfBirth" name="yearOfBirth" required>
-                            <option value="" disabled selected></option>
-                            <!-- Опциите ще се генерират динамично с JavaScript -->
-                        </select>
-                        <label for="yearOfBirth" class="required-label">Година на раждане</label>
-                        <span id="yearOfBirth-error" class="error-message"></span>
-                    </div>
-                    <div class="form-group">
-                        <select id="gender" 
-                                name="gender" 
-                                required>
-                            <option value="" disabled selected></option>
-                            <option value="male">Мъж</option>
-                            <option value="female">Жена</option>
-                        </select>
-                        <label for="gender" class="required-label">Пол</label>
-                        <span class="error-message" id="gender-error"></span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <select id="club" 
-                                name="club" 
-                                required>
-                            <option value="" disabled selected></option>
-                        </select>
-                        <label for="club" class="required-label">Отбор</label>
-                        <span class="error-message" id="club-error"></span>
-                    </div>
-                    
-                    <button type="submit" 
-                            class="button-53 button-53-red">Регистрация</button>
-                </form>
-                
-                <form id="login-form" class="form tab-content active" novalidate>
-                    <div class="form-group">
-                        <input type="email"  
-                               id="login-email" 
-                               name="login-email" 
-                               required>
-                        <label for="login-email" class="required-label">Email</label>
-                        <span class="error-message" id="login-email-error"></span>
-                        <div class="hint-message" id="login-email-hint">
-                            Изисква валиден имейл формат.
-                        </div>
-                    </div>
-         <div class="form-group">
-    <input type="password" 
-           id="login-password" 
-           name="login-password" 
-           required>
-    <label for="login-password" class="required-label">Password</label>
-    <span class="error-message" id="login-password-error"></span>
-    <div class="hint-message" id="login-password-hint">
-        Поне 8 символа, 1 главна буква и 1 цифра.
-    </div>
-    <i class="fa-solid fa-eye toggle-password" data-target="login-password"></i>
-</div>
-
-                    <button type="submit" 
-                            class="button-53 button-53-orange">Login</button>
-                </form>
+      <!-- LOGIN -->
+      <section class="panel is-active" id="panelLogin" role="tabpanel" aria-labelledby="tabLogin">
+        <form id="login-form" class="form" novalidate>
+          <div class="field">
+            <label class="field__label" for="login-email">Имейл</label>
+            <div class="field__control glass">
+              <i class="fa-solid fa-envelope field__icon"></i>
+              <input class="field__input" id="login-email" name="login-email" type="email"
+                     autocomplete="email" placeholder="name@example.com" required>
             </div>
-        </div>
-        
-        <div class="right-side">
-            <img src="https://sportstats.blob.core.windows.net/$web/Bqgane2.png" 
-                 alt="Athletics" 
-                 class="form-image right">
-        </div>
-    </div>
+            <div class="field__meta">
+              <span class="field__help">Валиден имейл формат.</span>
+              <span class="field__error" id="login-email-error"></span>
+            </div>
+          </div>
 
-    <script src="Index-script.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+          <div class="field">
+            <label class="field__label" for="login-password">Парола</label>
+            <div class="field__control glass">
+              <i class="fa-solid fa-lock field__icon"></i>
+              <input class="field__input" id="login-password" name="login-password" type="password"
+                     autocomplete="current-password" placeholder="••••••••" required>
+              <button class="field__trail" type="button" data-toggle="login-password" aria-label="Покажи/скрий">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div class="field__meta">
+              <span class="field__help">Въведи паролата си.</span>
+              <span class="field__error" id="login-password-error"></span>
+            </div>
+          </div>
+
+          <button class="btn btn--primary" id="loginBtn" type="submit">
+            <span class="btn__txt">Влез</span>
+            <span class="btn__spin" aria-hidden="true"></span>
+          </button>
+
+          <div class="divider"><span>или</span></div>
+
+          <details class="accordion glass" id="codeAccordion">
+            <summary class="accordion__sum">
+              <span class="accordion__left">
+                <i class="fa-solid fa-key"></i>
+                Влез чрез код
+              </span>
+              <i class="fa-solid fa-chevron-down accordion__chev"></i>
+            </summary>
+
+            <div class="accordion__body">
+              <div class="field">
+                <label class="field__label" for="login-code">Код</label>
+                <div class="field__control glass">
+                  <i class="fa-solid fa-key field__icon"></i>
+                  <input class="field__input" id="login-code" name="login-code" type="text"
+                         autocomplete="one-time-code" placeholder="Напр. ABCD234567">
+                </div>
+                <div class="field__meta">
+                  <span class="field__help">Въведи Access Code или SWRID. Пробвам и двата.</span>
+                  <span class="field__error" id="login-code-error"></span>
+                </div>
+              </div>
+
+              <button class="btn btn--secondary" id="loginCodeBtn" type="button">
+                <span class="btn__txt">Влез чрез код</span>
+                <span class="btn__spin" aria-hidden="true"></span>
+              </button>
+            </div>
+          </details>
+        </form>
+      </section>
+
+      <!-- REGISTER -->
+      <section class="panel" id="panelRegister" role="tabpanel" aria-labelledby="tabRegister">
+        <form id="registration-form" class="form" novalidate>
+          <div class="grid2">
+            <div class="field">
+              <label class="field__label" for="firstName">Име</label>
+              <div class="field__control glass">
+                <i class="fa-solid fa-user field__icon"></i>
+                <input class="field__input" id="firstName" name="firstName" type="text" placeholder="Иван" required>
+              </div>
+              <div class="field__meta">
+                <span class="field__help">Само букви.</span>
+                <span class="field__error" id="firstName-error"></span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="lastName">Фамилия</label>
+              <div class="field__control glass">
+                <i class="fa-solid fa-user field__icon"></i>
+                <input class="field__input" id="lastName" name="lastName" type="text" placeholder="Иванов" required>
+              </div>
+              <div class="field__meta">
+                <span class="field__help">Само букви.</span>
+                <span class="field__error" id="lastName-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label class="field__label" for="yearOfBirth">Година на раждане</label>
+              <div class="field__control glass">
+                <i class="fa-solid fa-calendar field__icon"></i>
+                <select class="field__input field__select" id="yearOfBirth" name="yearOfBirth" required>
+                  <option value="" selected disabled>Избери</option>
+                </select>
+              </div>
+              <div class="field__meta">
+                <span class="field__help">Избери година.</span>
+                <span class="field__error" id="yearOfBirth-error"></span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="gender">Пол</label>
+              <div class="field__control glass">
+                <i class="fa-solid fa-venus-mars field__icon"></i>
+                <select class="field__input field__select" id="gender" name="gender" required>
+                  <option value="" selected disabled>Избери</option>
+                  <option value="male">Мъж</option>
+                  <option value="female">Жена</option>
+                </select>
+              </div>
+              <div class="field__meta">
+                <span class="field__help">Задължително.</span>
+                <span class="field__error" id="gender-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="club">Отбор</label>
+            <div class="field__control glass">
+              <i class="fa-solid fa-people-group field__icon"></i>
+              <select class="field__input field__select" id="club" name="club" required>
+                <option value="" selected disabled>Избери</option>
+              </select>
+            </div>
+            <div class="field__meta">
+              <span class="field__help">Избери клуб.</span>
+              <span class="field__error" id="club-error"></span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="email">Имейл</label>
+            <div class="field__control glass">
+              <i class="fa-solid fa-envelope field__icon"></i>
+              <input class="field__input" id="email" name="email" type="email" autocomplete="email"
+                     placeholder="name@example.com" required>
+            </div>
+            <div class="field__meta">
+              <span class="field__help">Ще проверя дали е зает.</span>
+              <span class="field__error" id="email-error"></span>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label class="field__label" for="password">Парола</label>
+              <div class="field__control glass">
+                <i class="fa-solid fa-lock field__icon"></i>
+                <input class="field__input" id="password" name="password" type="password" autocomplete="new-password"
+                       placeholder="••••••••" required minlength="8">
+                <button class="field__trail" type="button" data-toggle="password" aria-label="Покажи/скрий">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <div class="field__meta">
+                <span class="field__help">8+ символа, 1 главна и 1 цифра.</span>
+                <span class="field__error" id="password-error"></span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="confirmPassword">Потвърди парола</label>
+              <div class="field__control glass">
+                <i class="fa-solid fa-lock field__icon"></i>
+                <input class="field__input" id="confirmPassword" name="confirmPassword" type="password"
+                       autocomplete="new-password" placeholder="••••••••" required minlength="8">
+                <button class="field__trail" type="button" data-toggle="confirmPassword" aria-label="Покажи/скрий">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <div class="field__meta">
+                <span class="field__help">Трябва да съвпада.</span>
+                <span class="field__error" id="confirmPassword-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn--primary" id="registerBtn" type="submit">
+            <span class="btn__txt">Регистрация</span>
+            <span class="btn__spin" aria-hidden="true"></span>
+          </button>
+
+          <div class="note">
+            Регистрацията може да изисква одобрение според правилата ти.
+          </div>
+        </form>
+      </section>
+
+      <footer class="card__footer">
+        <span class="footer__muted">© Sport Stats</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="Index-script.js"></script>
 </body>
 </html>

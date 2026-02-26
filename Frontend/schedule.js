@@ -36,40 +36,112 @@ function pick(obj, keys, def = '') {
   return def;
 }
 
-async function hashUserData(user) {
-  const data = [
-    pick(user, ['firstName','FirstName']),
-    pick(user, ['lastName','LastName']),
-    pick(user, ['email','Email']),
-    pick(user, ['gender','Gender']),
-    pick(user, ['roleID','roleId','RoleID','RoleId']),
-    pick(user, ['clubID','clubId','ClubID','ClubId']),
-    pick(user, ['profileImage_url','profileImageUrl','ProfileImage_url','ProfileImageUrl']),
-    pick(user, ['id','Id','ID']),
-    pick(user, ['yearOfBirth','YearOfBirth']),
-    pick(user, ['statusID','statusId','StatusID','StatusId']),
-  ].join('');
+/* ========= HASH (СЪЩИЯ КАТО INDEX/BACKEND) ========= */
 
-  if (!window.crypto || !window.crypto.subtle) {
+function safeParseJson(str) {
+  try { return JSON.parse(str); } catch { return null; }
+}
+
+function pickHash(obj, ...keys) {
+  for (const k of keys) {
+    if (obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
+  }
+  return undefined;
+}
+
+function toIntHash(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.trunc(n) : 0;
+}
+
+// Canonical session object like backend UserSession
+function normalizeSessionLikeBackend(raw) {
+  if (!raw) return null;
+
+  const id = toIntHash(pickHash(raw, 'id', 'Id', 'ID'));
+  if (!id) return null;
+
+  return {
+    Id: id,
+    FirstName: String(pickHash(raw, 'firstName', 'FirstName') ?? '').trim(),
+    LastName: String(pickHash(raw, 'lastName', 'LastName') ?? '').trim(),
+    Email: String(pickHash(raw, 'email', 'Email') ?? '').trim(),
+    Gender: String(pickHash(raw, 'gender', 'Gender') ?? '').trim(),
+    RoleID: toIntHash(pickHash(raw, 'roleID', 'RoleID', 'roleId', 'RoleId')),
+    ClubID: toIntHash(pickHash(raw, 'clubID', 'ClubID', 'clubId', 'ClubId')),
+    profileImage_url: String(
+      pickHash(raw, 'profileImage_url', 'ProfileImage_url', 'profileImageUrl', 'ProfileImageUrl') ?? ''
+    ).trim(),
+    YearOfBirth: toIntHash(pickHash(raw, 'yearOfBirth', 'YearOfBirth')),
+    StatusID: toIntHash(pickHash(raw, 'statusID', 'StatusID', 'statusId', 'StatusId')),
+    UserTokenHash: String(pickHash(raw, 'userTokenHash', 'UserTokenHash') ?? '').trim()
+  };
+}
+
+// Exactly like backend GetCanonicalPayload()
+function getCanonicalPayloadLikeBackend(s) {
+  if (!s) return '';
+
+  return [
+    String(toIntHash(s.Id)),
+    String(s.FirstName ?? '').trim(),
+    String(s.LastName ?? '').trim(),
+    String(s.Email ?? '').trim(),
+    String(s.Gender ?? '').trim(),
+    String(toIntHash(s.RoleID)),
+    String(toIntHash(s.ClubID)),
+    String(s.profileImage_url ?? '').trim(),
+    String(toIntHash(s.YearOfBirth)),
+    String(toIntHash(s.StatusID))
+  ].join('|');
+}
+
+async function sha256Base64Utf8(text) {
+  if (!(window.crypto && window.crypto.subtle)) {
     throw new Error('Crypto Subtle API изисква HTTPS (secure context).');
   }
-  const encoder = new TextEncoder();
-  const buffer  = await crypto.subtle.digest('SHA-256', encoder.encode(data));
-  return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const bytes = new Uint8Array(hashBuffer);
+
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+async function hashUserDataLikeIndex(raw) {
+  const s = normalizeSessionLikeBackend(raw);
+  if (!s) return '';
+  const payload = getCanonicalPayloadLikeBackend(s);
+  return sha256Base64Utf8(payload);
 }
 
 function readUserFromLocalStorage() {
-  const userJson  = localStorage.getItem('user');
-  const savedHash = localStorage.getItem('userHash');
+  const savedHash = String(localStorage.getItem('userHash') || '').trim();
 
-  if (!userJson || !savedHash) {
-    redirectToIndex('Невалидни данни. Пренасочване към началната страница.');
+  // Index записва обикновено и трите
+  const user       = safeParseJson(localStorage.getItem('user'));
+  const userServer = safeParseJson(localStorage.getItem('userServer'));
+  const session    = safeParseJson(localStorage.getItem('session'));
+
+  if (!savedHash) {
+    redirectToIndex('Липсва userHash. Пренасочване към началната страница.');
     return null;
   }
-  let parsed;
-  try { parsed = JSON.parse(userJson); }
-  catch { redirectToIndex('Повредени данни за потребител. Пренасочване...'); return null; }
-  return { user: parsed, savedHash };
+
+  // За hash проверка ползваме най-каноничния източник
+  const sourceForHash = session || userServer || user;
+
+  // За UI/ид-та ползваме user (snake/camel), fallback ако липсва
+  const userForApp = user || userServer || session;
+
+  if (!sourceForHash || !userForApp) {
+    redirectToIndex('Невалидни данни за потребител. Пренасочване...');
+    return null;
+  }
+
+  return { user: userForApp, sourceForHash, savedHash };
 }
 
 /* ========= STATE ========= */
@@ -483,11 +555,22 @@ saveBtn.addEventListener('click', saveSelections);
   try {
     const payload = readUserFromLocalStorage();
     if (!payload) return;
-    const { user, savedHash } = payload;
+
+    const { user, sourceForHash, savedHash } = payload;
 
     try {
-      const currentHash = await hashUserData(user);
-      if (currentHash !== savedHash) {
+      const currentHash = await hashUserDataLikeIndex(sourceForHash);
+
+      if (!currentHash || currentHash !== savedHash) {
+        console.warn('HASH MISMATCH', {
+          savedHash,
+          currentHash,
+          sourceForHash,
+          canonicalPayload: normalizeSessionLikeBackend(sourceForHash)
+            ? getCanonicalPayloadLikeBackend(normalizeSessionLikeBackend(sourceForHash))
+            : null
+        });
+
         redirectToIndex('Не бъди злонамерен <3');
         return;
       }
@@ -499,6 +582,7 @@ saveBtn.addEventListener('click', saveSelections);
 
     userId = Number(user.id ?? user.Id ?? user.ID ?? 0) || null;
     clubId = Number(user.clubID ?? user.clubId ?? user.ClubID ?? user.ClubId ?? 0) || null;
+
     if (!userId || !clubId) {
       redirectToIndex('Липсват userId/clubId. Пренасочване...');
       return;

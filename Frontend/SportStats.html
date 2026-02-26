@@ -1,263 +1,512 @@
 <!DOCTYPE html>
-<html lang="bg">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        <!-- SEO Meta Tags -->
-        <meta name="description" content="Sport Stats - Твоят личен спортен анализатор. Следете, записвайте и анализирайте спортните си постижения в реално време.">
-        <meta name="keywords" content="Sport Stats, спортна статистика, анализ на резултати, спортен анализ, тренировки, резултати, спорт">
-        <meta name="author" content="Sport Stats Team">
-        <meta name="robots" content="index, follow">
-        
-        <!-- Open Graph Meta Tags (за Facebook, LinkedIn и др.) -->
-        <meta property="og:title" content="Sport Stats - Личен спортен анализатор">
-        <meta property="og:description" content="Следете и анализирайте спортните си постижения в реално време. Лесен достъп и професионален анализ за треньори и спортисти.">
-        <meta property="og:image" content="https://sportstatsbg.com/LogoIconSS.png">
-        <meta property="og:url" content="https://sportstatsbg.com">
-        <meta property="og:type" content="website">
-        
-        <!-- Twitter Meta Tags -->
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="Sport Stats - Личен спортен анализатор">
-        <meta name="twitter:description" content="Следете спортните си постижения в реално време с Sport Stats. Лесен достъп и анализ за всички спортисти и треньори.">
-        <meta name="twitter:image" content="https://sportstatsbg.com/LogoIconSS.png">
-        <title>Sport Stats</title>
-        <link rel="stylesheet" href="SportStatsCss.css">
-        <script src="SportStatsJs.js"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Jura:wght@700&family=Domine:wght@700&display=swap" rel="stylesheet">    
-      <!-- Favicon и Apple иконка -->
-<link rel="icon" type="image/jpeg" href="LogoIconSS.png">
-<link rel="apple-touch-icon" href="LogoIconSS.png">
+<html lang="bg" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="SportStats — следи и анализирай резултати в реално време. Графики, нормативи, клубове и състезатели, сигурно съхранение в облака."/>
+  <title>SportStats — Real-time резултати и анализ</title>
 
-<!-- Структурирани данни (JSON-LD) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Sport Stats",
-  "url": "https://www.sportstatsbg.com",
-  "logo": "https://www.sportstatsbg.com/LogoIconSS.png"
-}
-</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <link rel="stylesheet" href="SportStatsCss.css"/>
+</head>
 
-    </head>
-    
 <body>
+  <!-- FIXED BG -->
+  <div class="bg-noise" aria-hidden="true"></div>
 
-    <div class="header">
-        <div class="header-logo">
-          <img src="Logo.jpg" alt="Sport Stats Logo">
-          Sport Stats
-        </div>
-      
-        <!-- Централна част с въртящи се лога 
-        <div class="sponsor-strip-wrapper">
-          <div class="sponsor-strip">
-            <img src="Decaton.png" alt="Бранд 1" class="sponsor-logo" />
-            <img src="GymBeam.webp" alt="Бранд 2" class="sponsor-logo" />
-            <img src="IcedOuut.webp" alt="Бранд 3" class="sponsor-logo" />
-            <img src="Арена2.jpg" alt="Бранд 4" class="sponsor-logo" />
-            <img src="Proof.png" alt="Бранд 5" class="sponsor-logo" />
+  <!-- NAV -->
+  <header class="nav-wrap">
+    <nav class="nav" aria-label="Основна навигация">
+      <a class="brand" href="#top" aria-label="SportStats начало">
+        <span class="brand__mark" aria-hidden="true">S</span>
+        <span class="brand__text">SportStats</span>
+        <span class="brand__tag">Real-time анализ</span>
+      </a>
 
-            <img src="Decaton.png" alt="Бранд 1" class="sponsor-logo" />
-            <img src="GymBeam.webp" alt="Бранд 2" class="sponsor-logo" />
-            <img src="IcedOuut.webp" alt="Бранд 3" class="sponsor-logo" />
-            <img src="Арена2.jpg" alt="Бранд 4" class="sponsor-logo" />
-            <img src="Proof.png" alt="Бранд 5" class="sponsor-logo" />
+      <div class="nav__links" role="navigation" aria-label="Меню">
+        <a class="nav__link" href="#features">Функции</a>
+
+        <div class="nav__dropdown" data-dropdown>
+          <button class="nav__link nav__link--btn" type="button" aria-haspopup="true" aria-expanded="false">
+            Решения
+            <span class="chev" aria-hidden="true">▾</span>
+          </button>
+          <div class="nav__menu" role="menu">
+            <a class="nav__menuItem" role="menuitem" href="#clubs">За клубове</a>
+            <a class="nav__menuItem" role="menuitem" href="#athletes">За състезатели</a>
+            <a class="nav__menuItem" role="menuitem" href="#coaches">За треньори</a>
           </div>
         </div>
-        -->
-      
-        <div class="header-buttons">
-          <a href="Index.html?form=login"><button class="button login">Вход</button></a>
-          <a href="Index.html?form=signup"><button class="button signup">Регист.</button></a>
+
+        <a class="nav__link" href="#how">Как работи</a>
+        <a class="nav__link" href="#pricing">Цени</a>
+        <a class="nav__link" href="#faq">FAQ</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="iconBtn" id="themeToggle" type="button" aria-label="Смени тема">
+          <span class="iconBtn__dot" aria-hidden="true"></span>
+        </button>
+
+        <a class="btn btn--ghost" href="#pricing">Виж планове</a>
+        <a class="btn btn--primary" href="#get-started">Започни сега</a>
+
+        <button class="burger" id="burger" type="button" aria-label="Отвори меню" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- MOBILE DRAWER -->
+    <div class="drawer" id="drawer" aria-hidden="true">
+      <div class="drawer__panel">
+        <div class="drawer__top">
+          <div class="drawer__brand">
+            <span class="brand__mark" aria-hidden="true">S</span>
+            <div>
+              <div class="drawer__title">SportStats</div>
+              <div class="drawer__sub">Real-time анализ</div>
+            </div>
+          </div>
+          <button class="iconBtn" id="drawerClose" type="button" aria-label="Затвори меню">
+            ✕
+          </button>
+        </div>
+
+        <div class="drawer__links">
+          <a href="#features" class="drawer__link">Функции</a>
+          <a href="#clubs" class="drawer__link">За клубове</a>
+          <a href="#athletes" class="drawer__link">За състезатели</a>
+          <a href="#coaches" class="drawer__link">За треньори</a>
+          <a href="#how" class="drawer__link">Как работи</a>
+          <a href="#pricing" class="drawer__link">Цени</a>
+          <a href="#faq" class="drawer__link">FAQ</a>
+        </div>
+
+        <div class="drawer__cta">
+          <a class="btn btn--primary btn--block" href="#get-started">Започни сега</a>
+          <a class="btn btn--ghost btn--block" href="#pricing">Виж планове</a>
         </div>
       </div>
-      
+      <div class="drawer__backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+    </div>
+  </header>
 
-    <!-- Hero Section -->
-    <div class="hero">
-        <div class="hero-title">Sport Stats</div>
-        <div class="hero-subtitle">Твоят личен спортен анализатор</div>
-        <a href="javascript:void(0)" onclick="scrollToContact()">
-            <button class="hero-button">Започни сега</button>
-        </a>
-    </div>
+  <main id="top">
+    <!-- HERO (90vh) -->
+    <section class="hero" aria-label="Hero">
+      <!-- VIDEO LAYERS -->
+      <div class="hero__media" aria-hidden="true">
+        <video class="heroVideo heroVideo--a" id="heroVideoA" muted autoplay playsinline preload="auto"></video>
+        <video class="heroVideo heroVideo--b" id="heroVideoB" muted autoplay playsinline preload="auto"></video>
 
-    <!-- Features Section -->
-    <div class="cards-container">
-        <div class="card">
-            <img src="real-time.png" alt="Икона">
-            <div class="card-title">Реално време</div>
-            <div class="card-text">Проследявайте резултатите мигновено и с лекота, без да губите време.</div>
-        </div>
-        <div class="card">
-            <img src="data-chart.png" alt="Икона">
-            <div class="card-title">Анализ с диаграми</div>
-            <div class="card-text">Проследявайте развитието с лекота. Всичко е в джобът ви.</div>
-        </div>
-        <div class="card">
-            <img src="data-storage.png" alt="Икона">
-            <div class="card-title">Достъп навсякъде</div>
-            <div class="card-text">Вашите данни са винаги с вас — съхранени в облака, сигурни и достъпни по всяко време.</div>
-        </div>
-    </div>
-    <!-- Success Path Section -->
-    <div class="success-path">
-        <div class="success-title">Пътят към успеха</div>
-        <div class="success-steps">
-            <div class="step step-left">Анализирай</div>
-            <div class="step step-center">Подобрявай</div>
-            <div class="step step-right">Побеждавай</div>
-        </div>
-    </div>
-    <!-- Info Section -->
-    <div class="info-section">
-        <h2 class="info-title">Sport Stats</h2>
-        <p class="info-text">
-            Революционно приложение, което променя начина, по който се следят, записват и анализират резултати. 
-            С него можете в реално време да виждате постиженията на състезателите си и автоматично да ги сравнявате с нормативите. 
-            Приложението не само показва разликата, но и ви помага да проследите напредъка им по начин, който е лесен за разбиране. 
-            Вече няма нужда да носите тетрадки – всичко е в джоба ви, готово за мигновено използване.
-        </p>
-        <p class="info-text">
-            Треньорите могат лесно да въвеждат времената на състезателите. Те имат възможността да проследяват 
-            най-добрите постижения на своите състезатели и да видят точно колко остава, за да покрият нормативите 
-            за участие в ДЛОП. Това прави процеса не само по-ефективен, но и много по-мотивиращ за всички.
-        </p>
-    </div>
-    <!-- Sponsors Section 
-<div class="main-sponsors-section">
-    <h3 class="main-sponsors-title">Благодарение на </h3>
-    <div class="main-sponsor-strip-wrapper">
-        <div class="main-sponsor-strip">
-            <img src="Decaton.png" alt="Бранд 1" class="main-sponsor-logo" />
-            <img src="GymBeam.webp" alt="Бранд 2" class="main-sponsor-logo" />
-            <img src="IcedOuut.webp" alt="Бранд 3" class="main-sponsor-logo" />
-            <img src="Арена2.jpg" alt="Бранд 4" class="main-sponsor-logo" />
-            <img src="Proof.png" alt="Бранд 5" class="main-sponsor-logo" />
-            -->
-            <!-- Повторения за безкраен скрол 
-            <img src="Decaton.png" alt="Бранд 1" class="main-sponsor-logo" />
-            <img src="GymBeam.webp" alt="Бранд 2" class="main-sponsor-logo" />
-            <img src="IcedOuut.webp" alt="Бранд 3" class="main-sponsor-logo" />
-            <img src="Арена2.jpg" alt="Бранд 4" class="main-sponsor-logo" />
-            <img src="Proof.png" alt="Бранд 5" class="main-sponsor-logo" />
-        </div>
-    </div>
-    <div class="sponsor-scroll-btn-wrapper">
-        <a href="#sponsor-cards" class="sponsor-button">Още информация</a>
-    </div>    
-</div>
--->
+        <div class="hero__scrim" aria-hidden="true"></div>
+        <div class="hero__glow" aria-hidden="true"></div>
+        <div class="hero__grid" aria-hidden="true"></div>
+      </div>
 
-        <!-- Contact Us Section -->
-        <div class="contact-us" id="contact-us">
-    <div class="contact-title">Ако си Клуб, който иска да се развива - свържи се с нас  </div>
-    <p class="contact-text">
-        Имейл за връзка:
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=sportstats.info@gmail.com&su=Запитване%20от%20клуб&body=Моля,%20представете%20се%20и%20попълнете%20следната%20информация:%0A%0A-%20Вашето%20име:%0A-%20Име%20на%20клуба:%0A-%20Град:%0A-%20Адрес:%0A-%20Телефон%20за%20връзка:%0A" target="_blank">
-    sportstats.info@gmail.com
-</a>
-
-      </p>
-      
-    <div class="app-screenshots">
-        <div class="screenshot">
-            <img src="HomePageNew.png" alt="Снимка на приложението 1">
-            <p>Всеки един потрбител може да следи своето развитие. Най-добрият резултат се сравнява с норматива на дадената дисциплина. Ако резултата е под пунктираната линия то означава че този резултат не покрива норматива. Синя линия "50м басейн норматив" </br> Червена линия "25м басейн норматив"</p>
+      <!-- CONTENT -->
+      <div class="container hero__inner">
+        <!-- top strip -->
+        <div class="strip">
+          <span class="strip__badge">LIVE</span>
+          <span class="strip__text">Резултати в реално време • Графики • Нормативи • Клубове и състезатели</span>
+          <a class="strip__link" href="#features">Виж какво получаваш →</a>
         </div>
-        <div class="screenshot">
-            <img src="ShowResultsNew.png" alt="Снимка на приложението 2">
-            <p>Екран с табица за добавяне и изтриване на резултат.</p>
-        </div>
-        <div class="screenshot">
-            <img src="MoreInfoNewTable.png" alt="Снимка на приложението 3">
-            <img src="MoreInfoResults.png" alt="Снимка на приложението 3">
-            <p>Екран който само треньора има достъп до него.Вижда по дати разултатите с подробен анализ.</p>
-        </div>
-        <div class="screenshot">
-            <img src="HomeMobile.png" alt="Снимка на приложението 4">
-            <img src="HomePageMobile1.png" alt="Снимка на приложението 4">
-            <img src="HomeMobile3.png" alt="Снимка на приложението 4">
-            <p>Екраните за мобилни уствойства. Треньорите имат "Заявки" и "Резултати".</p>
-        </div>
-    </div>
-</div>
-<div class="tutorial-section">
-  <h2 class="tutorial-title">Често задавани въпроси ?</h2>
-  <div class="tutorial-list">
-    <div class="tutorial-card">
-      <h4>Как да вляза в отбор ?-Приемане на състезател </h4>
-      <a href="https://www.youtube.com/watch?v=G_HhTLzY6rc" target="_blank">Гледай видео</a>
-    </div>
-    <div class="tutorial-card">
-      <h4>Как да добавя резултат ?</h4>
-      <a href="https://www.youtube.com/watch?v=mhbH8VunbaQ" target="_blank">Гледай видео</a>
-    </div>
-    <div class="tutorial-card">
-      <h4>Как да изтрия резултат ?</h4>
-      <a href="https://youtu.be/3l6M2Gdz1iw" target="_blank">Гледай видео</a>
-    </div>
-    <div class="tutorial-card">
-      <h4>Как да получа достъп до подробната статистика ?</h4>
-      <a href="https://youtu.be/7lATyx9zhXc" target="_blank">Гледай видео</a>
-    </div>
-  </div>
-</div>
 
-</div>
+        <div class="hero__content">
+          <div class="hero__left">
+            <h1 class="hero__h1">
+              Следи прогреса.
+              <span class="accent">Анализирай</span> резултатите.
+              Вземай решения по данни.
+            </h1>
 
-<!-- Sponsors Info Cards 
-<div id="sponsor-cards" class="sponsor-cards-section">
-    <h2 class="sponsor-cards-title">Спонсори</h2>
+            <p class="hero__p">
+              SportStats е уеб система за треньори, състезатели и клубове: резултати, сравнение с нормативи,
+              графики за напредък и сигурно съхранение в облака.
+            </p>
 
-    <div class="sponsor-cards-container">
-        <a href="https://www.decathlon.bg" target="_blank" class="sponsor-card-link">
-            <div class="sponsor-card">
-                <img src="DecatlonLogo.avif" alt="Decathlon" class="card-logo">
-                <h4>Decathlon</h4>
-                <p>Лидер в спортните стоки, предоставящ достъпни решения за спортисти от всички нива.</p>
+            <div class="hero__cta" id="get-started">
+              <a class="btn btn--primary btn--xl" href="#pricing">
+                Започни сега
+                <span class="btn__spark" aria-hidden="true"></span>
+              </a>
+              <a class="btn btn--ghost btn--xl" href="#how">Как работи</a>
             </div>
-        </a>
 
-        <a href="https://gymbeam.bg" target="_blank" class="sponsor-card-link">
-            <div class="sponsor-card">
-                <img src="GymBeamNoName.webp" alt="GymBeam" class="card-logo">
-                <h4>GymBeam</h4>
-                <p>Онлайн магазин за фитнес добавки, здравословни храни и спортна екипировка.</p>
+            <div class="hero__trust">
+              <div class="trustPill">
+                <span class="dot dot--ok" aria-hidden="true"></span>
+                Cloud-ready
+              </div>
+              <div class="trustPill">
+                <span class="dot dot--ok" aria-hidden="true"></span>
+                Real-time визуализации
+              </div>
+              <div class="trustPill">
+                <span class="dot dot--ok" aria-hidden="true"></span>
+                За много спортове
+              </div>
             </div>
-        </a>
+          </div>
 
-        <a href="https://icedout.bg" target="_blank" class="sponsor-card-link">
-            <div class="sponsor-card">
-                <img src="IcedOutNoName.png" alt="Iced Out" class="card-logo">
-                <h4>Iced Out</h4>
-                <p>Най-големият бранд за бижута в България. Известни с премиум качество и визия.</p>
+          <aside class="hero__right" aria-label="Предимства">
+            <div class="glassCard">
+              <div class="glassCard__kicker">Dashboard</div>
+              <div class="glassCard__title">Графики, които се четат за 3 секунди</div>
+              <div class="glassCard__text">Линейни графики за прогрес + сравнение с нормативи и лични цели.</div>
+              <div class="miniStats">
+                <div class="miniStat">
+                  <div class="miniStat__n">+18%</div>
+                  <div class="miniStat__l">прогрес</div>
+                </div>
+                <div class="miniStat">
+                  <div class="miniStat__n">0.12s</div>
+                  <div class="miniStat__l">средно подобрение</div>
+                </div>
+                <div class="miniStat">
+                  <div class="miniStat__n">Live</div>
+                  <div class="miniStat__l">резултати</div>
+                </div>
+              </div>
             </div>
-        </a>
 
-        <a href="https://www.arenawaterinstinct.com" target="_blank" class="sponsor-card-link">
-            <div class="sponsor-card">
-                <img src="ArenaNoBG.png" alt="Арена" class="card-logo">
-                <h4>Арена</h4>
-                <p>Водещ производител на екипировка за плуване и професионални спортни състезания.</p>
+            <div class="glassCard glassCard--thin">
+              <div class="pillRow">
+                <span class="pill">Клубове</span>
+                <span class="pill">Отбори</span>
+                <span class="pill">Състезания</span>
+                <span class="pill">Нормативи</span>
+                <span class="pill">Експорт</span>
+              </div>
             </div>
-        </a>
+          </aside>
+        </div>
 
-        <a href="https://proof.bg" target="_blank" class="sponsor-card-link">
-            <div class="sponsor-card">
-                <img src="Proof.png" alt="Proof" class="card-logo">
-                <h4>Proof</h4>
-                <p>Млада компания, подкрепяща иновативни спортни проекти и дигитализация в спорта.</p>
+        <!-- Hint that there is more (hero is 90vh, plus this arrow) -->
+        <button class="scrollHint" type="button" data-scroll="#features" aria-label="Скролни надолу">
+          <span class="scrollHint__mouse" aria-hidden="true"></span>
+          <span class="scrollHint__text">Надолу</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="sectionHead__kicker">Функции</div>
+          <h2 class="sectionHead__title">Всичко важно — на едно място</h2>
+          <p class="sectionHead__sub">
+            Никакви “експорти и ексели” за да разбереш кой върви нагоре. Виждаш го веднага.
+          </p>
+        </div>
+
+        <div class="grid3">
+          <article class="featCard">
+            <div class="featCard__icon">📈</div>
+            <h3 class="featCard__title">Графики за прогрес</h3>
+            <p class="featCard__text">Линейни диаграми по период, дисциплина, състезател или отбор.</p>
+          </article>
+
+          <article class="featCard">
+            <div class="featCard__icon">⚡</div>
+            <h3 class="featCard__title">Real-time резултати</h3>
+            <p class="featCard__text">Въвеждаш/качваш данни и веднага виждаш ефект върху класиране и статистика.</p>
+          </article>
+
+          <article class="featCard">
+            <div class="featCard__icon">🏁</div>
+            <h3 class="featCard__title">Сравнение с нормативи</h3>
+            <p class="featCard__text">Автоматично сравнение спрямо цели/нормативи и персонални рекорди.</p>
+          </article>
+
+          <article class="featCard">
+            <div class="featCard__icon">👥</div>
+            <h3 class="featCard__title">Клубове и роли</h3>
+            <p class="featCard__text">Треньор/състезател/админ, отбори, заявки, контролиран достъп.</p>
+          </article>
+
+          <article class="featCard">
+            <div class="featCard__icon">☁️</div>
+            <h3 class="featCard__title">Сигурно в облака</h3>
+            <p class="featCard__text">Данните са организирани и защитени. Работиш от всяко устройство.</p>
+          </article>
+
+          <article class="featCard">
+            <div class="featCard__icon">🧾</div>
+            <h3 class="featCard__title">Импорт/експорт</h3>
+            <p class="featCard__text">Подготвено за качване на файлове, отчети, разпечатки и статистики.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOLUTIONS -->
+    <section class="section" id="clubs">
+      <div class="container">
+        <div class="split">
+          <div class="split__a">
+            <div class="sectionHead__kicker">За клубове</div>
+            <h2 class="split__title">Контрол, яснота и по-бързи решения</h2>
+            <p class="split__text">
+              Управлявай състезатели, отбори и състезания. Проследи прогреса и отчетите без хаос.
+            </p>
+            <ul class="checkList">
+              <li>Права и роли</li>
+              <li>История на резултатите</li>
+              <li>Една база данни за целия клуб</li>
+            </ul>
+          </div>
+
+          <div class="split__b">
+            <div class="mockCard">
+              <div class="mockCard__top">
+                <span class="mockDot"></span><span class="mockDot"></span><span class="mockDot"></span>
+                <span class="mockTitle">Club Dashboard</span>
+              </div>
+              <div class="mockRows">
+                <div class="mockRow">
+                  <span class="mockLabel">Активни състезатели</span>
+                  <span class="mockValue">48</span>
+                </div>
+                <div class="mockRow">
+                  <span class="mockLabel">Тренировки/седмица</span>
+                  <span class="mockValue">6</span>
+                </div>
+                <div class="mockRow">
+                  <span class="mockLabel">Лични рекорди (30д)</span>
+                  <span class="mockValue">+12</span>
+                </div>
+              </div>
             </div>
-        </a>
-    </div>
-</div> 
--->   
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="athletes">
+      <div class="container">
+        <div class="split split--reverse">
+          <div class="split__a">
+            <div class="sectionHead__kicker">За състезатели</div>
+            <h2 class="split__title">Знаеш къде си. Знаеш накъде отиваш.</h2>
+            <p class="split__text">
+              Лични графики, история на резултатите, цели и сравнение с нормативи. Без догадки.
+            </p>
+            <ul class="checkList">
+              <li>Лични цели и PR</li>
+              <li>Графики по дисциплини</li>
+              <li>Ясни тенденции</li>
+            </ul>
+          </div>
+
+          <div class="split__b">
+            <div class="statStack">
+              <div class="statCard">
+                <div class="statCard__t">100m</div>
+                <div class="statCard__n">11.24</div>
+                <div class="statCard__s">-0.09 за 30 дни</div>
+              </div>
+              <div class="statCard">
+                <div class="statCard__t">200m</div>
+                <div class="statCard__n">22.88</div>
+                <div class="statCard__s">стабилен прогрес</div>
+              </div>
+              <div class="statCard">
+                <div class="statCard__t">Норматив</div>
+                <div class="statCard__n">Покрит</div>
+                <div class="statCard__s">за регионално</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="coaches">
+      <div class="container">
+        <div class="split">
+          <div class="split__a">
+            <div class="sectionHead__kicker">За треньори</div>
+            <h2 class="split__title">От “усещам” към “виждам”</h2>
+            <p class="split__text">
+              Виж кои методики работят. Проследи натоварване, форма и резултати в една картина.
+            </p>
+            <ul class="checkList">
+              <li>Сравнение между състезатели</li>
+              <li>Трендове и спадове</li>
+              <li>Отчети за период</li>
+            </ul>
+          </div>
+
+          <div class="split__b">
+            <div class="glassCard glassCard--tall">
+              <div class="glassCard__kicker">Coach View</div>
+              <div class="glassCard__title">Група: Юноши</div>
+              <div class="glassCard__text">Филтрирай по дисциплина, период и цел. Получаваш чист извод.</div>
+              <div class="pillRow">
+                <span class="pill pill--hot">trend ↑</span>
+                <span class="pill">top 5</span>
+                <span class="pill">risk</span>
+                <span class="pill">norms</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW -->
+    <section class="section" id="how">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="sectionHead__kicker">Как работи</div>
+          <h2 class="sectionHead__title">3 стъпки. Без драми.</h2>
+          <p class="sectionHead__sub">Качваш/въвеждаш данни, избираш състезатели, получаваш анализ.</p>
+        </div>
+
+        <div class="steps">
+          <div class="stepCard">
+            <div class="stepCard__badge">1</div>
+            <div class="stepCard__title">Създай клуб и роли</div>
+            <div class="stepCard__text">Админ/треньор/състезател. Контрол на достъпа както трябва.</div>
+          </div>
+
+          <div class="stepCard">
+            <div class="stepCard__badge">2</div>
+            <div class="stepCard__title">Въведи или качи резултати</div>
+            <div class="stepCard__text">Състезания, тренировки, дисциплини. Данните стават “живи”.</div>
+          </div>
+
+          <div class="stepCard">
+            <div class="stepCard__badge">3</div>
+            <div class="stepCard__title">Виж прогрес и сравнения</div>
+            <div class="stepCard__text">Графики, нормативи, тенденции. Решаваш по данни.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="section" id="pricing">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="sectionHead__kicker">Цени</div>
+          <h2 class="sectionHead__title">Прост план. Ясна стойност.</h2>
+          <p class="sectionHead__sub">Подходящо за клубове, които искат реални отчети и контрол.</p>
+        </div>
+
+        <div class="pricing">
+          <div class="priceCard priceCard--main">
+            <div class="priceCard__top">
+              <div>
+                <div class="priceCard__name">Club</div>
+                <div class="priceCard__desc">За клубове и треньори</div>
+              </div>
+              <div class="priceCard__badge">Най-избиран</div>
+            </div>
+
+            <div class="priceCard__price">
+              <span class="priceCard__n">50</span>
+              <span class="priceCard__cur">лв</span>
+              <span class="priceCard__per">/ месец</span>
+            </div>
+
+            <ul class="priceList">
+              <li>Роли и права</li>
+              <li>Резултати и история</li>
+              <li>Графики за прогрес</li>
+              <li>Сравнение с нормативи</li>
+              <li>Поддръжка</li>
+            </ul>
+
+            <a class="btn btn--primary btn--block" href="#get-started">Започни сега</a>
+            <div class="priceCard__fine">* Планът може да се разшири според броя членове.</div>
+          </div>
+
+          <div class="priceCard">
+            <div class="priceCard__name">Pilot</div>
+            <div class="priceCard__desc">За тест с малка група</div>
+
+            <div class="priceCard__price priceCard__price--small">
+              <span class="priceCard__n">—</span>
+              <span class="priceCard__per">по договаряне</span>
+            </div>
+
+            <ul class="priceList">
+              <li>Настройка + onboarding</li>
+              <li>Импорт на данни</li>
+              <li>Персонални отчети</li>
+            </ul>
+
+            <a class="btn btn--ghost btn--block" href="#faq">Питай за Pilot</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="sectionHead__kicker">FAQ</div>
+          <h2 class="sectionHead__title">Въпроси, които ще изскочат</h2>
+        </div>
+
+        <div class="faq">
+          <details class="faqItem">
+            <summary>Работи ли за различни спортове?</summary>
+            <p>Да. Моделът е подходящ за дисциплини/резултати и може да се адаптира спрямо спорта.</p>
+          </details>
+
+          <details class="faqItem">
+            <summary>Може ли да се използва на телефон?</summary>
+            <p>Да. Дизайнът е responsive. Админ панелът е удобен и на мобилни устройства.</p>
+          </details>
+
+          <details class="faqItem">
+            <summary>Какво става с данните ми?</summary>
+            <p>Организирани и защитени. Идеята е да имаш история и контрол, не хаос по файлове.</p>
+          </details>
+        </div>
+
+        <div class="ctaBar">
+          <div class="ctaBar__text">
+            <div class="ctaBar__t">Искаш да го видиш в действие?</div>
+            <div class="ctaBar__s">Пускай и правим onboarding за твоя клуб.</div>
+          </div>
+          <a class="btn btn--primary btn--xl" href="#get-started">Започни сега</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <span class="brand__mark" aria-hidden="true">S</span>
+          <div>
+            <div class="footer__title">SportStats</div>
+            <div class="footer__sub">Real-time резултати и анализ</div>
+          </div>
+        </div>
+
+        <div class="footer__links">
+          <a href="#features">Функции</a>
+          <a href="#how">Как работи</a>
+          <a href="#pricing">Цени</a>
+          <a href="#faq">FAQ</a>
+        </div>
+
+        <div class="footer__copy">© <span id="year"></span> SportStats. Всички права запазени.</div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="SportStatsJs.js"></script>
 </body>
 </html>
